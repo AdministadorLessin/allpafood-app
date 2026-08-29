@@ -1,0 +1,180 @@
+@import "node_modules/normalize-scss/sass/normalize";
+
+// Variables
+:root{
+    --green: #3CFB9F;
+    --green2: #18d178;
+    --gris: #F2F5F6;
+    --black: #1f2e27;
+    --dark-blue: #1C4455;
+    --dark-gris: #7c8d92;
+    --input-dark-gris: #cfd6d8;
+    --light-green:#cfffe6;
+    --gold:#C9A11E;
+    
+    --poppins: "Poppins", serif;
+    --days: "Days One", sans-serif;
+    
+    --error:#f76b6b;
+    --error-back:#fdecec;
+    --error-txt:#f76b6b;
+}
+
+// All
+*{
+    box-sizing: border-box;
+}
+
+//Body
+body{
+    font-family: var(--poppins);
+    background: url('../img/texture2.png');
+    color: var(--dark-blue);
+    h1,h2,h3,h4,h5,h6{
+        font-size: 30px;
+        margin: 0px;
+        color: var(--dark-blue);
+        margin: 0px;
+        padding: 0px;
+    }
+    p{
+        margin: 0px;
+        color: var(--dark-blue);
+    }
+    figure{
+        margin: 0px;
+        padding: 0px;
+        display: block;
+    }
+    ul{
+        list-style: none;
+        padding: 0px;
+    }
+}
+
+
+// Clases
+.displayBlock,
+.inlineBlock{
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+}
+
+.displayFlex,
+.inlineFlex{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.fieldSearch{
+    .MuiFormControl-root{
+        width: 100%;
+        .MuiInputBase-root{
+            .MuiSvgIcon-root{
+                color: var(--green);
+                font-size: 30px;
+            }
+            fieldset{
+                border-color: var(--input-dark-gris);
+                border-radius: 50px;
+            }
+        }
+    }
+}
+
+
+// Backdrop
+/*
+.MuiBackdrop-root{
+    backdrop-filter: blur(20px);
+    transition: ease-in-out .3s;
+}
+    */
+
+// Butons
+.btnPrimary{
+    cursor: pointer;
+    height: 50px;
+    color: white;
+    width: auto;
+    border: none;
+    padding: 0px 30px 0px 30px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,.1);
+    text-decoration: none;
+    background: radial-gradient(125% 125% at 50% 90%, var(--green2) 40%, var(--green) 100%);
+    font-weight: 600;
+    
+}
+
+.btnDisabled{
+    filter: grayscale(100%);
+    opacity: .5;
+    pointer-events: none;
+}
+
+.btnIcon{
+    text-decoration: none;
+    span{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        img,
+        svg{
+            margin-right: 10px;
+            width: auto;
+            height: 20px;
+        }
+    }
+}
+
+.btnIconRight{
+    img,svg{
+        margin-right: 0px;
+        margin-left: 10px;
+    }
+}
+
+
+// Loading....
+.disableForms{
+    filter: grayscale(100%);
+    pointer-events: none;
+    transition: all ease-in-out 0.3s;
+    //opacity: .0;
+}
+
+.loadForms{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    svg{
+        circle{
+            color: var(--green);
+        }
+
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

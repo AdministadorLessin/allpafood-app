@@ -1,0 +1,91 @@
+@import '../../../assets/css/mixin.scss';
+
+.dashMweekCont{
+    flex-direction: column;
+    //justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.dashMweekBox{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.dmwaNotfound{
+    background: white;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 15px;
+    text-align: left;
+    padding: 10px 20px 10px 20px;
+    justify-content: flex-start;
+    figure{
+        width: 100px;
+        img{
+            display: block;
+            width: 100%;
+        }
+    }
+    .txt{
+        padding: 0px 0px 0px 20px;
+        h5{
+            font-size: 22px;
+            text-align: left;
+            font-weight: bold;
+            width: 100%;
+        }
+        p{
+            font-size: 16px;
+            color: var(--dark-gris);
+        }
+    }
+    @include mediaTablet{
+        .txt{
+            h5{
+                font-size: 20px;
+            }
+            p{
+                font-size: 15px;
+            }
+        }
+    }
+    @include mediaPhone{
+        .txt{
+            h5{
+                font-size: 18px;
+            }
+            p{
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+.dmwaTerm{
+    justify-content: flex-start;
+    background: white;
+    margin: -10px 0px 10px 0px;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 25px;
+    padding: 5px 10px 5px 10px;
+    width: auto;
+    a{
+        font-size: 12px;
+        text-decoration: none;
+        color: var(--dark-blue);
+        margin-right: 10px;
+        padding-right: 10px;
+        border-right: 1px solid rgba(0,0,0,.15);
+        display: flex;
+        line-height: 1;
+        align-items: center;
+        justify-content: center;
+        svg{
+            width: 12px;
+            margin-right: 5px;
+        }
+        &:last-child{
+            border-right: 0px solid rgba(0,0,0,.15);
+        }
+    }
+}

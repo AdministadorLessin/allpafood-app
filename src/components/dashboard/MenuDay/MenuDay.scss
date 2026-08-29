@@ -1,0 +1,205 @@
+@import '../../../assets/css/mixin.scss';
+
+.dmwItem{
+    width: 100%;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.dmwDate{
+    width: 75px;
+    height: 75px;
+    background: #CDF6FF;
+    border-radius: 20px 0px 0px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    p{
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+        margin: 0px;
+    }
+    .corner{
+        position: absolute;
+        
+        bottom: -13px;
+        right: 0px;
+        width: 13px;
+        height: 13px;
+        svg{
+            width: 100%;
+            display: block;
+            height: 100%;
+        }
+    }
+    button{
+        width: 70px;
+        font-size: 10px;
+        border: none;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,.1);
+        background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+        border-radius: 15px 10px 15px 15px;
+        position: absolute;
+        bottom: -45px;
+        left: 0px;
+        color: white;
+        font-family: var(--poppins);
+        height: 40px;
+        cursor: pointer;
+        font-weight: 700;
+        line-height: 1;
+        svg{
+            font-size: 20px;
+        }
+    }
+    @include madiaPcsmall {
+        width: 55px;
+        height: 65px;
+        p{
+            font-size: 24px;
+        }
+        small{
+            font-size: 12px;
+        }
+    }
+}
+
+.dmwDetails{
+    background: #CDF6FF;
+    width: calc( 100% - 75px );
+    padding: 10px 20px 20px 20px;
+    border-radius: 0px 20px 20px 20px;
+    position: relative;
+    ul{
+        display: flex;
+        padding: 0px;
+        margin: 0px;
+        justify-content: space-between;
+        li{
+            padding: 0px 10px 0px 10px;
+            small{
+                font-size: 12px;
+            }
+            p{
+                font-size: 13px;
+                line-height: 1;
+                font-weight: 600;
+            }
+            &:last-child{
+                padding-right: 0px;
+            }
+            &:first-child{
+                padding-left: 0px;
+            }
+        }
+    }
+    .aditionals{
+        background: rgba(0,0,0,.05);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding: 12px 20px 7px 20px;
+        p{
+            font-size: 12px;
+            strong{
+                font-weight: 600;
+            }
+            
+        }
+    }
+    @include madiaPcsmall {
+        width: calc( 100% - 55px );
+        padding: 10px 10px 10px 10px;
+    }
+    @include mediaLaptop{
+        ul{
+            flex-direction: column;
+        }
+        .aditionals{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 7px 10px 7px 10px;
+        }
+    }
+}
+
+
+.dmwItemDisabled{
+    .dmwDate{
+        background: #ededed;
+        p{
+            color: #889499;
+        }
+        small{
+            color: #889499;
+        }
+        .corner{
+            svg{
+                width: 100%;
+                display: block;
+                height: 100%;
+            }
+        }
+    }
+    .dmwDetails{
+        background: #ededed;
+        ul{
+            li{
+                small,p{
+                    color: #889499;
+                }
+            }
+        }
+        .aditionals{
+            p{
+                color: #889499;
+            }
+        }
+    }
+
+
+}
+
+.dmwItemActive{
+    .dmwDate,.dmwDetails{
+        background: #7affd3;
+    }
+}
+
+.dmwBtnEditar{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    cursor: pointer;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg{
+        font-size: 14px;
+    }
+}
+
+.dpmResumenBtnBox{
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 15px;
+    .btnPrimary{
+        margin-right: 10px;
+        width: calc( 50% - 15px );
+        svg{
+            margin-right: 10px;
+        }
+    }
+}

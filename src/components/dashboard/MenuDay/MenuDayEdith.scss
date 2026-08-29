@@ -1,0 +1,257 @@
+@import '../../../assets/css/mixin.scss';
+
+// Variables Menu
+$backTabMenuLight : #CDF6FF;
+$backTabMenu : hsl(191, 86%, 83%);
+$selectMenu : #cfffe6;
+$errorSelectMenu : #ffdcdc;
+$orderItemVerify: #CDF6FF;
+
+.dpmEditItem{
+    width: 100%;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.dpmEditDate{
+    width: 75px;
+    height: 75px;
+    background: $orderItemVerify;
+    border-radius: 20px 0px 0px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    p{
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+        margin: 0px;
+    }
+    .corner{
+        position: absolute;
+        
+        bottom: -13px;
+        right: 0px;
+        width: 13px;
+        height: 13px;
+        svg{
+            width: 100%;
+            display: block;
+            height: 100%;
+        }
+    }
+    button{
+        width: 70px;
+        font-size: 10px;
+        border: none;
+        background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+        border-radius: 15px 10px 15px 15px;
+        position: absolute;
+        bottom: -45px;
+        left: 0px;
+        color: white;
+        font-family: var(--poppins);
+        height: 40px;
+        cursor: pointer;
+        font-weight: 700;
+        line-height: 1;
+        svg{
+            font-size: 20px;
+        }
+    }
+    @include madiaPcsmall {
+        width: 55px;
+        height: 65px;
+        p{
+            font-size: 24px;
+        }
+        small{
+            font-size: 12px;
+        }
+    }
+}
+
+.dpmEditDetails{
+    background: $orderItemVerify;
+    width: calc( 100% - 75px );
+    padding: 10px 20px 20px 20px;
+    border-radius: 0px 20px 20px 20px;
+    ul{
+        display: flex;
+        padding: 0px;
+        margin: 0px;
+        justify-content: space-between;
+        li{
+            padding: 0px 10px 0px 10px;
+            small{
+                font-size: 12px;
+            }
+            p{
+                font-size: 13px;
+                line-height: 1;
+                font-weight: 600;
+            }
+            &:last-child{
+                padding-right: 0px;
+            }
+            &:first-child{
+                padding-left: 0px;
+            }
+        }
+    }
+    .aditionals{
+        background: rgba(0,0,0,.05);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding: 7px 20px 7px 20px;
+        p{
+            font-size: 12px;
+            strong{
+                font-weight: 600;
+            }
+            
+        }
+    }
+    @include madiaPcsmall {
+        width: calc( 100% - 55px );
+        padding: 10px 10px 10px 10px;
+    }
+    @include mediaLaptop{
+        ul{
+            flex-direction: column;
+        }
+        .aditionals{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 7px 10px 7px 10px;
+        }
+    }
+}
+
+.dpmEditItemError{
+    .dpmEditDate,
+    .dpmEditDetails{
+        background: $errorSelectMenu;
+        .corner{
+            svg{
+                path{
+                    fill: $errorSelectMenu;
+                }
+            }
+        }
+    }
+}
+
+.dpmEditModal{
+    width: 90%;
+    max-width: 1000px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+
+.dpmEditMenuCats{
+    justify-content: flex-start;
+    margin: 0px;
+    padding: 0px;
+    li{
+        border: 1px solid rgba(0,0,0,.15);
+        padding: 5px 15px 5px 15px;
+        margin-right: 10px;
+        border-radius: 20px;
+        text-transform: capitalize;
+        font-size: 16px;
+        letter-spacing: 1px;
+        cursor: pointer;
+    }
+    .active{
+        background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+        color: white;
+        border: 1px solid rgba(0,0,0,.05);
+    }
+}
+
+.dpmEditMenuList{
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 20px 0px 0px 0px;
+}
+
+.dpmEditMenuItem{
+    width: calc( 50% - 10px );
+    flex-wrap: wrap;
+    border: 1px solid rgba(0,0,0,.07);
+    margin-bottom: 10px;
+    border-radius: 20px;
+    padding: 10px;
+    cursor: pointer;
+    background: white;
+    transition: ease-in-out .3s;
+    figure{
+        width: 70px;
+        height: 70px;
+        background: rgba(0,0,0,.1);
+        border-radius: 50%;
+        overflow: hidden;
+        img{
+            width: 100%;
+        }
+    }
+    .txt{
+        width: calc( 100% - 70px );
+        padding-left: 15px;
+        h4{
+            font-size: 16px;
+        }
+        p{
+            font-size: 14px;
+        }
+    }
+    &:hover{
+        background: var(--light-green);
+    }
+}
+
+.dpmEditMenuItemAct{
+    background: var(--green) !important;
+    .txt{
+        h4{
+            color: white;
+        }
+        p{
+            color: white;
+        }
+    }
+}
+
+.dpmEditMenuItemAct{
+    background: var(--light-green);
+}
+
+.dpmEditBtnBox{
+    button{
+        background: var(--dark-blue);
+        border: 0px solid rgba(0,0,0,.15);
+        height: 40px;
+        padding: 0px 20px 0px 20px;
+        color: white;
+        font-size: 16px !important;
+        border-radius: 20px;
+        margin-right: 5px;
+        cursor: pointer;
+    }
+
+}

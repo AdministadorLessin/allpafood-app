@@ -1,0 +1,57 @@
+
+.mainLayoutBoxMotorizado{
+    padding: 0px;
+    height: 100vh;
+}
+
+.motorizadoList{
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    max-width: 400px;
+    width: 90%;
+    .paperItem{
+        background: rgba(255,255,255,.9);
+    }
+}
+
+.motDeliveryItem{
+    background: white;
+    padding: 20px;
+    border-radius: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,.1);
+    figure{
+        width: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+        img{
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+    }
+    .txt{
+        width: calc( 100% - 75px );
+        padding: 0px 0px 0px 10px;
+        h4{
+            font-size: 16px;
+        }
+        p{
+            color: var(--dark-gris);
+            font-size: 12px;
+        }
+    }
+    .checkBox{
+        width: 30px;
+        .circl{
+            width: 100%;
+            height: 30px;
+            border: 3px solid var(--green);
+            border-radius: 50%;
+        }
+    }
+}

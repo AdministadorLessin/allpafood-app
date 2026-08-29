@@ -1,0 +1,15 @@
+.regDatosClaveValid{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    width: 100%;
+    text-align: left;
+    p{
+        color: var(--error);
+        font-size: 12px;
+        font-weight: 600;
+        width: 100%;
+    }
+}

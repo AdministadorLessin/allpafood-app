@@ -1,0 +1,85 @@
+@import '../../../assets/css/mixin.scss';
+
+.helloPaper{
+    background: linear-gradient(to bottom, rgb(221 255 216) 0%, rgb(143 255 235) 100%);
+    border-radius: 20px;
+    padding: 30px 10px 30px 30px;
+    height: 190px;
+    align-items: center;
+    display: flex;
+    figure{
+        width: 200px;
+        img{
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    }
+    .txt{
+        width: 100%;
+        small{
+            text-transform: capitalize;
+        }
+        h1{
+            
+            font-weight: normal;
+            font-size: 30px;
+            line-height: 1;
+            position: relative;
+            margin: 10px 0px 5px 0px;
+            strong{
+                font-weight: 700;
+            }
+
+        }
+        p{
+            font-size: 16px;
+            
+        }
+        a{
+            background: var(--dark-blue);
+            text-decoration: none;
+            color: white;
+            line-height: 1;
+            margin-top: 10px;
+            font-size: 14px;
+            border-radius: 20px;
+            padding: 10px 15px 10px 15px;
+            display: inline-block;
+        }
+    }
+    @include mediaLaptop{
+        padding: 25px;
+        .txt{
+            h1{
+                font-size: 26px;
+            }
+            p{
+                font-size: 17px;
+            }
+        }
+    }
+    @include mediaTablet{
+        padding: 20px;
+        .txt{
+            h1{
+                font-size: 26px;
+            }
+            p{
+                font-size: 16px;
+            }
+        }
+    }
+    @include mediaPhone{
+        padding: 20px;
+        height: auto;
+        .txt{
+            h1{
+                font-size: 22px;
+            }
+            p{
+                font-size: 14px;
+            }
+        }
+    }
+}

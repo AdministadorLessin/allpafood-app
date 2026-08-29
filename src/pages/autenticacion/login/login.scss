@@ -1,0 +1,206 @@
+@import '../../../assets/css/mixin.scss';
+
+.loginPageCont{
+    position: relative;
+}
+
+.loginPage{
+    flex-wrap: wrap;
+    height: 100vh;
+    padding: 30px;
+    //background: white;
+    z-index: 2;
+    @include mediaMiniPhone{
+        padding: 15px;
+    }
+}
+
+.loginLeft{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include mediaTablet{
+        width: 100%;
+    }
+}
+
+.loginBox{
+    flex-direction: column;
+    width: 100%;
+    max-width: 420px;
+    figure{
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 30px;
+        display: inline-block;
+        img{
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    }
+    form{
+        width: 100%;
+    }
+    @include mediaMiniPhone{
+        figure{
+            max-width: 220px;
+        }
+    }
+}
+
+.loginTextField{
+    margin-bottom: 24px;
+    width: 100%;
+    .MuiFormControl-root{
+        width: 100%;
+        .MuiFormLabel-root{
+            left: 45px;
+            color: var(--dark-gris);
+            font-family: var(--font1);
+        }
+        .MuiInputBase-root{
+            border-radius: 30px;
+            padding-left: 45px;
+            background: white;
+            border: 1px solid #D0DDD1;
+            color: var(--dark-blue);
+            font-family: var(--font1);
+            font-size: 14px;
+            overflow: hidden;
+            &::before,
+            &::after{
+                display: none;
+            }
+            input{
+                border-radius: 25px;
+                background-color: white !important;
+            }
+
+        }
+        &::after{
+            content: '';
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            margin-top: auto;
+            margin-bottom: auto;
+            left: 20px;
+            display: block;
+            opacity: 1;
+        }
+    }
+    .MuiInputBase-root.Mui-error{
+        border: 1px solid var(--error) !important;
+    }
+}
+
+.loginTextFieldUser{
+    .MuiFormControl-root{
+        &::after{
+            background: url('../../../assets/img/ico_usuario.svg') center no-repeat;
+            background-size: auto;
+        }
+    }
+
+}
+.loginTextFieldClave{
+    .MuiFormControl-root{
+        &::after{
+            background: url('../../../assets/img/ico_clave.svg') center no-repeat;
+            background-size: auto;
+        }
+    }
+}
+
+.loginLinks{
+    justify-content: space-between;
+    padding: 0px 10px 0px 10px;
+    margin-bottom: 24px;
+    a{
+        font-size: 14px;
+        color: var(--dark-blue);
+    }
+    .MuiFormGroup-root{
+        .MuiFormControlLabel-root{
+            .MuiTypography-root{
+                font-size: 14px;
+                color: var(--dark-gris);
+            }
+            .MuiButtonBase-root{
+                color: var(--dark-gris);
+            }
+        }
+    }
+    @include mediaMiniPhone{
+        .MuiFormGroup-root{
+            .MuiFormControlLabel-root{
+                .MuiTypography-root{
+                    font-size: 12px;
+                }
+                .MuiButtonBase-root{
+                    padding: 4px;
+                    .MuiSvgIcon-root {
+                        width: 12px;
+                        height: 12px;
+                    }
+                }
+            }
+        }
+        a{
+            font-size: 12px;
+        }
+    }
+}
+
+.loginErrors{
+    margin-bottom: 10px;
+    p{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 14px;
+        color: var(--error);
+        svg{
+            font-size: 18px;
+            margin-right: 5px;
+        }
+    }
+}
+
+.loginBtn{
+    .btnPrimary{
+        width: 100%;
+    }
+}
+
+.loginExternal{
+    .btnIcon{
+        margin-top: 15px;
+    }
+    .btnLogFb{
+        background: #3D5694;
+    }
+    .btnLogGoogle{
+        background: #ffffff;
+        color: var(--dark-blue);
+        
+    }
+}
+
+
+.loginRight{
+    width: 50%;
+    background: var(--green);
+    background-size: cover;
+    height: 100%;
+    border-radius: 40px;
+    @include mediaTablet{
+        display: none;
+    }
+
+}
+

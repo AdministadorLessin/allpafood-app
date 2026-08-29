@@ -1,0 +1,27 @@
+@import '../../../assets/css/mixin.scss';
+
+.regSide{
+    width: 40%;
+    background: var(--green);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px 50px 50px 50px;
+    overflow: hidden;
+    img{
+        object-fit: cover;
+        width: 100%;
+        height:  auto;
+    }
+    //figure{
+    //    img{
+    //        display: block;
+    //        width: 85%;
+    //        max-width: 400px;
+    //    }
+    //}
+    @include mediaLaptop{
+        display: none;
+    }
+}

@@ -1,0 +1,278 @@
+@import '../../../assets/css/mixin.scss';
+
+.ubiPageSearch{
+    width: 100%;
+    .MuiFormControl-root{
+        width: 100%;
+        background: #FDFFF8;
+        .MuiInputBase-root{
+            border-radius: 30px;
+            .MuiOutlinedInput-notchedOutline{
+                border-color: #D5E2D6;
+                
+            }
+
+        }
+        .MuiInputAdornment-root{
+            svg{
+                color: #A2BDA4;
+            }
+        }
+    }
+}
+
+.ubiPageMap{
+    flex-wrap: wrap;
+    margin-top: 25px;
+    align-items: flex-start;
+}
+
+.ubiPageMapLeft{
+    width: 380px;
+    .paperItem{
+        margin-bottom: 25px;
+        box-shadow: 0px 0px 20px 0px rgba(0,0,0,.05);
+    }
+    .btnBox{
+        display: flex;
+        justify-content: space-between;
+        .btnAgregarDireccion{
+            width: calc( 100% - 60px );
+        }
+    }
+    @include mediaTablet{
+        width: 100%;
+    }
+}
+
+.ubiFormDisabled{
+    filter: grayscale(100%);
+    opacity: .7;
+    pointer-events: none;
+}
+
+.btnAgregarDireccion{
+    background: var(--dark-blue);
+    border: none;
+    color: white;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border-radius: 50px;
+    font-size: 14px;
+    padding: 0px 20px 0px 20px;
+    justify-content: center;
+    cursor: pointer;
+    img{
+        margin-right: 10px;
+    }
+}
+
+.btnCancelCircle{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--dark-blue);
+}
+
+.textFieldBox{
+    width: 100%;
+    display: inline-block;
+    margin-bottom: 0px;
+    .MuiTextField-root{
+        width: 100%;
+        
+    
+        margin-bottom: 15px;
+        .MuiFormLabel-root{
+            left: 15px;
+            color: var(--dark-gris);
+        }
+        .MuiInputBase-root{
+            background: white;
+            border-radius: 30px;
+            border: 1px solid #D5E2D6;
+            input{
+                padding-left:25px;
+                color: var(--dark-blue);
+            }
+            &::before,
+            &::after{
+                display: none;
+            }
+        }
+    }
+}
+
+.ubiPageMapList{
+    display: flex;
+    width: 100%;
+}
+
+.ubiPageMapListBox{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between; 
+    width: 100%;
+}
+
+.ubiPageMapItem{
+    display: flex;
+    flex-wrap: wrap;
+    background: white;
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,.1);
+    width: 100%;
+    padding: 15px 15px 15px 25px;
+    border-radius: 15px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    .txt{
+        width: calc( 100% - 100px );
+        h3{
+            font-size: 14px;
+        }
+        p{
+            font-size: 12px;
+            color: var(--dark-gris);
+        }
+    }
+    .actions{
+        width: 30px;
+        display: flex;
+        justify-content: space-between;
+        .check{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            span{
+                width: 12px;
+                height: 6px;
+                border-bottom: 3px solid var(--green);
+                border-left: 3px solid var(--green);
+                display: block;
+                transform: rotate(-45deg);
+            }
+        }
+        .remove{
+            background: #E8A833;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            
+            svg{
+                color: white;
+                font-size: 20px;
+            }
+        }
+    }
+}
+
+.ubiPageMapItemAct{
+    background: #55c571;
+    .txt{
+        h3{
+            color: white;
+        }
+        p{
+            color: white;
+        }
+    }
+}
+
+
+// Right
+.ubiPageMapRight{
+    width: calc( 100% - 380px );
+    height: 80vh;
+    position: relative;
+    padding: 0px 0px 0px 30px;
+    @include mediaTablet{
+        width: 100%;
+        padding: 0px 0px 0px 0px;
+        height: 450px;
+    }
+}
+
+.ubiPageMapApi{
+    position: relative;
+}
+
+.ubiPageMapApiStyle{
+    width: 100%;
+    height: 70vh;
+    border-radius: 25px;
+    border: 1px solid #D2D2D2;
+    overflow: hidden;
+    position: relative;
+    //display: flex;
+    @include mediaTablet{
+        height: 450px;
+    }
+}
+
+// Google Map Api
+.searchMapBox{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: auto;
+    width: 500px;
+    &::before{
+        width: 18px;
+        height: 22.36px;
+        background: url('../../../assets/img/ico_marker_pin2.png') center no-repeat;
+        background-size: 100%  100%;
+        position: absolute;
+        top: 0px;
+        left: 18px;
+        bottom: 0px;
+        margin-top: auto;
+        content: '';
+        margin-bottom: auto;
+        z-index: 1;
+    }
+    input{
+        width: 100%;
+        height: 50px;
+        border-radius: 25px;
+        border: none;
+        box-shadow: 2px 4px 5px 0px rgba(0,0,0,.3);
+        outline: none;
+        padding: 0px 20px 0px 50px;
+        color: var(--dark-blue);
+        font-size: 16px;
+        display: block;
+        font-family: var(--poppins);
+        position: relative;
+
+    }
+}
+
+.searchNotCobertura{
+    position: absolute;
+    z-index: 4;
+    left: 10px;
+    bottom: 40px;
+    border-radius: 20px;
+    background: var(--error);
+    p{
+        color: white;
+        padding: 5px 20px 5px 20px;
+        font-size: 12px;
+    }
+}

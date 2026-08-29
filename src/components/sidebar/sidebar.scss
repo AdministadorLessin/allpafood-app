@@ -1,0 +1,255 @@
+@import '../../assets/css/mixin.scss';
+
+// Sidebar
+.sideBar{
+    padding: 20px;
+    width: 100px;
+    height: 90%;
+    flex-direction: column;
+    position: fixed;
+    z-index: 99;
+    box-sizing: border-box;
+    left: 20px;
+    top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fbffff;
+    border-radius: 50px;
+    box-shadow: 1px 3px 5px 0px rgba(0,0,0,.05);
+    .sideLogo{
+        display: block;
+        width: 40px;
+        height: auto;
+        margin-top: 11px;
+        img{
+            width: 100%;
+            height: auto;
+        }
+    }
+    @include mediaTablet{
+        position: fixed;
+        top: 0px;
+        height: 100px;
+        width: 100%;
+        left: 0px;
+        z-index: 99;
+        background: white;
+        flex-direction: row;
+        border-radius: 0px 0px 20px 20px;
+    }
+    @include mediaPhone{
+        padding: 0px 20px 0px 20px;
+        height: 65px;
+        border-radius: 0px 0px 20px 20px;
+        .sideLogo{
+            width: 40px;
+        }
+    }
+}
+
+//MenuSidebar
+.sideMenu{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    ul{
+        margin: 0px;
+        padding: 0px;
+        li{
+            padding: 10px 0px 10px 0px;
+            margin: 10px 0px 10px 0px;
+            .sideLink,
+            a{
+                text-decoration: none;
+                cursor: pointer;
+                color: var(--black);
+                width: 100px;
+                .iconSvg{
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    transition: all ease-in-out .3s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    img{
+                        width: auto;
+                        height: 30px;
+                    }
+                }
+                span{
+                    font-size: 0px;
+                    display: none;
+                }
+                &:hover{
+                    .iconSvg{
+                        background: rgba(0,0,0,.05);
+                    }
+                }
+            }
+        }
+        .active{
+            a{
+                .iconSvg{
+                    background: var(--green);
+                    color: white;
+                }
+                span{
+                    color: var(--black);
+                }
+            }
+        }
+    }
+    @include mediaTablet{
+        flex-direction: row;
+        opacity: 0;
+        ul{
+            display: flex;
+            li{
+                margin: 0px;
+                padding: 0px;
+                .sideLink,
+                a{
+                    .iconSvg{
+                        width: 40px;
+                        height: auto;
+                        img{
+                            width: auto;
+                            height: 22px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.sideMenu{
+    @include mediaTablet{
+        opacity: 0;
+        pointer-events: none;
+        position: fixed;
+        width: 100%;
+        top: 0px;
+        left: 100px;
+        height: 100%;
+        background: white;
+        transition: all ease-in-out .3s;
+        display: flex;
+        flex-direction: column;
+        ul{
+            flex-direction: column;
+            
+            li{
+                margin: 0px 0px 0px;
+                display: flex;
+                width: auto;
+                padding: 10px 0px 10px 0px;
+                border-bottom: 1px solid rgba(0,0,0,.15);
+                a{
+                    width: auto;
+                    display: flex;
+                    span{
+                        display: block;
+                        color: var(--dark-gris);
+                        font-size: 18px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.sideMenuAct{
+    opacity: 1;
+    pointer-events: visible;
+    left: 0px;
+}
+
+
+// Profile menu
+.sideProfile{
+    figure{
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        .imgLoad,
+        img{
+            width: 100%;
+            height: auto;
+        }
+        .imgLoad{
+            height: 60px;
+            background: rgba(0,0,0,.15);
+        }
+    }
+    @include mediaPhone{
+        figure{
+            width: 40px;
+            height: 40px;
+            .imgLoad,
+            img{
+                width: 100%;
+            }
+            .imgLoad{
+                height: 40px;
+            }
+        }
+    }
+}
+
+.sideHamburger{
+    display: none;
+    @include mediaTablet{
+        display: block;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        margin-left: 10px;
+        border-radius: 50%;
+        background: #edfbe1;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dcefcc;
+        svg{
+            color: var(--green);
+        }
+    }
+}
+
+/*
+.sideMenu{
+
+}
+*/
+.sideClose{
+    display: none;
+    @include mediaTablet{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 5%;
+        right: 5%;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #edfbe1;
+        color: var(--green);
+    }
+    
+}
+
+.sideLogoResp{
+    display: none;
+    @include mediaTablet{
+        display: block;
+        margin-bottom: 30px;
+        img{
+            width: 200px;
+        }
+    }
+}

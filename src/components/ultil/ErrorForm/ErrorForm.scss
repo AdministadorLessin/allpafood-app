@@ -1,0 +1,15 @@
+.barValidation{
+    background: var(--error-back);
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 15px 10px 15px;
+    border-radius: 25px;
+    svg{
+        color: var(--error);
+        margin-right: 10px;
+    }
+    p{
+        color: var(--error);
+        font-size: 14px;
+    }
+}

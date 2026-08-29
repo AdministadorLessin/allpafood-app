@@ -1,0 +1,55 @@
+.cardNoticaLoad{
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 25px;
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,.07);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    figure{
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ebfaff;
+        svg{
+            font-size: 30px;
+            opacity: .2;
+        }
+    }
+    h3{
+        border-bottom: 1px solid rgba(0,0,0,.15);
+        font-size: 30px;
+        padding: 10px 20px 13px 20px;
+    }
+    .txt{
+        padding: 20px 20px 20px 20px;
+        p{
+            margin: 0px;
+            color: var(--dark-gris);
+        }
+        .date{
+            position: relative;
+            padding: 0px 0px 0px 25px;
+            color: var(--dark-gris);
+            margin: 10px 0px 0px 0px;
+            font-size: 14px;
+            &::before{
+                content: '';
+                width: 16px;
+                height: 16px;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                background: url('../../../assets/img/ico_blog_date.png') center no-repeat;
+                background-size: 100% 100%;
+            }
+        }
+    }
+
+}

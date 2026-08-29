@@ -1,0 +1,96 @@
+@import '../../../assets/css/mixin.scss';
+
+// Items
+.paperItem{
+    background: rgba(255,255,255,.8);
+    padding: 30px;
+    display: inline-block;
+    width: 100%;
+    border-radius: 25px;
+    backdrop-filter: blur(1000px);
+    box-shadow: 0px 10px 30px 0px rgba(0,0,0,.05);
+    overflow: hidden;
+    .title{
+        width: 100%;
+        display: inline-block;
+        padding: 0px 0px 0px 55px;
+        margin: 0px 0px 30px 0px;
+        position: relative;
+        .ico{
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            border-radius: 50%;
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            margin-top: auto;
+            margin-bottom: auto;
+            background: linear-gradient(to bottom,  rgba(225,243,228,1) 0%,rgba(255,248,226,1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,.02);
+            img{
+                width: auto;
+                display: block;
+                height: 20px;
+            }
+        }
+        h3{
+            font-size: 16px;
+        }
+    }
+    @include mediaLaptop{
+        padding: 25px;
+        .title{
+            padding: 0px 0px 0px 45px;
+            .ico{
+                width: 35px;
+                height: 35px;
+                img{
+                    width: auto;
+                    height: 18px;
+                }
+            }
+            h3{
+                font-size: 15px;
+            }
+        }
+    }
+    @include mediaTablet{
+        padding: 20px;
+        .title{
+            padding: 0px 0px 0px 38px;
+            .ico{
+                width: 30px;
+                height: 30px;
+                img{
+                    width: auto;
+                    height: 16px;
+                }
+            }
+            h3{
+                font-size: 14px;
+            }
+        }
+    }
+    @include mediaPhone{
+        padding: 15px;
+        
+        .title{
+            padding: 0px 0px 0px 30px;
+            .ico{
+                width: 25px;
+                height: 25px;
+                img{
+                    width: auto;
+                    height: 14px;
+                }
+            }
+            h3{
+                font-size: 13px;
+            }
+        }
+    }
+}

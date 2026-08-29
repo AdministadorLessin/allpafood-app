@@ -1,0 +1,23 @@
+@import '../../../assets/css/mixin.scss';
+
+// News Dashboard
+.homeNewsCarrusel{
+    padding: 0px !important;
+    overflow: hidden;
+}
+
+// List Noticias
+.hnNotList{
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.hnNotItem{
+    @include mediaPhone{
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+}
+
+

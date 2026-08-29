@@ -1,0 +1,200 @@
+@import '../../../assets/css/mixin.scss';
+
+.dashCalcObject{
+    padding: 0px 0px 20px 0px;
+}
+
+.semiChart{
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    .txt{
+        display: flex;
+        flex-direction: column;
+        small{
+            color: var(--dark-gris);
+            font-size: 12px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        p{
+            color: var(--dark-gris);
+            font-size: 14px;
+            line-height: 1;
+        }
+    }
+    @media screen and (max-width: 1700px) {
+        width: 280px;
+    }
+    @media screen and (max-width: 1550px) {
+        width: 220px;
+    }
+    @media screen and (max-width: 1450px) {
+        width: 180px;
+        .txt{
+            small{
+                font-size: 10px;
+            }
+            p{
+                font-size: 12px;
+            }
+        }
+    }
+    @media screen and (max-width: 1200px) {
+        width: 140px;
+        .txt{
+            small{
+                font-size: 8px;
+            }
+            p{
+                font-size: 10px;
+            }
+        }
+    }
+    @include mediaPhone{
+        flex-direction: column;
+        width: 100px;
+        .txt{
+            text-align: center;
+            margin-top: -12px;
+        }
+    }
+}
+
+.doChartList{
+    width: calc( 100% - 320px );
+    @media screen and (max-width: 1700px) {
+        width: calc( 100% - 280px );
+    }
+    @media screen and (max-width: 1550px) {
+        width: calc( 100% - 220px );
+    }
+    @media screen and (max-width: 1450px) {
+        width: calc( 100% - 180px );
+    }
+    @media screen and (max-width: 1200px) {
+        width: calc( 100% - 140px );
+    }
+    @include mediaPhone{
+        width: calc( 100% - 100px );
+    }
+}
+
+.semiChartBox{
+    width: 220px;
+    margin-top: 20px;
+    position: relative;
+    img{
+        width: auto;
+        height: 30px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 30%;
+    }
+    @media screen and (max-width: 1750px) {
+        width: 180px;
+    }
+    @media screen and (max-width: 1550px) {
+        width: 140px;
+    }
+    @media screen and (max-width: 1450px) {
+        width: 100px;
+        margin-top: 0px;
+        svg{
+            transform: translateY(0px);
+        }
+        img{
+            height: 20px;
+        }
+    }
+
+}
+
+.doChartItem{
+    width: 33.3%;
+    .txt{
+        display: flex;
+        flex-direction: column;
+        small{
+            color: var(--dark-gris);
+            font-size: 12px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        p{
+            color: var(--dark-gris);
+            font-size: 14px;
+            line-height: 1;
+            b{
+                font-size: 8px;
+                font-weight: normal;
+            }
+        }
+    }
+    @media screen and (max-width: 1550px) {
+        .txt{
+            small{
+                font-size: 11px;
+            }
+            p{
+                font-size: 12px;
+            }
+        }
+    }
+    @media screen and (max-width: 1200px) {
+        .txt{
+            small{
+                font-size: 8px;
+            }
+            p{
+                font-size: 10px;
+            }
+        }
+    }
+    @include mediaPhone{
+        flex-direction: column;
+        .txt{
+            text-align: center;
+            margin-top: -12px;
+        }
+    }
+}
+
+.chartRadial{
+    width: 90px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .apexcharts-canvas{
+        width: 90px;
+    }
+    img{
+        width: auto;
+        height: 15px;
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+    @media screen and (max-width: 1450px) {
+        width: 70px;
+        .apexcharts-canvas{
+            width: 80px;
+        }
+        img{
+            height: 12px;
+        }
+    }
+    @media screen and (max-width: 1300px) {
+        width: 50px;
+        .apexcharts-canvas{
+            width: 70px;
+        }
+        img{
+            height: 12px;
+        }
+    }
+}

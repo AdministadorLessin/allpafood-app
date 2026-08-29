@@ -1,0 +1,114 @@
+@import '../../../../assets/css/mixin.scss';
+
+.profileEdithAvatar{
+    h3{
+        margin-bottom: 20px;
+        width: 100%;
+        text-align: center;
+        font-size: 25px;
+    }
+    @include mediaTablet{
+        h3{
+            font-size: 22px;
+        }
+    }
+    @include mediaPhone{
+        h3{
+            font-size: 18px;
+        }
+    }
+}
+
+.peaList{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0px;
+    margin: 0px;
+    justify-content: center;
+    align-items: center;
+    @include mediaPhone{
+        max-height: 400px;
+        overflow: auto;
+    }
+    li{
+        padding: 5px 5px 5px 5px;
+        position: relative;
+        cursor: pointer;
+        figure{
+            overflow: hidden;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            border: 4px solid white;
+            position: relative;
+            img{
+                display: block;
+                width: 100%;
+                height: auto;
+            }
+            &::before{
+                content: '';
+                width: 100%;
+                height: 100%;
+                background: white;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                opacity: 0;
+            }
+            @include mediaTablet{
+                width: 100px;
+                height: 100px;
+            }
+            @include mediaPhone{
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        &:hover{
+            figure{
+                &::before{
+                    opacity: .4;
+                }
+            }
+
+        }
+        @include mediaTablet{
+            padding: 3px 3px 3px 3px;
+        }
+        @include mediaPhone{
+            padding: 1px 1px 1px 1px;
+            width: 33.3%;
+        }
+    }
+    .active{
+        figure{
+            border: 4px solid var(--green);
+        }
+    }
+}
+
+.peaBtnBox{
+    margin: 20px 0px 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .btnPrimary{
+        margin: 0px 10px 0px 0px;
+        svg{
+            margin-right: 10px;
+        }
+    }
+    @include mediaPhone{
+        .btnPrimary{
+            height:35px;
+            font-size: 13px;
+            padding: 0px 15px 0px 10px;
+            svg{
+                margin-right: 5px;
+                font-size: 14px;
+            }
+        }
+    }
+}

@@ -1,0 +1,101 @@
+.bpDetTitle{
+    .date{
+        position: relative;
+        padding: 0px 0px 0px 25px;
+        color: var(--dark-gris);
+        margin: 10px 0px 0px 0px;
+        font-size: 14px;
+        &::before{
+            content: '';
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            background: url('../../../assets/img/ico_blog_date.png') center no-repeat;
+            background-size: 100% 100%;
+        }
+    }
+}
+
+.bpBackContent{
+    align-items: flex-end;
+    justify-content: flex-end;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    .btnBack{
+        background: var(--dark-blue);
+        height: 50px;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        padding: 0px 30px 0px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
+        span{
+            position: relative;
+            display: inline-block;
+            padding: 0px 0px 0px 20px;
+            &::before{
+                content: '';
+                width: 15px;
+                height: 15px;
+                background: url('../../../assets/img/ico_arrow_blanco.svg') center no-repeat;
+                background-size: 100% 100%;
+                transform: scale(-1,1);
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                margin-top: auto;
+                margin-bottom: auto;
+            }
+        }
+    }
+}
+
+.bpDetCont{
+    figure{
+        border-radius: 25px;
+        overflow: hidden;
+        width: 100%;
+        margin: 20px 0px 20px 0px;
+        box-shadow: 0px 0px 20px 0px rgba(0,0,0,.07);
+        img{
+            width: 100%;
+            display: block;
+            height: 500px;
+            object-fit: cover;
+        }
+    }
+    p{
+        color: var(--dark-gris);
+        margin-bottom: 25px;
+    }
+    ul{
+        font-size: 16px;
+        color: var(--dark-gris);
+        margin: 0px 0px 20px 0px;
+        li{
+            position: relative;
+            padding: 3px 0px 3px 20px;
+            &::before{
+                position: absolute;
+                top: 11px;
+                left: 0px;
+                content: '';
+                width: 7px;
+                height: 7px;
+                background: var(--green);
+                border-radius: 50%;
+            }
+        }
+    }
+    a{
+        color: var(--dark-blue);
+        
+    }
+}

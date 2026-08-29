@@ -1,0 +1,38 @@
+@import '../../../assets/css/mixin.scss';
+
+.facturasTable{
+    background: white;
+    border-radius: 25px !important;
+    overflow: hidden;
+    padding: 10px 20px 0px 20px;
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,.05);
+}
+
+.facturasTable{
+    .btnPrimary{
+        padding: 10px 20px 10px 20px;
+        height: auto;
+        margin: 7px 0px 0px 0px;
+    }
+}
+
+
+
+.factModal{
+    background: #f7fff6;
+    width: 550px;
+    padding: 20px 30px 20px 30px;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    outline: none;
+
+    @include mediaTablet{
+        width: 450px;
+    }
+    @include mediaPhone{
+        width: 95%;
+        padding: 15px 10px 15px 10px;
+    }
+}

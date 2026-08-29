@@ -1,0 +1,48 @@
+.yapeFormContent{
+    padding: 20px;
+}
+
+.yapeFormBox{
+    width: calc( 100% - 200px );
+    padding-right: 10%;
+}
+
+.yapeFormSwiper{
+    width: 200px;
+    
+    .swiper{
+        padding: 0px 15px 20px 15px;
+    }
+    .swiper-button-prev,
+    .swiper-button-next{
+        width: 30px;
+        height: 30px;
+        background: var(--green);
+        border-radius: 50%;
+        &::after{
+            font-size: 12px;
+            color: white;
+        }
+    }
+    .swiper-button-prev{
+        left: 0px;
+    }
+    .swiper-button-next{
+        right: 0px;
+    }
+    .swiper-pagination {
+        bottom: 0px;
+    }
+    .swiper-pagination-bullet-active{
+        background: var(--green);
+    }
+}
+
+.yapeSwiperItem{
+    width: 100%;
+    height: auto;
+    img{
+        width: 100%;
+        height: auto;
+    }
+}

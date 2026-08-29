@@ -1,0 +1,68 @@
+@import '../../../assets/css/mixin.scss';
+
+.preFreBox{
+    .MuiPaper-root{
+        box-shadow: 0px 0px 20px 0px rgba(0,0,0,.1);
+        border-radius: 25px !important;
+        margin-bottom: 25px;
+        .MuiAccordionSummary-content {
+            margin: 0px !important;
+        }
+        .MuiAccordion-heading{
+            .MuiButtonBase-root{
+                min-height: auto;
+                padding: 20px 30px 20px 20px;
+                flex-direction: row-reverse;
+                @include mediaTablet{
+                    padding: 15px 30px 15px 15px;
+                }
+                @include mediaPhone{
+                    padding: 10px 30px 10px 10px;
+                }
+                span{
+                    color: var(--dark-blue);
+                    font-size: 22px;
+                    font-weight: 600;
+                    @include mediaTablet{
+                        font-size: 20px;
+                    }
+                    @include mediaPhone{
+                        font-size: 18px;
+                    }
+                    @include mediaMiniPhone{
+                        font-size: 16px;
+                    }
+                }
+                .MuiAccordionSummary-expandIconWrapper{
+                    margin-right: 10px;
+                    color: var(--dark-blue);
+                    @include mediaPhone{
+                        margin-right: 10px;
+                    }
+                }
+            }
+        }
+        .MuiCollapse-root{
+            
+            .MuiAccordionDetails-root {
+                padding: 0px 20px 30px 30px;
+                
+                p{
+                    color: var(--dark-gris);
+                    margin-bottom: 25px;
+                    font-size: 14px;
+                    &:last-child{
+                        margin-bottom: 0px;
+                    }
+
+                }
+                @include mediaPhone{
+                    padding: 0px 20px 20px 20px;
+                }
+            }
+        }
+        &::before{
+            display: none;
+        }
+    }
+}

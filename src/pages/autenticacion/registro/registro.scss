@@ -1,0 +1,736 @@
+@import '../../../assets/css/mixin.scss';
+
+.registerPage{
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+    padding: 30px 30px 30px 30px;
+    box-sizing: border-box;
+    height: 100vh;
+    @include mediaTablet{
+        padding: 30px 30px 30px 30px;
+        height: auto;
+    }
+    @include mediaTablet{
+        padding: 20px 20px 20px 20px;
+    }
+}
+
+.registerPageResp{
+    display: none;
+    @include mediaLaptop{
+        display: block;
+        padding: 50px 0px 0px 0px;
+        img{
+            width: 250px;
+        }
+    }
+}
+
+.registerPageResp2{
+    @include mediaLaptop{
+        display: block;
+        padding: 20px 0px 0px 0px;
+        img{
+            width: 250px;
+        }
+    }
+}
+
+
+
+.regCont{
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    @include mediaLaptop{
+        width: 100%;
+        padding: 30px 0px 0px 0px;
+    }
+}
+
+
+// Step Verify
+.regVerify{
+    text-align: center;
+    padding: 0px 5%;
+    transition: all ease-in-out .3ms;
+    width: 100%;
+    .title{
+        text-align: center;
+        margin-bottom: 40px;
+        h2{
+            font-size: 35px;
+        }
+        p{
+            color: var(--dark-gris);
+        }
+        .backStep{
+            text-decoration: underline;
+            color: var(--dark-blue);
+            font-weight: 600;
+            display: inline-block;
+            cursor: pointer;
+        }
+    }
+    @include mediaTablet{
+        .title{
+            h2{
+                font-size: 30px;
+            }
+        }
+    }
+    @include mediaPhone{
+        padding: 0px 0%;
+        .title{
+            margin-bottom: 20px;
+            br{
+                display: none;
+            }
+            h2{
+                font-size: 22px;
+            }
+            p{
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+
+
+.textfieldVerify{
+    flex-direction: column;
+    p{
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .MuiFormControl-root{
+        width: 87%;
+        max-width: 350px;
+        text-align: center;
+        .MuiInputBase-root{
+            background: white;
+            border-radius: 30px;
+            font-size: 16px;
+            font-family: var(--font1);
+            //border: 2px solid blue;
+            color: var(--dark-blue);
+            fieldset{
+                border: 1px solid #C9E0CE;
+            }
+            input{
+                text-align: center;
+            }
+        }
+        .Mui-focused{
+            fieldset{
+                border: 1px solid var(--dark-blue) !important;
+            }
+        }
+    }
+    small{
+        font-size: 12px;
+        margin-top: 10px;
+        color: var(--dark-gris);
+    }
+    .btnPrimary{
+        margin-top: 40px;
+        width: 100%;
+        max-width: 280px;
+    }
+    .Mui-error{
+
+        fieldset{
+            border: 1px solid red !important;
+        }
+
+    }
+}
+
+
+
+
+.verifyPhoneError{
+    font-size: 14px;
+    font-weight: 600;
+    margin: 10px 0px 0px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--error);
+    svg{
+        font-size: 18px;
+        margin-right: 5px;
+    }
+}
+
+.regSocialDiv{
+    margin: 10px 0px 35px 0px;
+    width: 100%;
+    max-width: 480px;
+    span{
+        height: 2px;
+        width: 100%;
+        background: var(--gris);
+        position: relative;
+        display: block;
+        &::before,
+        &::after{
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: 2px solid var(--dark-gris);
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            background: white;
+            right: 0px;
+            left: 0px;
+            margin: auto;
+            z-index: 2;
+        }
+        &::after{
+            background: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            z-index: 1;
+        }
+    }
+}
+
+.regSocial{
+    flex-direction: column;
+    margin-top: 30px;
+    a{
+        width: 100%;
+        margin-bottom: 10px;
+        max-width: 480px;
+    }
+    .btnFb{
+        background: #3D5694;
+    }
+    .btnGoogle{
+        background: #ffffff;
+        span{
+            color: var(--dark-blue);
+        }
+    }
+}
+
+
+.textFieldReg{
+    width: 100%;
+    display: inline-block;
+    margin-bottom: 0px;
+    .MuiTextField-root{
+        width: 100%;
+        margin-bottom: 15px;
+        .MuiFormLabel-root{
+            left: 15px;
+            color: var(--dark-gris);
+        }
+        .MuiInputBase-root{
+            background: white;
+            border-radius: 30px;
+            border: 1px solid #D5E2D6;
+            input{
+                padding-left:25px;
+                color: var(--dark-blue);
+            }
+            &::before,
+            &::after{
+                display: none;
+            }
+        }
+    }
+}
+
+.textFieldReg2{
+    width: 100%;
+    display: inline-block;
+    margin-bottom: 0px;
+    .MuiTextField-root{
+        width: 100%;
+        margin-bottom: 15px;
+        .MuiFormLabel-root{
+            left: 10px;
+            color: var(--dark-gris);
+            font-family: var(--poppins);
+            ///transform: translate(1px, 16px) scale(1);
+        }
+        .MuiInputBase-root{
+            background: white;
+            border-radius: 30px;
+            border: 1px solid #D5E2D6;
+            overflow: hidden;
+            input{
+                padding-left:22px;
+                color: var(--dark-blue);
+                font-family: var(--poppins);
+                border-radius: 25px;
+                background: white;
+            }
+            &::before,
+            &::after{
+                display: none;
+            }
+        }
+    }
+    .MuiInputBase-root.Mui-error{
+        border: 1px solid var(--error) !important;
+    }
+}
+
+.uMedida{
+    height: auto;
+    background: #caffe5;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
+    p{
+        color: #24e186;
+        font-weight: 900;
+        font-size: 12px !important;
+        line-height: 1;
+    }
+}
+
+.textFieldReg3{
+    .MuiInputBase-root{
+        height: 50px !important;
+    }
+    .MuiFormLabel-root{
+        transform: translate(17px, 7px) scale(0.75) !important;
+    }
+}
+
+.textFieldRegSelect{
+    .MuiSelect-select{
+        padding: 21.5px 0px 11.5px 25px;
+    }
+    .MuiFormLabel-root{
+        font-family: var(--font1);
+        color: var(--dark-gris);
+    }
+
+    .MuiFormLabel-root{
+        transform: translate(25px, 16px) scale(1);
+    }
+    .MuiFormLabel-root.Mui-focused{
+        transform: translate(25px, 6px) scale(0.75);
+    }
+
+    fieldset{
+        border-radius: 40px;
+        border: 1px solid #D5E2D6;
+    }
+    .Mui-error{
+        fieldset{
+            border: 1px solid var(--error) !important;
+        }
+    }
+}
+
+.textFieldRegSelectAct{
+    .MuiFormLabel-root{
+        transform: translate(25px, 6px) scale(0.75);
+    }
+    //.MuiFormLabel-root.Mui-focused{
+    //    transform: translate(25px, 6px) scale(0.75);
+    //}
+}
+
+.MuiPopover-root{
+    .MuiPaper-root{
+        border-radius: 20px;
+        overflow: hidden;
+    }
+}
+
+.textFieldRegNota{
+    small{
+        display: inline-block;
+        width: 100%;
+        font-size: 12px;
+        margin: -20px 0px 0px 0px;
+    }
+}
+
+.textFieldRegSwitch{
+    .MuiSwitch-root{
+        margin: 15px 0px 10px 10px;
+    }
+    .MuiTypography-root{
+        margin: 0px 0px 0px 10px;
+        font-size: 14px;
+    }
+}
+
+
+.textFieldBtn{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    .btnPrimary{
+        width: 100%;
+        max-width: 350px;
+        span{
+            img{
+                height: 10px;
+            }
+        }
+    }
+}
+
+.formPaper{
+    background: white;
+    padding: 30px 50px 30px 50px;
+    border-radius: 30px;
+    box-shadow: 0px 10px 20px 0px rgba(0,0,0,.07);
+    @include mediaTablet{
+        padding: 20px 30px 20px 30px;
+    }
+    @include mediaPhone{
+        padding: 20px 15px 20px 15px;
+    }
+}
+
+
+
+// Profile Steps
+.regSteps{
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.regStepsBox{
+    max-width: 900px;
+    width: 100%;
+    @include mediaLaptop{
+        padding: 30px 4% 30px 4%;
+    }
+}
+
+.regStepsBox2{
+    @include mediaLaptop{
+        padding: 0px 4% 30px 4%;
+    }
+    @include mediaPhone{
+        padding: 0px 0% 30px 0%;
+    }
+}
+
+.regStepMenu{
+    display: inline;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    @include mediaPhone{
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    li{
+        width: calc( 33.3% - 30px );
+        text-align: center;
+        height: 50px;
+        background: white;
+        box-shadow: 0px 5px 10px 0px rgba(0,0,0,.05);
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 1px solid rgba(0,0,0,.05);
+        span{
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            color: #AFC2CB;
+            svg{
+                width: auto;
+                height: 20px;
+                margin-right: 10px;
+                path{
+                    fill: #AFC2CB;
+                }
+            }
+        }
+        @include mediaTablet{
+            width: calc( 33.3% - 10px );
+            span{
+                font-size: 15px;
+            }
+        }
+        @include mediaPhone{
+            width: auto;
+            padding: 0px 15px 0px 15px;
+            margin: 0px 3px 0px 3px;
+            height: 40px;
+            span{
+                font-size: 14px;
+                svg{
+                    width: auto;
+                    height: 15px;
+                }
+            }
+        }
+        @include mediaMiniPhone{
+            padding: 0px 10px 0px 10px;
+            margin: 0px 2px 0px 2px;
+            //height: 30px;
+            span{
+                font-size: 12px;
+                font-weight: 300;
+                svg{
+                    width: auto;
+                    height: 10px;
+                    margin-right: 5px;
+                }
+            }
+        }
+        
+    }
+    .active{
+        background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+        span{
+            color: white;
+            svg{
+                path{
+                    fill: white;
+                }
+            }
+        }
+    }
+}
+
+.regStepResp{
+    background: white;
+    box-shadow: 0px 2px 10px 0px rgba(0,0,0,.1);
+    padding: 30px 6% 30px 6%;
+    border-radius: 30px;
+    width: 100%;
+    display: inline-block;
+    .btnBox{
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .btnPrimary{
+            min-width: 180px;
+            margin: 0px 5px 0px 5px;
+            position: relative;
+            span{
+                font-weight: 600;
+                img,svg{
+                    right: 20px;
+                    height: 12px;
+                    margin-right: 0px;
+                    position: absolute;
+                    top: 0px;
+                    bottom: 0px;
+                    margin-top: auto;
+                    margin-bottom: auto;
+                }
+            }
+        }
+        .btnOutline{
+            border: 1px solid var(--green2);
+            background: white;
+            span{
+                color: var(--green2);
+                img,svg{
+                    left: auto;
+                    right: auto;
+                    left: 20px;
+                }
+            }
+        }
+        @include mediaPhone{
+            .btnPrimary,
+            .btnOutline{
+                min-width: 140px;
+            }
+        }
+    }
+    .btnBoxLeft{
+        justify-content: flex-start;
+    }
+}
+
+.rsrTitle{
+    span{
+        font-size: 18px;
+        font-weight: 600;
+        position: relative;
+        padding: 0px 0px 0px 20px;
+        &::before{
+            content: '';
+            background: var(--green);
+            width: 8px;
+            border-radius: 5px;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+    }
+    @include mediaTablet{
+        span{
+            font-size: 16px;
+        }
+    }
+    @include mediaPhone{
+        span{
+            font-size: 14px;
+        }
+    }
+}
+
+.regSexBox{
+    display: flex;
+    margin-top: 20px;
+    span{
+        display: flex;
+        height: 50px;
+        margin-right: 10px;
+        border: 1px solid rgba(0,0,0,.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 30px;
+        cursor: pointer;
+        padding: 0px 30px 0px 30px;
+        box-shadow: 0px 4px 5px 0px rgba(0,0,0,.08);
+        svg{
+            margin-right: 7px;
+            color: var(--green);
+        }
+    }
+    .active{
+        background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+        color: white;
+        svg{
+            color: white;
+        }
+    }
+    @include mediaPhone{
+        span{
+            font-size: 12px;
+            padding: 0px 15px 0px 15px;
+        }
+    }
+}
+
+.regObjField{
+    margin-top: 40px;
+}
+
+.regObjList{
+    flex-direction: column;
+    margin: 20px 0px 0px 0px;
+}
+
+.regObjItem{
+    padding: 20px;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 30px;
+    margin-bottom: 10px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-shadow: 0px 4px 5px 0px rgba(0,0,0,.08);
+    cursor: pointer;
+    .checkBox{
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(63,194,119,.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg{
+            font-size: 30px;
+            color: var(--dark-blue);
+        }
+    }
+    .txt{
+        width: calc( 100% - 50px );
+        padding: 0px 0px 0px 20px;
+        h4{
+            margin: 0px;
+            font-size: 16px;
+        }
+        p{
+            font-size: 14px;
+            color: var(--dark-gris);
+        }
+    }
+    @include mediaPhone{
+        padding: 10px 15px 10px 15px;
+        .txt{
+            h4{
+                font-size: 14px;
+            }
+            p{
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+.regObjItemAct{
+    background: radial-gradient(125% 125% at 50% 90%, #18d178 40%, var(--green) 100%);
+    .checkBox{
+        background: rgba(255,255,255,.2);
+        svg{
+            color: white;
+        }
+    }
+    .txt{
+        h4{
+            color: white;
+        }
+        p{
+            color: white;
+        }
+    }
+}
+
+
+.rsrIntensidad{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 20px 0px 0px 0px;
+    span{
+        height: 50px;
+        padding: 20px;
+        box-shadow: 0px 0px 0px 0px rgba(0,0,0,.15);
+        border: 1px solid rgba(0,0,0,.15);
+        display: flex;
+        align-items: center;
+        border-radius: 50px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-right: 15px;
+    }
+    .active{
+        background: var(--green);
+
+        color: white;
+    }
+}
+
+
+

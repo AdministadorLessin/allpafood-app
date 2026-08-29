@@ -1,0 +1,24 @@
+.blogNotResult{
+    background: white;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,.07);
+    border-radius: 25px;
+    figure{
+        width: 80px;
+        img{
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    }
+    .txt{
+        padding: 0px 0px 0px 20px;
+        h3{
+            font-size: 25px;
+        }
+    }
+}

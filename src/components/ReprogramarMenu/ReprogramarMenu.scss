@@ -1,0 +1,231 @@
+@import '../../assets/css/mixin.scss';
+
+.reprogramarMenu{
+    position: fixed;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    z-index: 999;
+    opacity:0;
+}
+
+.reprogramarMenuActive{
+    pointer-events: none;
+    opacity: 1;
+}
+
+.rMenuCont{
+    width: 90%;
+    max-width: 500px;
+    outline: none;
+    height: 100%;
+    overflow: auto;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background: #EBF9E9;
+    backdrop-filter: blur(25px);
+    padding: 30px 30px 30px 30px;
+    @include mediaMiniPhone{
+        padding: 25px 15px 15px 15px;
+        width: 95%;
+    }
+    .title{
+        width: 100%;
+        display: inline-block;
+        padding: 0px 0px 0px 45px;
+        margin: 0px 0px 30px 0px;
+        position: relative;
+        .ico{
+            width: 35px;
+            height: 35px;
+            position: absolute;
+            border-radius: 50%;
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            margin-top: auto;
+            margin-bottom: auto;
+            background: linear-gradient(135deg,  #e1f3e4 0%,#e2f5ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        h3{
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
+    @include mediaPhone{
+        .title{
+            h3{
+                font-size: 16px;
+            }
+        }
+    }
+}
+
+
+.rMenuExpiracion{
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,.03);
+}
+
+.rMenuExpiracionItem{
+    width: 50%;
+    padding: 20px 0px 20px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(0,0,0,.1);
+    &:last-child{
+        border-right: 0px solid rgba(0,0,0,.1);
+    }
+    figure{
+        width: 35px;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    
+        img{
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+    }
+    .txt{
+        padding: 0px 0px 5px 15px;
+    
+        h5{
+            font-size: 20px;
+            line-height: 1;
+        }
+        small{
+            font-size: 14px;
+            line-height: 1;
+            display:inline-block;
+        }
+    }
+    @include mediaPhone{
+        padding: 10px 0px 10px 0px;
+        figure{
+            width: 25px;
+        }
+        .txt{
+            h5{
+                font-size: 16px;
+            }
+            small{
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+.asdapodaisdASDADADSAS,
+.rMenuCalendar{
+    margin: 30px 0px 0px 0px;
+    .MuiDateCalendar-root{
+        width: 100%;
+        max-height: 480px;
+        height: 480px;
+        background: white;
+        margin-bottom: 25px;
+        border-radius: 20px;
+        box-shadow: 0px 0px 20px 0px rgba(0,0,0,.03);
+        padding: 10px 0px 0px 0px;
+        @include mediaPhone{
+            height: 390px;
+        }
+        @include mediaMiniPhone{
+            height: 340px;
+        }
+        .MuiSkeleton-circular,
+        .MuiDayCalendar-weekDayLabel,
+        .MuiPickersDay-root{
+            width: 55px !important;
+            height: 55px !important;
+            color: var(--dark-blue);
+            font-display: var(--font1);
+            font-weight: 600;
+            background: #f7faff;
+            @include mediaPhone{
+                width: 48px;
+                height: 48px;
+            }
+            @include mediaMiniPhone{
+                width: 42px;
+                height: 42px;
+            }
+            @media screen and (max-width: 390px) {
+                width: 40px;
+                height: 40px;
+            }
+            @media screen and (max-width: 370px) {
+                width: 39px;
+                height: 39px;
+            }
+            @media screen and (max-width: 365px) {
+                width: 38px;
+                height: 38px;
+            }
+        }
+        .MuiDayCalendar-weekDayLabel{
+            background: #e2f7ff;
+            color: var(--dark-blue);
+            font-weight: 600;
+            border-radius: 50%;
+        }
+        .MuiPickersSlideTransition-root{
+            min-height: 340px;
+            .Mui-selected{
+                background: var(--dark-blue);
+                color: white;
+            }
+        }
+    }
+    .MuiBadge-badge{
+        background: var(--green);
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        svg{
+            color: white;
+            font-size: 16px;
+        }
+    }
+}
+
+
+.MuiPickersCalendarHeader-labelContainer{
+    background: #e3ffdc !important;
+    padding: 5px 10px 5px 20px;
+    border-radius: 20px;
+    margin-left: -10px;
+    font-size: 12px;
+    margin-bottom: 20px;
+    .MuiPickersCalendarHeader-label{
+        font-size: 14px;
+        font-family: var(--font1);
+        font-weight: 600;
+    }
+}
+
+.MuiPickersArrowSwitcher-root{
+    margin-bottom: 15px;
+    button{
+        width: 40px;
+        height: 40px;
+        background: var(--green);
+        color: white;
+        margin-left: 1px;
+        &:hover{
+            background: var(--green);
+        }
+    }
+}
+

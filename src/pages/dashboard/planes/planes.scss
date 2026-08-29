@@ -1,0 +1,257 @@
+@import '../../../assets/css/mixin.scss';
+
+.sPlanesList{
+    justify-content: space-between;
+    align-items: flex-start;
+    @include mediaTablet{
+        flex-direction: column;
+    }
+}
+
+.sPlanesItem{
+    background: white;
+    width: calc( 33.3% - 10px );
+    padding: 50px 0px 30px 0px;
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.05);
+    border-radius: 30px;
+    background: #F9FFFB;
+    position: relative;
+    overflow: hidden;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    //border: 6px solid white;
+    border: 1px solid rgba(0,0,0,.07);
+    @include mediaTablet{
+        padding: 30px 0px 20px 0px;
+    }
+    .tag{
+        background: var(--green2);
+        color:white;
+        height: 25px;
+        letter-spacing: 1px;
+        line-height: 25px;
+        padding: 0px 20px 0px 20px;
+        font-size: 12px;
+        border-radius: 25px;
+        @include mediaTablet{
+            font-size: 12px;
+            height: 25px;
+            line-height: 25px;
+            border-radius: 0px 0px 0px 20px;
+            padding: 0px 20px 0px 20px;
+        }
+    }
+    .title{
+        text-align: center;
+        margin: 0px 0px 10px 0px !important;
+        padding: 0px;
+        h4{
+            font-size: 45px;
+            font-weight: 800;
+        }
+        h3{
+            font-size: 70px;
+            font-weight: 900;
+            color: var(--green2);
+            position: relative;
+            display: inline-block;
+            padding: 0px 0px 0px 40px;
+            line-height:1;
+            small{
+                font-size: 30px;
+            }
+            .pen{
+                position: absolute;
+                top: 15px;
+                left: 0px;
+                font-size:25px;
+            }
+        }
+        p{
+            margin: 0px;
+        }
+        @include mediaTablet{
+            h4{
+                font-size: 35px;
+            }
+            h3{
+                font-size: 50px;
+            }
+            p{
+                font-size: 12px;
+            }
+        }
+    }
+    .list{
+        padding: 0px;
+        margin: 20px 0px 20px 0px;
+        list-style: none;
+        display: inline-block;
+        li{
+            position: relative;
+            color: var(--grees);
+            padding: 3px 0px 3px 40px;
+            margin: 4px 0px 4px 0px;
+            &::before{
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                content: '';
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                background: #EAFFEE;
+            }
+            &::after{
+                content: '';
+                width: 8px;
+                position: absolute;
+                top: 9px;
+                left: 9px;
+                height: 4px;
+                border-bottom: 2px solid #11C95F;
+                border-left: 2px solid #11C95F;
+                transform: rotate(-45deg);
+            }
+        }
+        @include mediaPhone{
+            li{
+                font-size: 14px;
+            }
+        }
+
+    }
+    .btnPrimary{
+        width: 70%;
+        text-align: center;
+        color: white;
+        text-decoration: none;
+        height: 50px;
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        border-radius: 30px;
+    }
+    &:nth-child(1){
+        order: 1;
+    }
+    &:nth-child(2){
+        order: 3;
+    }
+    &:nth-child(3){
+        order: 2;
+    }
+    @include mediaTablet{
+        width: 100%;
+        margin-bottom: 25px;
+    }
+}
+
+.sPlanesItemActive{
+    border: 2px solid var(--white);
+    padding-bottom: 50px;
+    
+    &::before{
+        position: absolute;
+        z-index: 1;
+        inset: -1em;
+        border: solid 1.4em;
+        border-image: 
+            conic-gradient(from var(--a), #669900, #99cc33, #ccee66, 
+                    #006699, #3399cc, #990066, #cc3399, 
+                    #ff6600, #ff9900, #ffcc00, #669900) 1;
+        filter: blur(.75em);
+        animation: a 4s linear infinite;
+        content: '';
+        pointer-events: none;
+    }
+}
+
+.sPlanesItemAcum{
+    text-align: center;
+    width: 100%;
+    background: #e8fbfb;
+    
+    h5{
+        height: 50px;
+        background: var(--green2);
+        font-size:18px;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        padding: 0px 20px 0px 20px;
+        color: white;
+    }
+    .txt{
+        display: flex;
+        flex-direction: column;
+        margin-top: 10px;
+        p{
+            font-size: 14px;
+            font-weight: bold;
+        }
+        ul{
+            display: flex;
+            padding: 0px 30px 0px 30px;
+            align-items: center;
+            justify-content: center;
+            li{
+                font-size: 14px;
+                border-left: 1px solid rgba(0,0,0,.15);
+                display: flex;
+                flex-direction: column;
+                padding: 0px 20px 0px 20px;
+                span{
+                    img{
+                        width: auto;
+                        height: 25px;
+                    }
+                }
+                p{
+                    text-align: left;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    strong{
+                        font-size: 10px;
+                        font-weight: 300;
+                        line-height: 1;
+                        display: inline-block;
+                    }
+                    small{
+                        font-size: 8px;
+                        line-height: 1;
+                        display: inline-block;
+                    }
+                }
+                &:first-child{
+                    border-left: 0px solid rgba(0,0,0,.15);
+                }
+                @include mediaLaptop{
+                    padding: 0px 10px 0px 10px;
+                }
+            }
+        }
+    }
+}
+
+.sPlanesItemAcum2{
+    border-top: 1px solid rgba(0,0,0,.01);
+    border-bottom: 1px solid rgba(0,0,0,.01);
+}
+
+// Animate
+@property --a { 
+	syntax: '<angle>';
+	initial-value: 0deg;
+	inherits: false
+}
+
+
+@keyframes a { to { --a: 1turn } }

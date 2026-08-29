@@ -1,0 +1,102 @@
+.loadMacrosList{
+    justify-content: flex-start;
+    margin: 20px 0px 0px 0px;
+    padding: 0px;
+    li{
+        margin: 0px 15px 0px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .graphic{
+            width: 140px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            svg{
+                margin-top: 15px;
+            }
+            img{
+                width: auto;
+                height: 25px;
+                margin-bottom: 3px;
+                position: absolute;
+                top: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        .txt{
+            display: flex;
+            flex-direction: column;
+            h5{
+                font-size: 13px;
+                font-weight: 400;
+                color: var(--dark-gris);
+            }
+            p{
+                text-align: left;
+                font-size: 18px;
+                font-weight: 900;
+                line-height: 1;
+                color: #eea300;
+                strong{
+                    font-weight: 800;
+                }
+                small{
+                    font-size: 12px;
+                    line-height: 1;
+                    display: inline-block;
+                    font-weight: 600;
+                }
+            }
+        }
+        &:last-child{
+            margin: 0px 0px 0px 0px;
+        }
+
+    }
+    .macroGraphBox{
+        .graphic{
+            width: 80px;
+            svg{
+                margin-top: 0px;
+            }
+            img{
+                height: 18px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+        }
+    }
+    .proteinBox{
+        .txt{
+            p{
+                color: #31CA72;
+            }
+        }
+    }
+    .carbsBox{
+        .txt{
+            p{
+                color: #36B1CC;
+            }
+        }
+    }
+    .fatBox{
+        .txt{
+            p{
+                color: #488ADF;
+            }
+        }
+    }
+    @media screen and (max-width: 750px) {
+        flex-direction: column;
+        li{
+            width: 250px;
+            margin: 0px 0px 0px 0px;
+        }
+    }   
+}

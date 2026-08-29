@@ -1,0 +1,150 @@
+@import '../../../assets/css/mixin.scss';
+
+.cardNotica{
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 25px;
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,.07);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    figure{
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        img{
+            object-fit: cover;
+            height: 230px;
+            width: 100%;
+            display: block;
+            @include madiaPcsmall{
+                height: 200px;
+            }
+            @include mediaLaptop{
+                height: 170px;
+            }
+            @media screen and (max-width: 1100px) {
+                height: 150px;
+            }
+        }
+        .cat{
+            background: #43BF73;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            height: 40px;
+            padding: 0px 30px 0px 40px;
+            color: white;
+            font-weight: 600;
+            line-height: 40px;
+            border-radius: 0px 0px 20px 0px;
+            &::before{
+                content: '';
+                width: 19px;
+                height: 19px;
+                position: absolute;
+                top: 10px;
+                left: 16px;
+                z-index: 1;
+                background: url('../../../assets/img/ico_categoria.svg') center no-repeat;
+                background-size: 100% 100%;
+            }
+            @include madiaPcsmall{
+                height: 35px;
+                line-height: 35px;
+                border-radius: 0px 0px 15px 0px;
+                font-size: 15px;
+                padding: 0px 30px 0px 40px;
+            }
+            @include mediaLaptop{
+                height: 30px;
+                line-height: 30px;
+                border-radius: 0px 0px 15px 0px;
+                font-size: 14px;
+                padding: 0px 20px 0px 40px;
+                &::before{
+                    top: 5px;
+                }
+            }
+
+        }
+    }
+    h3{
+        border-bottom: 1px solid rgba(0,0,0,.15);
+        font-size: 18px;
+        padding: 10px 20px 13px 20px;
+        @include madiaPcsmall{
+            font-size: 17px;
+        }
+        @include mediaLaptop{
+            font-size: 16px;
+        }
+    }
+    .txt{
+        padding: 20px 20px 20px 20px;
+        p{
+            margin: 0px;
+            color: var(--dark-gris);
+        }
+        .date{
+            position: relative;
+            padding: 0px 0px 0px 25px;
+            color: var(--dark-gris);
+            margin: 10px 0px 0px 0px;
+            font-size: 14px;
+            &::before{
+                content: '';
+                width: 16px;
+                height: 16px;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                background: url('../../../assets/img/ico_blog_date.png') center no-repeat;
+                background-size: 100% 100%;
+            }
+        }
+        @include madiaPcsmall{
+            p{
+                font-size: 15px;
+            }
+        }
+        @include mediaLaptop{
+            p{
+                font-size: 14px;
+            }
+        }
+    }
+    .btnMore{
+        background: var(--dark-blue);
+        color: white;
+        height: auto;
+        position: absolute;
+        cursor: pointer;
+        right: 0px;
+        bottom: 0px;
+        padding: 12px 25px 12px 25px;
+        font-size: 14px;
+        border-radius: 25px 0px 0px 0px;
+        span{
+            display: inline-block;
+            padding: 0px 20px 0px 0px;
+            font-weight: 400;
+            position: relative;
+            &::before{
+                width: 11px;
+                height: 9.5px;
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                margin-top: auto;
+                margin-bottom: auto;
+                right: 0px;
+                content: '';
+                background: url('../../../assets/img/ico_arrow_white_large.png') center no-repeat;
+                background-size: 100% 100%;
+            }
+        }
+    }
+}
