@@ -39,7 +39,8 @@ import icoCalorias from '../../../assets/img/ico_cal.png';
 
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
-import { faker } from '@faker-js/faker';
+import { useRef } from 'react';
+
 
 import SecurityIcon from '@mui/icons-material/Security';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -59,6 +60,15 @@ import icoCheckProteina from '../../../assets/img/ico_check_proteina.png';
 import icoCheckSnack from '../../../assets/img/ico_check_snack.png';
 import icoCheckFruta from '../../../assets/img/ico_check_fruta.png';
 import icoCheckDesayuno from '../../../assets/img/ico_check_desayuno.png';
+
+// Clave de idempotencia del pago. Debe ser ESTABLE durante todo el intento de
+// compra: es lo que impide que un reintento o un doble clic se cobre dos veces.
+// Antes se generaba un uuid nuevo en cada envio (con faker, ademas una
+// dependencia de desarrollo), lo que anulaba esa proteccion.
+const newRequestId = () =>
+  (window.crypto && window.crypto.randomUUID)
+    ? window.crypto.randomUUID()
+    : `af-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
 
 const CheckoutPage = (props) => {
@@ -208,7 +218,17 @@ const CheckoutPage = (props) => {
         }
     ];
 
-    const { token,cartItems, cartAdicionales, addItemAdToCart, deleteItemAdToCart, emptyCart, removeLocalstorage } = useAuthContext();
+    const { token,cartItems, cartAdicionales, planInfo, addItemAdToCart, deleteItemAdToCart, emptyCart, removeLocalstorage } = useAuthContext();
+
+    // Se crea una sola vez por montaje del checkout y sobrevive a los reintentos.
+    const requestIdRef = useRef(newRequestId());
+
+    // Direccion de facturacion: la que el cliente ya registro como entrega.
+    // Antes iba quemada como 'av test' en todas las facturas.
+    const invoiceAddress = {
+        address: planInfo?.profile?.address || planInfo?.profile?.descriptionAddress || '',
+        description: planInfo?.profile?.descriptionAddress || planInfo?.profile?.district || '',
+    };
 
     const [paymentMetod,setPaymentMetod] = useState();
 
@@ -258,33 +278,14 @@ const CheckoutPage = (props) => {
     // Modal
     const [showLoaderPayment, setShowLoaderPayment] = useState(false);
 
-    const onSubmitHandler = (data) => {
-        
-        const adicionalesList = [];
-
-        if(cartAdicionales && cartAdicionales.length > 0){
-            cartAdicionales.map((item,index)=>{
-                adicionalesList.push(item.id);
-            })
-        }
-        
-        axios.post('https://api.allpafood.com/dev/api-af/v1/invoice/create',{
-            complementsId: adicionalesList,
-            planId: parseFloat(cartItems[0].id),
-            paymentMethodType: paymentMetod,
-            paymentMethodId: 'yape',
-            paymentToken: faker.string.uuid(),
-        },
-        {
-            headers: {"Authorization" : `Bearer ${token}`} 
-        }).then((resp)=>{
-            setShowLoaderPayment(true);
-        }).catch((errr)=>{
-            console.log(errr)
-        })
-    };
+    // NOTA: aqui vivia un onSubmitHandler que mandaba un paymentToken falso
+    // (faker) y paymentMethodId 'yape' quemado. Se pasaba como prop
+    // cardSubmitForm, pero CheckoutPaymentCard nunca la recibia: era codigo
+    // muerto. El cobro con tarjeta lo hace CreditCard.js con el token real
+    // del SDK de MercadoPago.
 
     const [openMp, setOpenMp] = useState(false);
+    const [serverFail, setServerFail] = useState(false);
     const handleOpenMp = () => {
         setOpenMp(true);
     };
@@ -309,7 +310,7 @@ const CheckoutPage = (props) => {
         axios.post('https://api.allpafood.com/dev/api-af/v1/subscriptions/payments/secure/tokens/mercadopago/yape',{
             phone: data.ynumero,
             otp: data.yotp,
-            requestId: faker.string.uuid()
+            requestId: requestIdRef.current
         },
         {
             headers: {"Authorization" : `Bearer ${token}`} 
@@ -322,10 +323,7 @@ const CheckoutPage = (props) => {
                     paymentMethodType: paymentMetod,
                     paymentMethodId: 'yape',
                     paymentToken: resp.data.data.token,
-                    invoiceAddress:{
-                        address: 'av test',
-                        description: 'av test'
-                    }
+                    invoiceAddress
                 },
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
@@ -360,11 +358,19 @@ const CheckoutPage = (props) => {
                 })
 
             }).catch((errr)=>{
+                const status = errr?.response?.status;
+                setServerFail(!status || status >= 500);
                 setOpenMp(true);
                 setLoadYape(false);
             })
             
         }).catch((errr)=>{
+            // Antes esto solo apagaba el spinner: el cliente ingresaba su OTP,
+            // tocaba pagar y no pasaba nada visible.
+            console.log('yape token ==>', errr);
+            const status = errr?.response?.status;
+            setServerFail(!status || status >= 500);
+            setOpenMp(true);
             setLoadYape(false);
         })
     }
@@ -654,7 +660,6 @@ const CheckoutPage = (props) => {
                                                 {paymentMetod === 'card' &&
                                                     <div className="inlineFlex ccPaymentForm ccPaymentFormTarjet">
                                                         <CheckoutPaymentCard 
-                                                            cardSubmitForm={onSubmitHandler} 
                                                             paymentMetod={paymentMetod} 
                                                             //handleOpen={handleOpen} 
                                                             setShowLoaderPayment={setShowLoaderPayment} 
@@ -694,6 +699,7 @@ const CheckoutPage = (props) => {
                                                             handleOpenMp={handleOpenMp} 
                                                             handleCloseMp={handleCloseMp}
                                                             openMp={openMp}
+                                                            serverFail={serverFail}
                                                             loadYape={loadYape}
                                                             paymentMethod={false}
                                                         />

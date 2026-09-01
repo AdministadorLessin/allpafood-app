@@ -374,8 +374,10 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
             ...newObjet,
             bornDate:bodyForm.fs3fecnac,
             district:bodyForm.fs3distrito,
-            address:bodyForm.fs3dirdescripcion,
-            descriptionAddress:bodyForm.fs3dir,
+            // Estaban invertidos: se guardaba la referencia como direccion y la
+            // direccion como referencia. Es el dato que usa el motorizado.
+            address:bodyForm.fs3dir,
+            descriptionAddress:bodyForm.fs3dirdescripcion,
             location:{
                 latitude: defailtCenter.lat,
                 longitude: defailtCenter.lng

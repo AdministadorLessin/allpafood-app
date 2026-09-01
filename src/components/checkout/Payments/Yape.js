@@ -31,7 +31,7 @@ import './Yape.scss';
 import CheckoutPaymentFail from './FailPayment';
 import { useAuthContext } from './../../../context/authContext';
 
-const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,loadYape}) => {
+const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,loadYape,serverFail}) => {
 
 
     const [yapeFormFields,setYapeFormFields] = useState({
@@ -173,6 +173,7 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
                 handleCloseMp={handleCloseMp}
                 openMp={openMp}
                 paymentMethod={false}
+                serverFail={serverFail}
             />
             
         </form>

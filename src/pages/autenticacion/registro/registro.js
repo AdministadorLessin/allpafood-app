@@ -98,11 +98,17 @@ const RegistroPage = (props) => {
                 }, 1000);
             }).catch((err)=>{
                 console.log('error',err)
-                if(err.status === 409 ){
+                // El loader se libera SIEMPRE. Antes solo ocurria dentro del
+                // if del 409: con un 500, un timeout o la red caida, el boton
+                // quedaba girando para siempre y el registro moria ahi.
+                setLoadingVal(false);
+
+                if(err.status === 409){
                     setErrorSendCode(err.response.data);
-                    setTimeout(() => {
-                        setLoadingVal(false);    
-                    }, 200);
+                }else if(!err.response){
+                    setErrorSendCode({ message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' });
+                }else{
+                    setErrorSendCode({ message: 'No pudimos enviar el codigo. Intentalo de nuevo en un momento.' });
                 }
             })
         
@@ -126,8 +132,12 @@ const RegistroPage = (props) => {
                 }, 1000);
             }).catch((err)=>{
                 setLoadingVal(false);
-                if(err.status === 500){
+                // Antes solo contemplaba el 500: si el codigo era incorrecto
+                // (400) no se mostraba absolutamente nada.
+                if(err.response){
                     setErrorVerifyCode(err.response);
+                }else{
+                    setErrorVerifyCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' } });
                 }
             })
     }

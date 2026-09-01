@@ -26,9 +26,17 @@ import { useEffect } from "react";
 const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => {
 
     initMercadoPago('APP_USR-fa1bc33e-3d56-4b37-b674-a6f65864ba86');
-    const { token,cartItems, cartAdicionales } = useAuthContext();
+    const { token,cartItems, cartAdicionales, planInfo } = useAuthContext();
+
+    // Direccion de facturacion: la que el cliente ya registro como entrega.
+    // Antes iba quemada como 'dir test' en todas las facturas con tarjeta.
+    const invoiceAddress = {
+        address: planInfo?.profile?.address || planInfo?.profile?.descriptionAddress || '',
+        description: planInfo?.profile?.descriptionAddress || planInfo?.profile?.district || '',
+    };
 
     const [openMp, setOpenMp] = useState(false);
+    const [serverFail, setServerFail] = useState(false);
     const handleOpenMp = () => {
         setOpenMp(true);
     };
@@ -58,14 +66,15 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
         if(paymentMethods && paymentMethods.results.length){
             axios.post('https://api.allpafood.com/dev/api-af/v1/invoice/create',{
                 complementsId: adicionalesList,
+                // El backend hace dto.additional().stream() sin comprobar null:
+                // si este campo no viaja, revienta con NullPointerException (500)
+                // y el cliente ve "tarjeta rechazada". Mandarlo vacio lo evita.
+                additional: (cartAdicionales || []).map((item) => item.type),
                 planId: parseFloat(cartItems[0].id),
                 paymentMethodType: paymentMetod,
                 paymentMethodId: paymentMethods.results[0].id,
                 paymentToken: response.id,
-                invoiceAddress:{
-                    address: 'dir test',
-                    description: 'desc test'
-                }
+                invoiceAddress
             },
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
@@ -93,6 +102,11 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                 })
             }).catch((errr)=>{
                 console.log('card==>',errr);
+                // Un 5xx o una caida de red no son un rechazo de la tarjeta.
+                // Decirle al cliente que su tarjeta fallo cuando el problema es
+                // nuestro lo hace abandonar la compra sin motivo.
+                const status = errr?.response?.status;
+                setServerFail(!status || status >= 500);
                 setOpenMp(true);
                 setLoadForm(false)
             })
@@ -215,6 +229,7 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                 handleCloseMp={handleCloseMp}
                 openMp={openMp}
                 paymentMethod={true}
+                serverFail={serverFail}
             />
         </form>
     )
