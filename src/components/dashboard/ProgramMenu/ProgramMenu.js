@@ -56,7 +56,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
       
       const planNameFnc = data.planName;
       if(lastDateProgram){
-        axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/menus?initDate='+moment(lastDateProgram).add(1,'days').format('YYYY-MM-DD'),
+        axios.get('http://localhost:8443/api-af/v1/dashboard/menus?initDate='+moment(lastDateProgram).add(1,'days').format('YYYY-MM-DD'),
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }
@@ -113,7 +113,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
           })
       }else{
         
-        axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/menus?initDate='+moment().add(1,'days').format('YYYY-MM-DD'),
+        axios.get('http://localhost:8443/api-af/v1/dashboard/menus?initDate='+moment().add(1,'days').format('YYYY-MM-DD'),
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }
@@ -187,7 +187,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
 
     try {
       const resp = await axios.get(
-        `https://api.allpafood.com/dev/api-af/v1/dashboard/menus?initDate=${initDate}`,
+        `http://localhost:8443/api-af/v1/dashboard/menus?initDate=${initDate}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -422,7 +422,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
 
   const getDirections = () => {
       setLoadPl(true)
-      axios.get('https://api.allpafood.com/dev/api-af/v1/delivery/find/points',{
+      axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
         headers: {"Authorization" : `Bearer ${token}`} 
       }).then((resp)=>{
         
@@ -444,7 +444,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
   }
 
   const removeUbi = (item) =>{
-      axios.delete('https://api.allpafood.com/dev/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
+      axios.delete('http://localhost:8443/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
           headers: {"Authorization" : `Bearer ${token}`} 
       }).then((resp)=>{
           getDirections();

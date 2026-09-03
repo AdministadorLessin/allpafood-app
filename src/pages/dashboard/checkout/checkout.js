@@ -307,7 +307,7 @@ const CheckoutPage = (props) => {
             })
         }
 
-        axios.post('https://api.allpafood.com/dev/api-af/v1/subscriptions/payments/secure/tokens/mercadopago/yape',{
+        axios.post('http://localhost:8443/api-af/v1/subscriptions/payments/secure/tokens/mercadopago/yape',{
             phone: data.ynumero,
             otp: data.yotp,
             requestId: requestIdRef.current
@@ -315,7 +315,7 @@ const CheckoutPage = (props) => {
         {
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
-            axios.post('https://api.allpafood.com/dev/api-af/v1/invoice/create',
+            axios.post('http://localhost:8443/api-af/v1/invoice/create',
                 {
                     //complementsId: adicionalesList,
                     additional: aditionalsTmp,

@@ -59,7 +59,7 @@ const LoginPage = (props) => {
 
   const [errorAxios,setErrorAxios] = useState(false);
   const sendData = () =>{
-    axios.post('https://api.allpafood.com/dev/api-af/v1/auth/login',
+    axios.post('http://localhost:8443/api-af/v1/auth/login',
         {
           username:bodyFields.lfcorreo,
           password:bodyFields.lfpassword

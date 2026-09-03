@@ -391,7 +391,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         }
         
 
-        axios.put('https://api.allpafood.com/dev/api-af/v1/register/profile', {
+        axios.put('http://localhost:8443/api-af/v1/register/profile', {
             bornDate: formatDate(newObjet2.bornDate),
             district: newObjet2.district,
             address: newObjet2.address,
@@ -421,7 +421,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
 
-            axios.patch('https://api.allpafood.com/dev/api-af/v1/plan/user/need-day',
+            axios.patch('http://localhost:8443/api-af/v1/plan/user/need-day',
                 {
                     needDay:JSON.stringify(getCaloriesAllDays(newObjet2))
                 },
@@ -436,7 +436,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
 
 
-            axios.post('https://api.allpafood.com/dev/api-af/v1/auth/refresh-token',
+            axios.post('http://localhost:8443/api-af/v1/auth/refresh-token',
             {},
             {
                 headers: { "Authorization": `Bearer ${token}` }

@@ -39,7 +39,7 @@ const DashboadHome = (props) => {
   });
   
   const getMenus = () =>{
-      axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/orders',
+      axios.get('http://localhost:8443/api-af/v1/dashboard/orders',
           {headers: {"Authorization" : `Bearer ${token}`} }
       ).then((resp)=>{
           //console.log('======>',resp.data.data)
@@ -77,7 +77,7 @@ const DashboadHome = (props) => {
 
   const [objetMEtrics,setObjetMetrics] = useState();
   const getExpData = () =>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/plan/user/need-day',
+    axios.get('http://localhost:8443/api-af/v1/plan/user/need-day',
       {
           headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -100,7 +100,7 @@ const DashboadHome = (props) => {
   const [planChecked,setPlanChecked] = useState(false);
 
   const getPlan = ()=>{
-      axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/plan',{
+      axios.get('http://localhost:8443/api-af/v1/dashboard/plan',{
           headers: {"Authorization" : `Bearer ${token}`} 
       })
       .then((resp)=>{
@@ -146,7 +146,7 @@ const DashboadHome = (props) => {
   const [lastDateProgram,setLastDateProgram] = useState();
   const sendOrder = ()=>{
     setLoadResp(true);
-    axios.post('https://api.allpafood.com/dev/api-af/v1/order/scheduled',
+    axios.post('http://localhost:8443/api-af/v1/order/scheduled',
       orderPass,
       {
         headers: {"Authorization" : `Bearer ${token}`} 
@@ -166,7 +166,7 @@ const DashboadHome = (props) => {
   const reproOrder = (id)=>{
     setLoadResp(true);
     axios.delete(
-      'https://api.allpafood.com/dev/api-af/v1/order?orderId='+id,
+      'http://localhost:8443/api-af/v1/order?orderId='+id,
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }

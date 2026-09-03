@@ -20,7 +20,7 @@ const ProtectedRoutes = ({
 
     const validateToken = () =>{
         if(loadApp){
-            axios.get('https://api.allpafood.com/dev/api-af/v1/auth/validate-token',
+            axios.get('http://localhost:8443/api-af/v1/auth/validate-token',
                 {
                     headers: {"Authorization" : `Bearer ${loadApp}`} 
                 }

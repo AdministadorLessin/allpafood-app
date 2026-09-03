@@ -137,7 +137,7 @@ const UbicacionesPage = (props) => {
     const [loadPl,setLoadPl] = useState(false);
     const getDirections = () => {
         setLoadPl(true)
-        axios.get('https://api.allpafood.com/dev/api-af/v1/delivery/find/points',{
+        axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
             setPointList(resp.data.data)
@@ -153,7 +153,7 @@ const UbicacionesPage = (props) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
-        axios.post('https://api.allpafood.com/dev/api-af/v1/delivery/create/point',
+        axios.post('http://localhost:8443/api-af/v1/delivery/create/point',
             dataAddPoint
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
@@ -167,7 +167,7 @@ const UbicacionesPage = (props) => {
     // Update ubi
     const updateUbi = (item) =>{
         if(token){
-            axios.put('https://api.allpafood.com/dev/api-af/v1/delivery/update/point?deliveryPointId='+item.id,
+            axios.put('http://localhost:8443/api-af/v1/delivery/update/point?deliveryPointId='+item.id,
                 {},
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
@@ -181,7 +181,7 @@ const UbicacionesPage = (props) => {
     }
 
     const removeUbi = (item) =>{
-        axios.delete('https://api.allpafood.com/dev/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
+        axios.delete('http://localhost:8443/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
             getDirections()

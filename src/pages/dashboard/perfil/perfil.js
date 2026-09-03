@@ -51,7 +51,7 @@ const PerfilPage = (props) => {
   const [person,setPerson] = useState();
   const [imgProfile,setImgProfile] = useState(null);
   const getInfo = ()=>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/profile/data/personal',
+    axios.get('http://localhost:8443/api-af/v1/profile/data/personal',
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -81,7 +81,7 @@ const PerfilPage = (props) => {
   // Delivery Point
   const [delivery,setDelivery] = useState();
   const getDelivery = () =>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/profile/data/delivery',
+    axios.get('http://localhost:8443/api-af/v1/profile/data/delivery',
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -97,7 +97,7 @@ const PerfilPage = (props) => {
   // Privacidad
   const [privacity,setPrivacity] = useState();
   const getPrivacity = () =>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/profile/data/privacy',
+    axios.get('http://localhost:8443/api-af/v1/profile/data/privacy',
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }

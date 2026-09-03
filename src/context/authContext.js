@@ -32,7 +32,7 @@ function useLocalStorageState(key, defaultValue) {
 }
 
 export default function AuthContextProvider({ children }) {
-  const baseUrl = 'https://api.allpafood.com/dev/api-af/v1/';
+  const baseUrl = 'http://localhost:8443/api-af/v1/';
 
   // Estados sincronizados automáticamente con LocalStorage
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEYS.TOKEN) || null);

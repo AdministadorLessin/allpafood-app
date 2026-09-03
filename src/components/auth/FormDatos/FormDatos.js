@@ -104,7 +104,7 @@ const FormDatos = ({telefono}) => {
 
     const sendData = (data) => {
         setFormRegLoad(true);
-        axios.post('https://api.allpafood.com/dev/api-af/v1/register/user',
+        axios.post('http://localhost:8443/api-af/v1/register/user',
             {
                 email: data.fdcorreo,
                 password: data.fdclave,

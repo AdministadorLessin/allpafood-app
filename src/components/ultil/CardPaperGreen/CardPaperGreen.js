@@ -21,7 +21,7 @@ const CardPaperGreen = ({planes,data}) => {
   };
 
   const getPlandData = () =>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/plan',{
+    axios.get('http://localhost:8443/api-af/v1/dashboard/plan',{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
       setPlanData(resp.data.data);

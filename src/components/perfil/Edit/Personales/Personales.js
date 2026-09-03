@@ -43,7 +43,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
 
     const updateDataPrivacity = (dataTmp) =>{
         setLoadingForm(true);
-        axios.put('https://api.allpafood.com/dev/api-af/v1/profile/data/personal',
+        axios.put('http://localhost:8443/api-af/v1/profile/data/personal',
             {
                 name: dataTmp.fpnombres,
                 lastname: dataTmp.fpapellos,

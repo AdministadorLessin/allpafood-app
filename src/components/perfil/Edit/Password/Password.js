@@ -62,7 +62,7 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
             data:null
         });
 
-        axios.put('https://api.allpafood.com/dev/api-af/v1/profile/data/authentication',
+        axios.put('http://localhost:8443/api-af/v1/profile/data/authentication',
             {
                 password: dataTmp.oldPassword,
                 newPassword: dataTmp.password

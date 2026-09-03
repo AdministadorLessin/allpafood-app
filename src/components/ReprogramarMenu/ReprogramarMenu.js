@@ -95,7 +95,7 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
     const [highlightedDays, setHighlightedDays] = useState([]);
 
     const getAllprogam = () =>{
-        axios.get('https://api.allpafood.com/dev/api-af/v1/order/plan',
+        axios.get('http://localhost:8443/api-af/v1/order/plan',
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }

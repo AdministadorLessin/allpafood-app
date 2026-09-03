@@ -55,7 +55,7 @@ const FacturacionPage = (props) => {
 
   const getFacturas = () =>{
     const rowsTmp = [];
-    axios.get('https://api.allpafood.com/dev/api-af/v1/invoice/list',{
+    axios.get('http://localhost:8443/api-af/v1/invoice/list',{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
       if(resp.data.data && resp.data.data.length){
@@ -78,7 +78,7 @@ const FacturacionPage = (props) => {
   const [helloCard,setHelloCard] = useState();
 
   const getPlan = ()=>{
-      axios.get('https://api.allpafood.com/dev/api-af/v1/dashboard/plan',{
+      axios.get('http://localhost:8443/api-af/v1/dashboard/plan',{
           headers: {"Authorization" : `Bearer ${token}`} 
       })
       .then((resp)=>{

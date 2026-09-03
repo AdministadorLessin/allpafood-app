@@ -89,7 +89,7 @@ const RegistroPage = (props) => {
         setLoadingVal(true);
 
         const phoneVerify = '51' + numberVerify;
-        axios.post('https://api.allpafood.com/dev/api-af/v1/auth/send-code',{phoneNumber:phoneVerify })
+        axios.post('http://localhost:8443/api-af/v1/auth/send-code',{phoneNumber:phoneVerify })
             .then((resp)=>{
                 handleUpdateToken(resp.data.data.token,resp.data.data);
                 setTimeout(() => {
@@ -117,7 +117,7 @@ const RegistroPage = (props) => {
     const [errorVerifyCode,setErrorVerifyCode] = useState();
     const sendCode = () =>{
         setLoadingVal(true)
-        axios.post('https://api.allpafood.com/dev/api-af/v1/register/verify-code',
+        axios.post('http://localhost:8443/api-af/v1/register/verify-code',
             {
                 code:codeVerify
             },

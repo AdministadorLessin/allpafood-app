@@ -51,7 +51,7 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
 
     const updateDataPrivacity = (dataTmp) =>{
         setLoadingForm(true);
-        axios.put('https://api.allpafood.com/dev/api-af/v1/profile/data/privacy',
+        axios.put('http://localhost:8443/api-af/v1/profile/data/privacy',
             {
                 documentNumber: dataTmp.fpdni,
                 phoneNumber: dataTmp.fpwhatsapp,

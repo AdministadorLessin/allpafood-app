@@ -17,7 +17,7 @@ const ProfileEditAvatar = ({closeModal,data,updatePerson}) => {
 
   const updateAvatar = ()=>{
     setLoadingForm(true);
-    axios.put('https://api.allpafood.com/dev/api-af/v1/profile/data/personal',
+    axios.put('http://localhost:8443/api-af/v1/profile/data/personal',
         {
             name: data.name,
             lastname: data.lastname,

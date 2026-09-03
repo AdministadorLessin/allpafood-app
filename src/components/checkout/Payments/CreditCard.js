@@ -69,7 +69,7 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
         }
         
         if(paymentMethods && paymentMethods.results.length){
-            axios.post('https://api.allpafood.com/dev/api-af/v1/invoice/create',{
+            axios.post('http://localhost:8443/api-af/v1/invoice/create',{
                 complementsId: adicionalesList,
                 // El backend hace dto.additional().stream() sin comprobar null:
                 // si este campo no viaja, revienta con NullPointerException (500)

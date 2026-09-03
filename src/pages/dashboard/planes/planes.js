@@ -28,7 +28,7 @@ const PlanesPage = (props) => {
 
   const [recomendPlans,setRecomendPlans] = useState();
   const getRecomend = () =>{
-    axios.get('https://api.allpafood.com/dev/api-af/v1/private/catalog/subscription-plans/recommended',{
+    axios.get('http://localhost:8443/api-af/v1/private/catalog/subscription-plans/recommended',{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
 

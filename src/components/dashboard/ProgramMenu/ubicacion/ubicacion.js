@@ -140,7 +140,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
     
 
     const getDirections = () => {
-        axios.get('https://api.allpafood.com/dev/api-af/v1/delivery/find/points',{
+        axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
             //console.log(resp)
@@ -155,7 +155,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
-        axios.post('https://api.allpafood.com/dev/api-af/v1/delivery/create/point',
+        axios.post('http://localhost:8443/api-af/v1/delivery/create/point',
             dataAddPoint
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
