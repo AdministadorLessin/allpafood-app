@@ -25,7 +25,12 @@ import { useEffect } from "react";
 
 const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => {
 
-    initMercadoPago('APP_USR-fa1bc33e-3d56-4b37-b674-a6f65864ba86');
+    // La llave publica sale del entorno para poder probar en sandbox sin tocar
+    // el codigo. Si la variable no existe cae en la de produccion, que es el
+    // comportamiento de siempre.
+    // OJO: en staging hay que definir REACT_APP_MP_PUBLIC_KEY con la llave TEST-,
+    // porque sin ella el navegador cobra tarjetas reales.
+    initMercadoPago(process.env.REACT_APP_MP_PUBLIC_KEY || 'APP_USR-fa1bc33e-3d56-4b37-b674-a6f65864ba86');
     const { token,cartItems, cartAdicionales, planInfo } = useAuthContext();
 
     // Direccion de facturacion: la que el cliente ya registro como entrega.
@@ -81,7 +86,11 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
             }).then((resp)=>{
                 //handleOpen(true);
                 setShowLoaderPayment(true);
-                setLoadForm(false);
+                // No se restaura el boton: el pago ya paso y LoaderPayment tarda
+                // 7 segundos en llevar al dashboard. Si el boton vuelve, un segundo
+                // clic en esa ventana dispara otro invoice/create que responde 409
+                // "Usted cuenta con un plan vigente", y la pantalla se lo muestra
+                // al cliente como "no procesamos tu pago" justo despues de cobrarle.
                 const planInfoT=  JSON.parse(window.localStorage.getItem('inf'))
                 const baseUrl = 'https://admin-landing.allpafood.com/';
                 const emailBody = {

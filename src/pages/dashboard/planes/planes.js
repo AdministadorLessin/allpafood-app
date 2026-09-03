@@ -66,13 +66,23 @@ const PlanesPage = (props) => {
         })
       }
 
+      // Orden de presentacion preferido. Los planes que no esten en esta
+      // lista se muestran igual al final: antes, crear un plan nuevo en el
+      // panel admin hacia que no apareciera aqui.
       const order = [2, 1, 3];
+      const lista = Array.isArray(planesList) ? planesList : [];
 
-      const orderedData = order.map(id =>
-        planesList.find(item => item.id === id)
+      const preferidos = order
+        .map(id => lista.find(item => item && item.id === id))
+        .filter(Boolean);
+
+      const resto = lista.filter(
+        item => item && !order.includes(item.id)
       );
 
-      setRecomendPlans(orderedData);
+      // .filter(Boolean) evita los undefined que antes tumbaban la pantalla
+      // cuando un id de la lista no existia en la base.
+      setRecomendPlans([...preferidos, ...resto]);
 
     }).catch((error)=>{
       console.log(error);
@@ -134,7 +144,9 @@ const PlanesPage = (props) => {
 
                       <div className="title">
                         <h4>{item.description}</h4>
-                        <h3><small className="pen">S/.</small>{parseInt(item.price).toFixed(0)} <small>.99</small></h3>
+                        {/* El precio real, no uno inventado: antes el ".99" iba escrito a mano
+                            y el cliente veia 295.99 cuando el plan costaba 295.00. */}
+                        <h3><small className="pen">S/.</small>{Math.trunc(Number(item.price))} <small>.{String(Number(item.price).toFixed(2)).split(".")[1]}</small></h3>
                         <p>Antes s/. {item.previousPrice}</p>
                       </div>
 
@@ -155,7 +167,7 @@ const PlanesPage = (props) => {
 
                           {item.properties && item.properties.length && 
                             <ul>
-                              {item.properties.map((propItem)=>{
+                              {item.properties?.map((propItem)=>{
                                 if( propItem.name === 'calorias' ){
                                   return (
                                     <li><span><img src={icoCalorias} alt="" /></span><p>{propItem.value} <small>kcal</small> <strong>Calorías</strong></p></li>
@@ -185,7 +197,7 @@ const PlanesPage = (props) => {
                       
                       {item.descriptionList && item.descriptionList.length &&
                         <ul className={'list'}>
-                          {item.descriptionList.map((descItem)=>(
+                          {item.descriptionList?.map((descItem)=>(
                             <li>{descItem}</li>
                           ))}
                         </ul>

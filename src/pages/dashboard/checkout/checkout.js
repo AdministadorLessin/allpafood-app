@@ -336,7 +336,9 @@ const CheckoutPage = (props) => {
                 });
 
                 setShowLoaderPayment(true);
-                setLoadYape(false);
+                // Mismo caso que en la tarjeta: si el boton de Yape vuelve durante
+                // los 7 segundos de LoaderPayment, un segundo envio recibe 409 y el
+                // cliente ve "no procesamos tu pago" con el cobro ya hecho.
                 
                 const planInfoT=  JSON.parse(window.localStorage.getItem('inf'))
                 const baseUrl = 'https://admin-landing.allpafood.com/';

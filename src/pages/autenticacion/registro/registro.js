@@ -106,9 +106,9 @@ const RegistroPage = (props) => {
                 if(err.status === 409){
                     setErrorSendCode(err.response.data);
                 }else if(!err.response){
-                    setErrorSendCode({ message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' });
+                    setErrorSendCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' } });
                 }else{
-                    setErrorSendCode({ message: 'No pudimos enviar el codigo. Intentalo de nuevo en un momento.' });
+                    setErrorSendCode({ data: { message: 'No pudimos enviar el codigo. Intentalo de nuevo en un momento.' } });
                 }
             })
         
@@ -193,7 +193,7 @@ const RegistroPage = (props) => {
                                         {errorSendCode &&
                                             <div className="verifyPhoneError">
                                                 <DoDisturbIcon />
-                                                {errorSendCode.data.message}
+                                                {errorSendCode?.data?.message || 'No pudimos enviar el codigo. Intentalo de nuevo.'}
                                             </div>
                                         }
                                         <small>Envíaremos un código de verificación a tu número celular para validar que eres tu.</small>
@@ -248,7 +248,7 @@ const RegistroPage = (props) => {
                                         {errorVerifyCode &&
                                             <div className="verifyPhoneError">
                                                 <DoDisturbIcon />
-                                                {errorVerifyCode.data.message}
+                                                {errorVerifyCode?.data?.message || 'El codigo no es valido. Revisalo e intentalo de nuevo.'}
                                             </div>
                                         }
                                         <button onClick={sendCode} className="btnPrimary btnIcon">

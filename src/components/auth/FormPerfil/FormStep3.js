@@ -33,6 +33,7 @@ import {
     useAdvancedMarkerRef
   } from '@vis.gl/react-google-maps';
 import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const IOSSwitch = styled((props) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -367,6 +368,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         const getUserTmp = JSON.parse(window.localStorage.getItem('inf'));
 
         setLoadingForm(true)
+        setErrorGuardar('');   // limpiar el aviso del intento anterior
         updateData(dataForm);
 
         const newObjet = data;
@@ -394,7 +396,9 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
             district: newObjet2.district,
             address: newObjet2.address,
             descriptionAddress: newObjet2.descriptionAddress,
-            districtLocation: distrito,
+            // Si el geocodificador no detecto el distrito, se usa el que
+            // el cliente escribio. Antes viajaba vacio y el API devolvia 400.
+            districtLocation: distrito || bodyForm.fs3distrito,
             location: {
                 latitude: defailtCenter.lat,
                 longitude: defailtCenter.lng
@@ -451,6 +455,16 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
             
         }).catch((errr)=>{
             console.log(errr);
+            // Antes esto solo iba a consola: el formulario quedaba gris y el
+            // cliente no sabia que su registro habia fallado.
+            // Reactivar el formulario: sin esto queda gris y el cliente no
+            // puede reintentar aunque corrija el dato.
+            setLoadingForm(false);
+            loadStatus(false);
+            setErrorGuardar(
+                errr?.response?.data?.data?.message ||
+                'No pudimos guardar tus datos. Revisa el distrito e intentalo de nuevo.'
+            );
         })
 
     };
@@ -518,6 +532,8 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
     };
 
     const [distrito,setDistrito] = useState();
+    const [distritoNoDetectado,setDistritoNoDetectado] = useState(false);
+    const [errorGuardar,setErrorGuardar] = useState('');
 
     const getDistrictFromCoords = (latLng) => {
 
@@ -583,13 +599,18 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                     }
                 }
 
-                // 3. No encontramos distrito
+                // 3. No encontramos distrito.
+                // Google devuelve "Lima" en muchas direcciones de avenida
+                // principal. Antes esto hacia `return` y dejaba districtLocation
+                // vacio: el API respondia 400 y el cliente no veia nada.
+                // Ahora se avisa y el campo queda para que lo complete a mano.
                 if (!district) {
-                    console.warn(
-                        'Distrito no detectado (Google devolvió Lima)'
-                    );
+                    console.warn('Distrito no detectado (Google devolvio Lima)');
+                    setDistritoNoDetectado(true);
                     return;
                 }
+
+                setDistritoNoDetectado(false);
 
                 console.log('Distrito FINAL:', district);
 
@@ -657,6 +678,19 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                             onChange={handleChangeFields} 
                             value={bodyForm.fs3distrito} 
                         />
+                        {/* El geocodificador de Google devuelve "Lima" en muchas
+                            avenidas principales. Cuando eso pasa hay que pedir el
+                            distrito, no fallar en silencio. */}
+                        {distritoNoDetectado && !bodyForm.fs3distrito &&
+                            <div className="regErrorField">
+                                <p> <ErrorOutlineIcon /> No pudimos detectar tu distrito. Escríbelo aquí por favor.</p>
+                            </div>
+                        }
+                        {errors.fs3distrito &&
+                            <div className="regErrorField">
+                                <p> <ErrorOutlineIcon /> Ingresa tu distrito por favor.</p>
+                            </div>
+                        }
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={10}>
@@ -792,6 +826,13 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                             </span>
                         </button>
                     </div>
+                    {/* Si el guardado falla, el cliente tiene que enterarse.
+                        Antes el formulario quedaba gris sin explicacion. */}
+                    {errorGuardar &&
+                        <div className="regErrorField">
+                            <p> <ErrorOutlineIcon /> {errorGuardar}</p>
+                        </div>
+                    }
                 </Grid>
             </Grid>
 
