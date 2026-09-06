@@ -26,8 +26,6 @@ import * as motion from "motion/react-client"
 
 import { 
     APIProvider,
-    ControlPosition,
-    MapControl,
     AdvancedMarker,
     Map,
     useMap,
@@ -544,17 +542,21 @@ const UbicacionesPage = (props) => {
 
                                     />
                                 </Map>
-                                <MapControl position={ControlPosition.TOP_LEFT} width={'100%'}>
-                                    <div className="searchMapBox" >
-                                        <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
-                                    </div>
-                                </MapControl>
                                 <MapHandler 
                                     place={selectedPlace} 
                                     marker={marker}
                                     onLocationChange={handleLocationChange}
                                 />
 
+                                {/* El buscador vivia dentro de un MapControl. Google envuelve
+                                    cada control en un div que se ajusta al contenido, asi que la
+                                    caja no tenia contra que medir un porcentaje y por eso estaba
+                                    clavada en 500px: en un movil de 375 se salia del mapa. Aqui
+                                    cuelga del contenedor del mapa, igual que el aviso de
+                                    cobertura, y left/right la ajustan a cualquier pantalla. */}
+                                <div className="searchMapBox">
+                                    <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
+                                </div>
                             </APIProvider>
                             {!statusUbi &&
                             <div className="searchNotCobertura">

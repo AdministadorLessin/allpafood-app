@@ -143,13 +143,17 @@
     background: white;
     box-shadow: 0px 0px 20px 0px rgba(0,0,0,.1);
     width: 100%;
-    padding: 15px 15px 15px 25px;
+    padding: 14px 16px;
     border-radius: 15px;
-    justify-content: space-between;
+    gap: 12px;
     align-items: center;
     margin-bottom: 10px;
+
+    /* El texto manda: se lleva el ancho que sobre y puede encogerse. Antes
+       tenia un calc(100% - 100px) fijo que no correspondia con nada. */
     .txt{
-        width: calc( 100% - 100px );
+        flex: 1 1 100%;
+        min-width: 0;
         h3{
             font-size: 14px;
         }
@@ -158,10 +162,16 @@
             color: var(--dark-gris);
         }
     }
+
+    /* Aqui estaba el recorte: .actions media 30px fijos y dentro vivian una
+       pildora de ~120px y un boton redondo de 30. Los dos se salian de la
+       tarjeta y de la pantalla, y en movil el de borrar quedaba fuera del
+       viewport, sin forma de alcanzarlo. */
     .actions{
-        width: 30px;
+        flex: 1 1 100%;
         display: flex;
-        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
         .check{
             width: 30px;
             height: 30px;
@@ -221,7 +231,9 @@
     @include mediaTablet{
         width: 100%;
         padding: 0px 0px 0px 0px;
-        height: 380px;
+        /* El contenedor media 380px y el mapa de dentro 450: los 70px de
+           diferencia se derramaban encima de "Datos de la entrega". */
+        height: 450px;
         margin-bottom: 20px;
     }
 }
@@ -248,8 +260,12 @@
     position: absolute;
     top: 10px;
     left: 10px;
+    /* Eran 500px fijos dentro de un mapa de 313px: la caja se salia por la
+       derecha. Con left y right se ajusta sola al ancho del mapa. */
+    right: 10px;
+    max-width: 500px;
     height: auto;
-    width: 500px;
+    z-index: 4;
     &::before{
         width: 18px;
         height: 22.36px;
@@ -314,7 +330,21 @@
         margin: 4px 0 0;
         line-height: 1.4;
     }
-    .actions{ display: flex; align-items: center; gap: 8px; }
+}
+
+/* En movil los botones ocupan su propia linea a lo ancho: son el area que hay
+   que tocar con el pulgar, y comprimidos a un costado no cabian. Desde tablet
+   vuelven al costado del texto, donde si hay sitio. */
+.ubiPageMapItem .ubiUsar{ flex: 1 1 auto; text-align: center; }
+.ubiPageMapItem .remove{ flex: 0 0 auto; }
+
+@media screen and (min-width: 560px){
+    .ubiPageMapItem{
+        flex-wrap: nowrap;
+        .txt{ flex: 1 1 auto; }
+        .actions{ flex: 0 0 auto; }
+        .ubiUsar{ flex: 0 0 auto; }
+    }
 }
 
 /* La dirección en uso se declara con palabras, no solo con un color: antes el
