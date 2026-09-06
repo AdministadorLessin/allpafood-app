@@ -1,0 +1,518 @@
+/* ==========================================================================
+   El embudo: registro, ingreso, planes y pago.
+
+   Todo lo de aqui usa los mismos tokens, el mismo ancho y la misma escala
+   tipografica que el panel del cliente. Antes cada pantalla del embudo traia
+   su propio fondo (manchas pastel), su propio ancho y sus propios botones
+   degradados, asi que quien se registraba cruzaba tres disenos distintos y
+   despues aterrizaba en un cuarto.
+   ========================================================================== */
+
+.afAuth{
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    padding: 22px 16px 60px;
+
+    &__col{
+        width: 100%;
+        max-width: 560px;   /* el mismo que .afPanel */
+        margin: 0 auto;
+    }
+
+    &__top{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    &__marca{
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        img{ width: 26px; height: auto; display: block; }
+        span{
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -.025em;
+            color: var(--af-ink);
+        }
+        &--centro{ margin: 0 auto; padding-right: 38px; }
+    }
+
+    &__volver{
+        width: 38px;
+        height: 38px;
+        flex: 0 0 auto;
+        border: 0;
+        border-radius: 50%;
+        background: var(--af-paper);
+        box-shadow: var(--af-shadow-s);
+        color: var(--af-ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        svg{ width: 17px; height: 17px; }
+    }
+}
+
+/* --- Avance del embudo ---
+   Se llama afAvance y no afPaso porque .afPaso ya existe: es cada etapa del
+   seguimiento del pedido en PedidoDeHoy, y su display:flex aplastaba esta
+   barra en una sola linea. */
+.afAvance{
+    margin-bottom: 26px;
+
+    &__barra{
+        display: flex;
+        gap: 5px;
+    }
+    &__seg{
+        flex: 1;
+        height: 5px;
+        border-radius: var(--af-r-pill);
+        background: rgba(16,31,24,.09);
+        overflow: hidden;
+        i{
+            display: block;
+            height: 100%;
+            border-radius: var(--af-r-pill);
+            background: var(--af-accent);
+            transition: width .5s cubic-bezier(.4,0,.2,1);
+        }
+    }
+    &__pie{
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 9px 0 0;
+        font-size: var(--af-t-xs);
+        color: var(--af-muted);
+        b{ color: var(--af-ink); font-weight: 700; }
+        span{ white-space: nowrap; }
+    }
+}
+
+/* --- Titulares: los mismos dos tonos del panel --- */
+.afAuth__titular{
+    font-size: var(--af-t-xxl);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    color: var(--af-ink);
+    margin: 0 0 8px;
+    text-wrap: balance;
+    .t1{ display: block; color: var(--af-muted); font-weight: 700; }
+}
+.afAuth__bajada{
+    font-size: var(--af-t-s);
+    line-height: 1.55;
+    color: var(--af-muted);
+    margin: 0 0 22px;
+    b, strong{ color: var(--af-ink); font-weight: 700; }
+}
+
+/* --- Campos ---
+   MUI se usa con las dos variantes (outlined en registro, filled en el resto).
+   Se normalizan aqui las dos para que un formulario no se vea distinto del
+   siguiente por un prop que nadie recuerda haber elegido. */
+.afCampo{
+    width: 100%;
+    margin-bottom: 14px;
+
+    .MuiFormControl-root{ width: 100%; }
+
+    .MuiInputBase-root{
+        background: var(--af-paper);
+        border-radius: 16px;
+        border: 1.5px solid var(--af-line);
+        font-family: var(--poppins);
+        font-size: 15px;
+        color: var(--af-ink);
+        transition: border-color .2s ease, box-shadow .2s ease;
+        overflow: hidden;
+
+        &::before, &::after{ display: none !important; }
+
+        &.Mui-focused{
+            border-color: var(--af-accent);
+            box-shadow: 0 0 0 3px var(--af-accent-soft);
+        }
+        &.Mui-error{ border-color: var(--error); }
+
+        input{
+            padding: 22px 16px 8px;
+            color: var(--af-ink);
+            font-size: 15px;
+        }
+    }
+
+    /* Sin etiqueta flotante el campo se centra: si no, queda un hueco arriba
+       reservado para una etiqueta que nunca llega. */
+    .MuiInputBase-root:not(.MuiInputLabel-shrink) input{ padding-top: 22px; }
+    .MuiFormControl-root:not(:has(label)) .MuiInputBase-root input{ padding: 15px 16px; }
+
+    .MuiInputLabel-root{
+        font-family: var(--poppins);
+        font-size: 14px;
+        color: var(--af-muted);
+        left: 4px;
+        &.Mui-focused{ color: var(--af-accent); }
+        &.Mui-error{ color: var(--error); }
+    }
+
+    /* El outlined dibuja su propio borde encima del nuestro. */
+    .MuiOutlinedInput-notchedOutline{ border: 0 !important; }
+
+    &--grande .MuiInputBase-root input{
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-align: center;
+        padding: 17px 16px;
+    }
+
+    /* El contador de flechitas del type=number no aporta nada en un telefono
+       ni en un codigo de verificacion, y se come 20px del campo. */
+    input[type=number]{ -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{
+        -webkit-appearance: none; margin: 0;
+    }
+}
+
+.afCampo__ayuda{
+    display: block;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--af-muted);
+    margin: -4px 0 18px;
+}
+
+.afAuth__error{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--error-back);
+    color: var(--error-txt);
+    border-radius: 13px;
+    padding: 11px 13px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin: 0 0 14px;
+    svg{ width: 15px; height: 15px; flex: 0 0 auto; margin-top: 1px; }
+}
+
+/* --- Pie de pantalla: la puerta a la otra opcion --- */
+.afAuth__pie{
+    text-align: center;
+    font-size: 13px;
+    color: var(--af-muted);
+    margin: 22px 0 0;
+    a, button{
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--af-accent);
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: none;
+    }
+}
+
+/* Mientras se envia algo, el formulario se apaga entero en vez de dejar
+   botones vivos que disparan la peticion dos veces. */
+.afAuth__ocupado{
+    opacity: .55;
+    pointer-events: none;
+}
+
+/* --- Formulario de datos (ultimo paso de la cuenta) --- */
+.afDatos{
+    .MuiGrid-item{ padding-top: 0 !important; }
+}
+
+/* Reglas de la contrasena: se marcan solas mientras se escribe. */
+.afClave{
+    list-style: none;
+    margin: 2px 0 16px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+
+    li{
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: var(--af-muted);
+        transition: color .2s ease;
+
+        span{
+            width: 15px;
+            height: 15px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            border: 1.5px solid var(--af-line);
+            position: relative;
+            transition: background .2s ease, border-color .2s ease;
+        }
+    }
+
+    &--ok{
+        color: var(--af-accent) !important;
+        font-weight: 600;
+        span{
+            background: var(--af-accent);
+            border-color: var(--af-accent);
+            &::after{
+                content: '';
+                position: absolute;
+                left: 4.5px; top: 2px;
+                width: 3.5px; height: 7px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   Los tres pasos del perfil (objetivo, condicion fisica, medidas).
+
+   Estas pantallas conservan su logica intacta: lo que cambia es como se ven.
+   Se re-viste por nombre de clase y todo va acotado a .afAuth, para no tocar
+   ni un formulario del panel que reutilice los mismos nombres.
+   ========================================================================== */
+.afAuth{
+
+    /* registro.scss envuelve estos pasos en una tarjeta blanca con sombra.
+       Dentro van otras tarjetas blancas con sombra —las opciones—, asi que
+       quedaba blanco sobre blanco y ninguna resaltaba. Las opciones flotan
+       sobre el degradado, igual que en el panel. */
+    .regStepResp{
+        width: 100%;
+        background: none;
+        box-shadow: none;
+        padding: 0;
+        border-radius: 0;
+        display: block;
+    }
+
+    /* Etiqueta de cada grupo de preguntas */
+    .rsrTitle{
+        margin: 22px 0 10px;
+        span{
+            display: block;
+            padding: 0;
+            /* La barrita verde de registro.scss */
+            &::before{ display: none; }
+            font-size: var(--af-t-m);
+            font-weight: 700;
+            letter-spacing: -.012em;
+            color: var(--af-ink);
+        }
+    }
+    .regStepResp > div:first-child .rsrTitle{ margin-top: 0; }
+    /* registro.scss deja 60px de aire debajo de cada grupo. */
+    .regSexField, .regObjField{ margin-bottom: 0 !important; display: block; }
+
+    /* --- Elegir entre dos: sexo, fuerza si/no --- */
+    .regSexBox,
+    .rsrIntensidad{
+        display: flex;
+        gap: 8px;
+        margin-bottom: 4px;
+
+        span{
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 48px;
+            padding: 10px 12px;
+            border-radius: 15px;
+            background: var(--af-paper);
+            border: 1.5px solid var(--af-line);
+            box-shadow: var(--af-shadow-s);
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--af-ink);
+            cursor: pointer;
+            transition: border-color .18s ease, background .18s ease;
+            svg{ width: 18px; height: 18px; color: var(--af-muted); }
+
+            &.active{
+                border-color: var(--af-ink);
+                background: var(--af-accent-soft);
+                color: var(--af-accent);
+                font-weight: 700;
+                svg{ color: var(--af-accent); }
+            }
+        }
+    }
+
+    /* --- Objetivo nutricional: tres tarjetas --- */
+    .regObjList{
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+    .regObjItem{
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        width: 100%;
+        background: var(--af-paper);
+        border: 1.5px solid transparent;
+        border-radius: 18px;
+        padding: 14px 15px;
+        box-shadow: var(--af-shadow-s);
+        cursor: pointer;
+        transition: border-color .18s ease;
+
+        .checkBox{
+            width: 40px;
+            height: 40px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: rgba(16,31,24,.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            svg{ width: 19px; height: 19px; color: var(--af-muted); }
+        }
+        .txt{
+            min-width: 0;
+            h4{
+                font-size: 14.5px;
+                font-weight: 700;
+                color: var(--af-ink);
+                margin: 0 0 2px;
+                line-height: 1.25;
+            }
+            p{
+                font-size: 12px;
+                line-height: 1.45;
+                color: var(--af-muted);
+                margin: 0;
+            }
+        }
+    }
+    .regObjItemAct{
+        border-color: var(--af-ink);
+        .checkBox{
+            background: var(--af-accent-soft);
+            svg{ color: var(--af-accent); }
+        }
+    }
+
+    /* --- Campos de los pasos 2 y 3 --- */
+    .textFieldReg,
+    .textFieldReg2,
+    .textFieldReg3{
+        width: 100%;
+        margin-bottom: 14px;
+
+        .MuiFormControl-root{ width: 100%; }
+        .MuiInputBase-root{
+            background: var(--af-paper);
+            border-radius: 16px;
+            border: 1.5px solid var(--af-line);
+            font-family: var(--poppins);
+            font-size: 15px;
+            color: var(--af-ink);
+            overflow: hidden;
+            &::before, &::after{ display: none !important; }
+            &.Mui-focused{
+                border-color: var(--af-accent);
+                box-shadow: 0 0 0 3px var(--af-accent-soft);
+            }
+            &.Mui-error{ border-color: var(--error); }
+            input{ padding: 22px 16px 8px; color: var(--af-ink); }
+        }
+        .MuiInputLabel-root{
+            font-family: var(--poppins);
+            font-size: 14px;
+            color: var(--af-muted);
+            left: 4px;
+            &.Mui-focused{ color: var(--af-accent); }
+        }
+        .MuiOutlinedInput-notchedOutline{ border: 0 !important; }
+    }
+
+    .uMedida{
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--af-muted);
+        padding-right: 6px;
+    }
+
+    .textFieldRegNota{
+        display: block;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--af-muted);
+        margin: -6px 0 16px;
+    }
+
+    .regErrorField{
+        p{
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--error-back);
+            color: var(--error-txt);
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-size: 12.5px;
+            margin: 8px 0 0;
+            svg{ width: 15px; height: 15px; }
+        }
+    }
+
+    /* --- Botones de paso ---
+       Los originales son pildoras con degradado verde y una flecha blanca
+       encima. Aqui se alinean con el boton unico del panel. */
+    .btnBox{
+        display: flex;
+        gap: 9px;
+        margin-top: 24px;
+
+        .btnPrimary{
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            border: 0;
+            border-radius: var(--af-r-pill);
+            background: var(--af-mint);
+            color: var(--af-mint-ink);
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0 18px;
+            span{ display: inline-flex; align-items: center; gap: 8px; }
+            /* La flecha es un PNG blanco: sobre menta no se ve. */
+            img{ display: none; }
+        }
+        .btnOutline{
+            flex: 0 0 auto;
+            background: transparent;
+            border: 1.5px solid var(--af-line);
+            color: var(--af-muted);
+        }
+    }
+    .btnBoxLeft{ justify-content: flex-start; }
+}

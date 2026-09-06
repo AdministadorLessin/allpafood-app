@@ -1,24 +1,16 @@
 import React,{useEffect, useState} from "react";
 import './registro.scss';
 
-import logoAllpafood2 from '../../../assets/img/logo_allpafood.png';
-
-import IconCondicionSvg from '../../../components/ultil/iconSvg/iconCondicionSvg';
-import IconObjetivoSvg from './../../../components/ultil/iconSvg/iconObjetivoSvg';
-import IconProfileSvg from './../../../components/ultil/iconSvg/iconProfileSvg';
-
 import {useAuthContext} from '../../../context/authContext';
 
-import LayoutTransition from './../../../components/LayoutTransition/LayoutTransition';
+import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
 import FormPerfilStep1 from './../../../components/auth/FormPerfil/FormStep1';
 import FormPerfilStep2 from './../../../components/auth/FormPerfil/FormStep2';
 import FormPerfilStep3 from './../../../components/auth/FormPerfil/FormStep3';
 
 import { AnimatePresence } from "motion/react"
 import * as motion from "motion/react-client"
-import Backdrop from './../../../components/ultil/Backdrop/Backdrop';
 import LoaderMacros from './../../../components/auth/FormPerfil/LoaderMacros/LoaderMacros';
-import RegistroSidebar from './../../../components/Registro/Sidebar/Sidebar';
 
 // Claves para el localStorage
 const STEP_CACHE_KEY = 'registro_step_cache';
@@ -66,79 +58,67 @@ const RegistroPage = (props) => {
         localStorage.removeItem(DATA_CACHE_KEY);
     };
 
+    /* Que se le esta preguntando y por que. Antes las tres pantallas solo
+       tenian una fila de iconos sin explicacion: el cliente daba su peso y su
+       altura sin saber para que servian. */
+    const TITULOS = [
+        { t1: 'Cuéntanos', fuerte: 'qué buscas',
+          bajada: 'Con esto calculamos cuántas calorías necesitas al día y qué plan te queda mejor.' },
+        { t1: 'Ahora,', fuerte: 'cómo te mueves',
+          bajada: 'Tu nivel de actividad cambia bastante el cálculo. Sé honesto: nadie lo va a ver.' },
+        { t1: 'Por último,', fuerte: 'tus medidas',
+          bajada: 'Es el último paso. Después te mostramos los planes que te calzan.' },
+    ];
+    const titulo = TITULOS[stepProfile] || TITULOS[0];
+
     return (
-        <LayoutTransition keytst={'123123asdada'}>
-            <Backdrop />
+        <MarcoAuth
+            fase="perfil"
+            paso={stepProfile}
+            volver={stepProfile > 0 ? () => setStepProfile(stepProfile - 1) : undefined}
+        >
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={stepProfile + 'profileFormRegistro'}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <h1 className="afAuth__titular">
+                        <span className="t1">{titulo.t1}</span>
+                        {titulo.fuerte}
+                    </h1>
+                    <p className="afAuth__bajada">{titulo.bajada}</p>
 
-            <main className="inlineFlex registerPage">
-                <RegistroSidebar />
-                <div className="registerPageResp registerPageResp">
-                    <img src={logoAllpafood2} alt="" />
-                </div>
-                <div className="regCont">
-                    <div className="inlineFlex regSteps ">
-                        <div className="regStepsBox regStepsBox2">
-                            <ul className="regStepMenu">
-                                <li className={stepProfile === 0 ? 'active' : null}>
-                                    <span>
-                                        <IconObjetivoSvg color={'#000'} />
-                                        Objetivos
-                                    </span>
-                                </li>
-                                <li className={stepProfile === 1 ? 'active' : null}>
-                                    <span>
-                                        <IconCondicionSvg color={'#000'} />
-                                        Condición física
-                                    </span>
-                                </li>
-                                <li className={stepProfile === 2 ? 'active' : null}>
-                                    <span>
-                                        <IconProfileSvg color={'#000'} />
-                                        Perfil
-                                    </span>
-                                </li>
-                            </ul>
-
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={stepProfile + 'profileFormRegistroasdada'}
-                                    initial={{ y: 10, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    exit={{ y: -10, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    {stepProfile === 0 ? (
-                                        <FormPerfilStep1
-                                            stepForm={stepProfile}
-                                            setStepForm={setStepProfile}
-                                            data={dataAxios}
-                                            setData={setDataAxios}
-                                        />
-                                    ) : stepProfile === 1 ? (
-                                        <FormPerfilStep2
-                                            stepForm={stepProfile}
-                                            setStepForm={setStepProfile}
-                                            data={dataAxios}
-                                            setData={setDataAxios}
-                                        />
-                                    ) : (
-                                        <FormPerfilStep3
-                                            stepForm={stepProfile}
-                                            setStepForm={setStepProfile}
-                                            data={dataAxios}
-                                            setData={setDataAxios}
-                                            loadStatus={setShowLoader}
-                                            clearCache={clearRegistrationCache} // Se pasa por si se necesita limpiar tras completar
-                                        />
-                                    )}
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-            </main>
+                    {stepProfile === 0 ? (
+                        <FormPerfilStep1
+                            stepForm={stepProfile}
+                            setStepForm={setStepProfile}
+                            data={dataAxios}
+                            setData={setDataAxios}
+                        />
+                    ) : stepProfile === 1 ? (
+                        <FormPerfilStep2
+                            stepForm={stepProfile}
+                            setStepForm={setStepProfile}
+                            data={dataAxios}
+                            setData={setDataAxios}
+                        />
+                    ) : (
+                        <FormPerfilStep3
+                            stepForm={stepProfile}
+                            setStepForm={setStepProfile}
+                            data={dataAxios}
+                            setData={setDataAxios}
+                            loadStatus={setShowLoader}
+                            clearCache={clearRegistrationCache}
+                        />
+                    )}
+                </motion.div>
+            </AnimatePresence>
             {showLoader && <LoaderMacros />}
-        </LayoutTransition>
+        </MarcoAuth>
     );
 };
 

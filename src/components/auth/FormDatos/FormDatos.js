@@ -9,12 +9,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from 'axios';
 
-import icoArrow from '../../../assets/img/ico_arrow_white_large.png';
 
 import {useAuthContext} from '../../../context/authContext';
 
 import { useNavigate } from "react-router-dom";
 import ErrorForm from './../../ultil/ErrorForm/ErrorForm';
+import { motion, alToque } from './../../ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 
 const LOCAL_STORAGE_KEY = 'form_datos_cache';
@@ -96,6 +96,14 @@ const FormDatos = ({telefono}) => {
 
     const formValues = watch();
 
+    const claveEscrita = formValues.fdclave || '';
+    const reglasClave = [
+        { txt: 'Al menos 8 caracteres',   ok: claveEscrita.length >= 8 },
+        { txt: 'Mayúsculas y minúsculas', ok: /[a-z]/.test(claveEscrita) && /[A-Z]/.test(claveEscrita) },
+        { txt: 'Un número',               ok: /[0-9]/.test(claveEscrita) },
+        { txt: 'Un símbolo (!@#$…)',      ok: /[!@#$%^&*]/.test(claveEscrita) },
+    ];
+
     useEffect(() => {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(formValues));
     }, [formValues]);
@@ -154,10 +162,10 @@ const FormDatos = ({telefono}) => {
 
     return (
 
-        <form className={'formPaper regDatosForm'} onSubmit={handleSubmit(onSubmitHandler)}>
+        <form className="afDatos" onSubmit={handleSubmit(onSubmitHandler)}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField 
                             variant="filled" 
                             id="fdnombre" 
@@ -171,7 +179,7 @@ const FormDatos = ({telefono}) => {
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField
                             variant="filled" 
                             id="fdapellidos" 
@@ -185,7 +193,7 @@ const FormDatos = ({telefono}) => {
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField 
                             variant="filled"
                             id="fdcorreo" 
@@ -199,7 +207,7 @@ const FormDatos = ({telefono}) => {
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField 
                             variant="filled"
                             id="fdtelefono" 
@@ -213,7 +221,7 @@ const FormDatos = ({telefono}) => {
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField
                             type={'number'}
                             variant="filled"
@@ -228,7 +236,7 @@ const FormDatos = ({telefono}) => {
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
+                    <div className="afCampo">
                         <TextField
                             variant="filled"
                             id="fdclave" 
@@ -241,16 +249,17 @@ const FormDatos = ({telefono}) => {
                             onChange={handleFieldChange}
                         />
                     </div>
-                    {errors.fdclave &&
-                        
-                            <div className="regDatosClaveValid">
-                                {errors.fdclave?.message ==='Deben tener al menos ocho caracteres.' && <p>(*) Deben tener al menos ocho caracteres</p>}
-                                {errors.fdclave?.message ==='Incluir mayúsculas y minúsculas.' && <p>(*) Incluir mayúsculas y minúsculas</p>}
-                                {errors.fdclave?.message ==='Incluir números.' && <p>(*) Incluir números</p>}
-                                {errors.fdclave?.message ==='Incluir símbolos.' && <p>(*) Incluir símbolos</p>}
-                            </div>
-                        
-                    }
+                    {/* Las cuatro reglas siempre a la vista y marcandose solas.
+                        Antes Yup mostraba una cada vez, asi que el cliente
+                        corregia una y descubria la siguiente: cuatro intentos
+                        para adivinar una contrasena valida. */}
+                    <ul className="afClave">
+                        {reglasClave.map((r) => (
+                            <li className={r.ok ? 'afClave--ok' : undefined} key={r.txt}>
+                                <span />{r.txt}
+                            </li>
+                        ))}
+                    </ul>
                 </Grid>
 
                 {errorData &&
@@ -260,14 +269,10 @@ const FormDatos = ({telefono}) => {
                 }
 
                 <Grid item xs={12}>
-                    <div className="textFieldBtn">
-                        <button type={'submit'} className={formRegLoad ? 'btnPrimary btnIcon btnIconRight btnDisabled':'btnPrimary btnIcon btnIconRight'}>
-                            <span>
-                                Siguiente
-                                <img src={icoArrow} alt="" />
-                            </span>
-                        </button>
-                    </div>
+                    <motion.button type="submit" className="afBtn afBtn--mint"
+                        disabled={formRegLoad} {...alToque}>
+                        {formRegLoad ? 'Creando tu cuenta…' : 'Crear mi cuenta'}
+                    </motion.button>
                 </Grid>
             </Grid>
 

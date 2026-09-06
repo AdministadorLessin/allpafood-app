@@ -1,15 +1,7 @@
 import React,{useState,useEffect} from "react";
 import './registro.scss';
 import TextField from '@mui/material/TextField';
-
-import logoAllpafood2 from '../../../assets/img/logo_allpafood.png';
-
-import icoUser from '../../../assets/img/ico_usuario_white.svg';
-import icoFacebook from '../../../assets/img/ico_facebook.svg';
-import icoGoogle from '../../../assets/img/ico_google.svg';
-
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-
+import { Link } from 'react-router-dom';
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -20,11 +12,15 @@ import {useAuthContext} from '../../../context/authContext';
 
 import { AnimatePresence } from "motion/react"
 import * as motion from "motion/react-client"
-import LayoutTransition from './../../../components/LayoutTransition/LayoutTransition';
+import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
+import { Bloque, alToque } from './../../../components/ultil/Motion/Motion';
 import FormDatos from './../../../components/auth/FormDatos/FormDatos';
-import Backdrop from './../../../components/ultil/Backdrop/Backdrop';
-import RegistroSidebar from './../../../components/Registro/Sidebar/Sidebar';
 import { API_URL } from '../../../config';
+
+const IcoError = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6v5M12 16.2v.2"/></svg>
+);
 
 const RegistroPage = (props) => {
 
@@ -48,12 +44,10 @@ const RegistroPage = (props) => {
     }
 
     useEffect(()=>{
-        // console.log('token show',token);
         updateFormStep();
     },[])
 
     const handleNextStep = () => {
-        //setStepItem(stepItem + 1);
         updateFormStep( stepItem + 1 );
     }
 
@@ -107,9 +101,9 @@ const RegistroPage = (props) => {
                 if(err.status === 409){
                     setErrorSendCode(err.response.data);
                 }else if(!err.response){
-                    setErrorSendCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' } });
+                    setErrorSendCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.' } });
                 }else{
-                    setErrorSendCode({ data: { message: 'No pudimos enviar el codigo. Intentalo de nuevo en un momento.' } });
+                    setErrorSendCode({ data: { message: 'No pudimos enviar el código. Inténtalo de nuevo en un momento.' } });
                 }
             })
         
@@ -128,7 +122,6 @@ const RegistroPage = (props) => {
             .then((resp)=>{
                 setTimeout(() => {
                     setLoadingVal(false)
-                    //setStepItem(2);  
                     updateFormStep(2);
                 }, 1000);
             }).catch((err)=>{
@@ -138,143 +131,138 @@ const RegistroPage = (props) => {
                 if(err.response){
                     setErrorVerifyCode(err.response);
                 }else{
-                    setErrorVerifyCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e intentalo de nuevo.' } });
+                    setErrorVerifyCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.' } });
                 }
             })
     }
 
+    const paso = Number(stepItem) || 0;
 
     return (
-        <LayoutTransition keytst={'123123asdaasdasdadda'}>
-            <Backdrop/>
-            <main className="inlineFlex registerPage">
-                <RegistroSidebar />
+        <MarcoAuth
+            fase="cuenta"
+            paso={paso}
+            volver={paso === 1 ? () => updateFormStep(0) : undefined}
+        >
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={paso}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <div className={loadingValid ? 'afAuth__ocupado' : undefined}>
 
-                <div className="registerPageResp">
-                    <img src={logoAllpafood2} alt="" />
-                </div>
-                
-                <div className='regCont'>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={stepItem === 0 ? stepItem : "empty"}
-                            initial={{ y: 10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -10, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className={'regVerify'}
-                        >
-                            { stepItem === 0 ?
-                                <div className={loadingValid ?'inlineBlock  disableForms' :'inlineBlock '}>
-                                    <div className="title">
-                                        <h2>Estas a unos pasos de registrarte</h2>
-                                        <p>Te damos la bienvenida a <strong>Allpafood</strong>. Ingresa y conoce <br />nuestros planes de comida</p>
-                                    </div>
+                    { paso === 0 ?
+                        <>
+                            <h1 className="afAuth__titular">
+                                <span className="t1">Empecemos por</span>
+                                tu número
+                            </h1>
+                            <p className="afAuth__bajada">
+                                Te mandamos un código por WhatsApp para confirmar que eres tú.
+                                Es lo único que necesitas para empezar.
+                            </p>
 
-                                    <form className={'inlineFlex textfieldVerify'} onSubmit={handleSubmit(onSubmitHandler)}>
-                                        <p>¿Cuál es tu teléfono?</p>
-                                        <TextField 
-                                            id="outlined-basic" 
-                                            name="fValidNumber" 
-                                            type='number' 
-                                            placeholder={'Ejem: 963 987 654'}
-                                            error={errors.fValidNumber ? true : false}
-                                            {...register("fValidNumber")} 
-                                            onChange={handleChangeNumber} 
-                                            value={numberVerify} 
-                                            variant="outlined"
-                                            
-                                        />
-                                        {errors.fValidNumber && (
-                                            <div className="verifyPhoneError">
-                                                <DoDisturbIcon />
-                                                {errors.fValidNumber.message}
-                                            </div>
-                                        )}
-                                        {errorSendCode &&
-                                            <div className="verifyPhoneError">
-                                                <DoDisturbIcon />
-                                                {errorSendCode?.data?.message || 'No pudimos enviar el codigo. Intentalo de nuevo.'}
-                                            </div>
-                                        }
-                                        <small>Envíaremos un código de verificación a tu número celular para validar que eres tu.</small>
-                                        <button href="#" type={'submit'}  className="btnPrimary btnIcon">
-                                            <span>
-                                                <img src={icoUser} alt="" />
-                                                Enviar mensaje
-                                            </span>
-                                        </button>
-                                    </form>
-                        
-                                    {false &&
-                                        <div className="inlineFlex regSocial">
-                                            <div className="inlineFlex regSocialDiv">
-                                                <span></span>
-                                            </div>
-                                            <a href="#" className="btnPrimary btnIcon btnIconRight btnFb">
-                                                <span>
-                                                    Continuar con
-                                                    <img src={icoFacebook} alt="" />
-                                                </span>
-                                            </a>
-                                            <a href="http://api.allpafood.com:8080/api-af/v1/oauth2/authorization/google" className="btnPrimary btnIcon btnIconRight btnGoogle">
-                                                <span>
-                                                    Continuar con
-                                                    <img src={icoGoogle} alt="" />
-                                                </span>
-                                            </a>
-                                        </div>
-                                    }
-
+                            <form onSubmit={handleSubmit(onSubmitHandler)}>
+                                <div className="afCampo afCampo--grande">
+                                    <TextField 
+                                        id="fValidNumber"
+                                        name="fValidNumber" 
+                                        type='number'
+                                        inputMode="numeric"
+                                        autoComplete="tel-national"
+                                        placeholder={'963 987 654'}
+                                        error={errors.fValidNumber ? true : false}
+                                        {...register("fValidNumber")} 
+                                        onChange={handleChangeNumber} 
+                                        value={numberVerify} 
+                                        variant="outlined"
+                                    />
                                 </div>
 
-                            :stepItem === 1 ?
-                                <div className={loadingValid ?'inlineBlock  disableForms' :'inlineBlock'}>
-                                    <div className="title" onClick={()=>setLoadingVal(false)}>
-                                        <h2>Valide su codigo por favor.</h2>
-                                        <p>El codigo es valido por 15 minutos. si no le llego puede <div className={'backStep'} onClick={()=>updateFormStep(0)}>volver a enviarlo</div></p>
+                                {errors.fValidNumber &&
+                                    <div className="afAuth__error">
+                                        <IcoError />
+                                        Escribe tus 9 dígitos, sin el código de país.
                                     </div>
+                                }
+                                {errorSendCode &&
+                                    <div className="afAuth__error">
+                                        <IcoError />
+                                        {errorSendCode?.data?.message || 'No pudimos enviar el código. Inténtalo de nuevo.'}
+                                    </div>
+                                }
 
-                                    <div className={'inlineFlex textfieldVerify'} >
-                                        <p>Ingrese el codigo de verificación por favor</p>
-                                        <TextField 
-                                            id="outlined-basic" 
-                                            name="fValidCode" 
-                                            type='number' 
-                                            onChange={handleChangeCode} 
-                                            value={codeVerify} 
-                                            variant="outlined"
-                                        />
-                                        
-                                        {errorVerifyCode &&
-                                            <div className="verifyPhoneError">
-                                                <DoDisturbIcon />
-                                                {errorVerifyCode?.data?.message || 'El codigo no es valido. Revisalo e intentalo de nuevo.'}
-                                            </div>
-                                        }
-                                        <button onClick={sendCode} className="btnPrimary btnIcon">
-                                            <span>
-                                                <img src={icoUser} alt="" />
-                                                Verificar
-                                            </span>
-                                        </button>
-                                    </div>
+                                <motion.button type="submit" className="afBtn afBtn--mint" {...alToque}>
+                                    {loadingValid ? 'Enviando…' : 'Enviarme el código'}
+                                </motion.button>
+                            </form>
+
+                            <p className="afAuth__pie">
+                                ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
+                            </p>
+                        </>
+
+                    : paso === 1 ?
+                        <>
+                            <h1 className="afAuth__titular">
+                                <span className="t1">Te llegó un código a</span>
+                                {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
+                            </h1>
+                            <p className="afAuth__bajada">
+                                Vale por 15 minutos. Escríbelo aquí y seguimos.
+                            </p>
+
+                            <div className="afCampo afCampo--grande">
+                                <TextField 
+                                    id="fValidCode"
+                                    name="fValidCode" 
+                                    type='number'
+                                    inputMode="numeric"
+                                    autoComplete="one-time-code"
+                                    placeholder="000000"
+                                    onChange={handleChangeCode} 
+                                    value={codeVerify} 
+                                    variant="outlined"
+                                />
+                            </div>
+
+                            {errorVerifyCode &&
+                                <div className="afAuth__error">
+                                    <IcoError />
+                                    {errorVerifyCode?.data?.message || 'El código no es válido. Revísalo e inténtalo de nuevo.'}
                                 </div>
-                            :
-                                <div className="inlineBlock regVerify regDatos">
-                                    <div className="title">
-                                        <h2>Ya confirmamos su teléfono</h2>
-                                        <p>Necesitamos algunos datos para continuar y personalizar tu plan de comidas.</p>
-                                    </div>
-                                    <FormDatos telefono={numberVerify ? numberVerify : null} />
-                                </div>
-                                
                             }
-                        </motion.div>
-                    </AnimatePresence >
-                </div>
-            </main>
-        </LayoutTransition >
+
+                            <motion.button type="button" onClick={sendCode}
+                                className="afBtn afBtn--mint" {...alToque}>
+                                {loadingValid ? 'Verificando…' : 'Verificar'}
+                            </motion.button>
+
+                            <p className="afAuth__pie">
+                                ¿No te llegó? <button type="button" onClick={()=>updateFormStep(0)}>Reenviar el código</button>
+                            </p>
+                        </>
+
+                    :
+                        <>
+                            <h1 className="afAuth__titular">
+                                <span className="t1">Número confirmado.</span>
+                                Ahora, tus datos
+                            </h1>
+                            <p className="afAuth__bajada">
+                                Con esto creamos tu cuenta y podemos emitir tus comprobantes.
+                            </p>
+                            <FormDatos telefono={numberVerify ? numberVerify : null} />
+                        </>
+                    }
+
+                    </div>
+                </motion.div>
+            </AnimatePresence>
+        </MarcoAuth>
     )
 };
 

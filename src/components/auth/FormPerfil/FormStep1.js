@@ -92,7 +92,7 @@ const FormPerfilStep1 = ({stepForm,setStepForm,data,setData}) => {
                         </div>
                         <div className="txt">
                             <h4>Bajar de peso</h4>
-                            <p>Requiere ejercicio como complemento de alimentación</p>
+                            <p>Menos calorías de las que gastas, sin pasar hambre</p>
                         </div>
                     </div>
                     <div className={optionObjetivo === 'IMPROVE' ? 'regObjItem regObjItemAct' : 'regObjItem'} onClick={()=>changeObjetivo('IMPROVE')} >
@@ -101,7 +101,7 @@ const FormPerfilStep1 = ({stepForm,setStepForm,data,setData}) => {
                         </div>
                         <div className="txt">
                             <h4>Mejorar mi salud</h4>
-                            <p>Requiere ejercicio como complemento de alimentación</p>
+                            <p>Mantener tu peso y comer mejor cada día</p>
                         </div>
                     </div>
                     <div className={optionObjetivo === 'GAIN' ? 'regObjItem regObjItemAct' : 'regObjItem'} onClick={()=>changeObjetivo('GAIN')} >
@@ -110,7 +110,7 @@ const FormPerfilStep1 = ({stepForm,setStepForm,data,setData}) => {
                         </div>
                         <div className="txt">
                             <h4>Subir de peso</h4>
-                            <p>Requiere ejercicio como complemento de alimentación</p>
+                            <p>Más calorías y proteína, para ganar masa</p>
                         </div>
                     </div>
                 </div>

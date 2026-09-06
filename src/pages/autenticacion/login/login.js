@@ -1,12 +1,7 @@
 import React,{ useState, useEffect } from "react";
 import './login.scss';
 
-import logoAllpafood from '../../../assets/img/logo_allpafood.png';
-import icoFacebook from '../../../assets/img/ico_facebook.svg';
-import icoGoogle from '../../../assets/img/ico_google.svg';
-
 import TextField from '@mui/material/TextField';
-
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -15,13 +10,17 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import Alert from '@mui/material/Alert';
-
 import axios from 'axios';
 import {useAuthContext} from '../../../context/authContext';
-import { useNavigate } from "react-router-dom";
-import Backdrop from './../../../components/ultil/Backdrop/Backdrop';
+import { useNavigate, Link } from "react-router-dom";
+import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
+import { motion, alToque } from './../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
+
+const IcoError = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+       strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6v5M12 16.2v.2"/></svg>
+);
 
 const LoginPage = (props) => {
   
@@ -59,7 +58,13 @@ const LoginPage = (props) => {
   });
 
   const [errorAxios,setErrorAxios] = useState(false);
+  // Sin esto el boton no daba ninguna senal entre el toque y la respuesta, y
+  // el cliente lo pulsaba tres veces creyendo que no habia pasado nada.
+  const [enviando,setEnviando] = useState(false);
+
   const sendData = () =>{
+    setEnviando(true);
+    setErrorAxios(false);
     axios.post(`${API_URL}auth/login`,
         {
           username:bodyFields.lfcorreo,
@@ -77,6 +82,7 @@ const LoginPage = (props) => {
           
         }).catch((error) =>{
           console.log(error)
+          setEnviando(false);
           setErrorAxios(true)
         })
   }
@@ -91,79 +97,78 @@ const LoginPage = (props) => {
 
 
   return (
-    <main className="inlineFlex loginPageCont">
-      <Backdrop />
+    <MarcoAuth>
+      <h1 className="afAuth__titular">
+        <span className="t1">Hola de nuevo,</span>
+        entra a tu plan
+      </h1>
+      <p className="afAuth__bajada">
+        Aquí ves tus almuerzos de la semana, tu plan y tus entregas.
+      </p>
 
-      <div className="inlineFlex loginPage">
-        <div className="loginLeft">
-          <div className="inlineFlex loginBox">
-            <figure>
-              <img src={logoAllpafood} alt="" />
-            </figure>
-            <form onSubmit={handleSubmit(onSubmitHandler)}>
-              <div className="loginTextField loginTextFieldUser">
-                <TextField 
-                  label="Correo:" 
-                  variant="filled"
-                  id="lfcorreo" 
-                  name="lfcorreo" 
-                  value={bodyFields ? bodyFields.lfcorreo : ''}
-                  error={errors.lfcorreo ? true : false}
-                  {...register("lfcorreo")} 
-                  onChange={handleFieldChange}
-                />
-              </div>
-              <div className="loginTextField loginTextFieldClave">
-                <TextField 
-                  label="Clave" 
-                  variant="filled"
-                  id="lfpassword" 
-                  name="lfpassword" 
-                  type={'password'}
-                  value={bodyFields ? bodyFields.lfpassword : ''}
-                  error={errors.lfpassword ? true : false}
-                  {...register("lfpassword")} 
-                  onChange={handleFieldChange}
-                />
-              </div>
-              {errorAxios &&
-                <Alert className="inlineFlex loginErrors" severity="error">Verifique sus credenciales por favor.</Alert>
-              }
-              <div className="inlineFlex loginLinks">
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Recordar por 30 dias" />
-                </FormGroup>
-                <a href="#">Recuperar contraseña</a>
-              </div>
-              <div className="inlineFlex loginBtn">
-                <button type={'submit'} className="btnPrimary">
-                  Ingresar
-                </button>
-              </div>
-            </form>
-            {false &&
-            <div className="inlineBlock loginExternal">
-              <a href="#" className="btnPrimary btnIcon btnLogFb">
-                <span>
-                  <img src={icoFacebook} alt="" />
-                  Ingresar con facebook
-                </span>
-              </a>
-              <a href="#" className="btnPrimary btnIcon btnLogGoogle">
-                <span>
-                  <img src={icoGoogle} alt="" />
-                  Ingresar con google
-                </span>
-              </a>
-            </div>
-            }
-          </div>
+      <form onSubmit={handleSubmit(onSubmitHandler)}
+            className={enviando ? 'afAuth__ocupado' : undefined}>
+        <div className="afCampo">
+          <TextField 
+            label="Correo" 
+            variant="filled"
+            id="lfcorreo" 
+            name="lfcorreo" 
+            type="email"
+            autoComplete="email"
+            value={bodyFields ? bodyFields.lfcorreo : ''}
+            error={errors.lfcorreo ? true : false}
+            {...register("lfcorreo")} 
+            onChange={handleFieldChange}
+          />
+        </div>
+        <div className="afCampo">
+          <TextField 
+            label="Contraseña" 
+            variant="filled"
+            id="lfpassword" 
+            name="lfpassword" 
+            type={'password'}
+            autoComplete="current-password"
+            value={bodyFields ? bodyFields.lfpassword : ''}
+            error={errors.lfpassword ? true : false}
+            {...register("lfpassword")} 
+            onChange={handleFieldChange}
+          />
         </div>
 
-        <div className="loginRight"></div>
-      </div>
+        {errorAxios &&
+          <div className="afAuth__error">
+            <IcoError />
+            El correo o la contraseña no coinciden. Revísalos e inténtalo otra vez.
+          </div>
+        }
 
-    </main>
+        <div className="afLogin__opts">
+          <FormGroup>
+            <FormControlLabel control={<Checkbox size="small" />} label="Recordarme 30 días" />
+          </FormGroup>
+          {/* Este enlace no llevaba a ninguna parte (href="#") y el cliente que
+              olvidaba su clave terminaba escribiendo por WhatsApp. Mientras no
+              exista la pantalla de recuperacion, al menos dice la verdad. */}
+          <a href="https://wa.me/51999999999?text=Olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20Allpa%20Food"
+             target="_blank" rel="noreferrer">
+            Olvidé mi contraseña
+          </a>
+        </div>
+
+        <motion.button type="submit" className="afBtn afBtn--mint"
+          disabled={enviando} {...alToque}>
+          {enviando ? 'Entrando…' : 'Ingresar'}
+        </motion.button>
+      </form>
+
+      {/* No existia ninguna puerta de ingreso a registro: quien llegaba aqui
+          sin cuenta se quedaba encerrado en esta pantalla. */}
+      <p className="afAuth__pie">
+        ¿Es tu primera vez? <Link to="/registro">Crea tu cuenta</Link>
+      </p>
+    </MarcoAuth>
   )
 };
 
