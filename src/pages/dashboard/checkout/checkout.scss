@@ -637,3 +637,468 @@
         }
     }
 }
+/* ==========================================================================
+   Pago, alineado con el panel.
+
+   La logica del checkout no se toca: el pago es lo ultimo que conviene
+   reescribir. Todo esto son estilos acotados a .afCheckout, el gancho que
+   LayoutDashboard pone en el contenedor de esta pantalla.
+   ========================================================================== */
+.afCheckout{
+
+    max-width: 560px;
+    margin: 0 auto;
+
+    &__titular{
+        font-size: var(--af-t-xxl) !important;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -.035em;
+        color: var(--af-ink) !important;
+        margin: 4px 0 18px !important;
+        text-wrap: balance;
+        .t1{ display: block; color: var(--af-muted); font-weight: 700; }
+    }
+
+    /* Las tarjetas del panel, no las de sombra difusa de 20px. */
+    .paperItem{
+        background: var(--af-paper);
+        border-radius: var(--af-r-card);
+        box-shadow: var(--af-shadow-s);
+        padding: 17px 18px;
+        margin-bottom: 14px;
+
+        > .title{
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 14px;
+            h3{
+                font-size: var(--af-t-m) !important;
+                font-weight: 700;
+                letter-spacing: -.012em;
+                color: var(--af-ink) !important;
+            }
+            .ico{
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: var(--af-accent-soft);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                img{ width: 13px; height: 13px; }
+            }
+        }
+    }
+
+    /* --- Resumen del plan ---
+       Iba dentro de otra tarjeta blanca con sombra: blanco sobre blanco. */
+    .coResumenItem,
+    .coResumenItemBox{
+        box-shadow: none !important;
+        background: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+    }
+    .coResumenItemBox{
+        .txt{
+            width: 100%;
+            small{
+                display: block;
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: .09em;
+                text-transform: uppercase;
+                color: var(--af-accent);
+                margin-bottom: 2px;
+            }
+            h3{
+                font-size: var(--af-t-xl) !important;
+                font-weight: 800;
+                letter-spacing: -.03em;
+                color: var(--af-ink) !important;
+                margin: 0 0 14px !important;
+            }
+        }
+    }
+
+    /* El boton de vaciar: era un cuadrado negro pegado a la esquina. */
+    .coResumenItem{ position: static; }
+    .coResumenItemEmpty{
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(16,31,24,.05) !important;
+        color: var(--af-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        svg{ font-size: 17px; color: var(--af-muted); }
+    }
+    .paperItem{ position: relative; }
+
+    .criLinesBox{
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+    .lineItem{
+        width: 100%;
+        .liTxt{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 5px;
+            p{
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12.5px;
+                color: var(--af-muted);
+                margin: 0;
+                img{ width: 14px; height: 14px; }
+            }
+            p:last-child{
+                color: var(--af-ink);
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+            }
+        }
+        .line{
+            height: 6px;
+            border-radius: var(--af-r-pill);
+            background: rgba(16,31,24,.07);
+            overflow: hidden;
+            span{
+                display: block;
+                height: 100%;
+                border-radius: var(--af-r-pill);
+                background: var(--af-accent) !important;
+            }
+        }
+    }
+
+    /* La palomita ya la dibuja checkout.scss con ::after; anadir otra con
+       ::before pintaba dos por linea. */
+    .contain .list{
+        list-style: none;
+        margin: 0 0 14px;
+        padding: 0;
+        li{
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--af-ink);
+            padding: 3px 0 3px 20px;
+            &::after{ border-color: var(--af-accent) !important; }
+        }
+    }
+
+    .coResumenItemBox > .price{
+        width: 100%;
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-start;
+        gap: 10px;
+        text-align: left;
+        padding-top: 12px;
+        border-top: 1px solid var(--af-line);
+        p{
+            order: 2;
+            font-size: 12.5px;
+            color: var(--af-muted);
+            margin: 0;
+            strong{ font-weight: 600; text-decoration: line-through; }
+        }
+        h6{
+            order: 1;
+            font-size: 30px !important;
+            font-weight: 800;
+            letter-spacing: -.04em;
+            color: var(--af-ink) !important;
+            margin: 0;
+        }
+    }
+
+    /* --- Adicionales --- */
+    .coAditionalList{
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        width: 100%;
+    }
+    .coAditionalItem{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        background: rgba(16,31,24,.035);
+        border-radius: 16px;
+        box-shadow: none;
+        padding: 13px 14px;
+        width: 100%;
+
+        h4{
+            font-size: 14px !important;
+            font-weight: 700;
+            color: var(--af-ink) !important;
+            margin: 0 !important;
+        }
+        .txt{
+            flex: 1 1 100%;
+            order: 3;
+            p{ font-size: 12px; color: var(--af-muted); margin: 0 0 10px; }
+        }
+        .price{
+            order: 2;
+            margin-left: auto;
+            padding: 0;
+            border: 0;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--af-ink);
+            background: none;
+        }
+        .btnPrimary{
+            display: block;
+            width: 100%;
+            background: transparent;
+            border: 1.5px solid var(--af-ink);
+            color: var(--af-ink);
+            border-radius: var(--af-r-pill);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 11px 16px;
+            text-align: center;
+            cursor: pointer;
+            span{ color: inherit; }
+        }
+    }
+
+    .coResumenAdicionales{
+        width: 100%;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--af-line);
+        h5{
+            font-size: 11px !important;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--af-muted) !important;
+            margin: 0 0 9px !important;
+        }
+    }
+    .coResumenAdicionalesItem{
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--af-accent-soft);
+        border-radius: 14px;
+        padding: 11px 40px 11px 13px;
+        margin-bottom: 8px;
+        box-shadow: none;
+        font-size: 13px;
+        color: var(--af-accent);
+    }
+    .coaiClose{
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: rgba(23,122,76,.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        svg{ font-size: 15px; color: var(--af-accent); }
+    }
+
+    /* --- Metodos de pago ---
+       "Tarjeta de credito o debito" se montaba encima de los cuatro logos:
+       .txt no encogia y .logos no tenia sitio reservado. */
+    .ccPaymentList{
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        width: 100%;
+    }
+    .ccPaymentItem{
+        display: block;
+        width: 100%;
+        background: var(--af-paper);
+        border: 1.5px solid var(--af-line);
+        border-radius: 18px;
+        box-shadow: none;
+        padding: 0;
+        cursor: pointer;
+        transition: border-color .18s ease;
+    }
+    .ccPaymentItemBox{
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 14px 15px;
+        width: 100%;
+
+        .circle{
+            width: 20px;
+            height: 20px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            border: 2px solid var(--af-line);
+            background: none;
+            position: relative;
+        }
+        .txt{
+            flex: 1 1 auto;
+            min-width: 0;
+            p{
+                font-size: 13.5px;
+                font-weight: 700;
+                color: var(--af-ink);
+                margin: 0;
+                line-height: 1.3;
+            }
+        }
+        /* Estaba en position:absolute a la derecha, fuera del flujo, asi que
+           el nombre del metodo se le montaba encima. Vuelve a ser un elemento
+           mas de la fila y ya no puede solaparse con nada. */
+        .logos{
+            position: static;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            .logosItem{ margin: 0; }
+        }
+        .logosItem{
+            width: 30px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img{ max-width: 100%; max-height: 100%; }
+        }
+    }
+    .ccPaymentItemAct{
+        border-color: var(--af-ink);
+        .circle{
+            border-color: var(--af-accent);
+            &::after{
+                content: '';
+                position: absolute;
+                inset: 3px;
+                border-radius: 50%;
+                background: var(--af-accent);
+            }
+        }
+    }
+    .ccPaymentForm{
+        width: 100%;
+        padding: 4px 15px 16px;
+    }
+
+    /* --- Total --- */
+    .coTotalPayment{
+        width: 100%;
+        background: none;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+        > ul, > div{ background: none; border: 0; box-shadow: none; padding: 0; }
+        ul{
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        li{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--af-line);
+            font-size: 13.5px;
+            color: var(--af-muted);
+            font-variant-numeric: tabular-nums;
+            p, span, strong{ margin: 0; }
+            &:last-child{ border-bottom: 0; }
+        }
+        /* El descuento es la unica linea con color: es la buena noticia.
+           El verde original (--green2) es el de los botones viejos. */
+        .relevand,
+        .relevand span{
+            color: var(--af-accent) !important;
+            font-weight: 700;
+        }
+        li:last-child{
+            padding-top: 14px;
+            font-size: var(--af-t-l);
+            font-weight: 800;
+            color: var(--af-ink);
+            letter-spacing: -.02em;
+        }
+    }
+
+    /* --- Sellos de confianza ---
+       Eran cuatro columnas al 25% con separadores: en un movil cada una
+       media 60px y el texto caia en cuatro lineas. */
+    .coTotalInfo{
+        background: none;
+        border: 0;
+        border-top: 1px solid var(--af-line);
+        border-radius: 0;
+        margin-top: 16px;
+        padding: 16px 0 0;
+
+        ul{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 10px;
+            padding: 0;
+        }
+        li{
+            width: auto !important;
+            border-right: 0 !important;
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-align: center;
+            p{
+                font-size: 11.5px !important;
+                line-height: 1.35;
+                color: var(--af-muted) !important;
+                margin: 0;
+            }
+            svg{ color: var(--af-accent); font-size: 19px; }
+        }
+    }
+
+    /* Botones de pago: el mismo boton unico del panel. */
+    .btnPrimary:not(.coAditionalItem .btnPrimary){
+        background: var(--af-mint);
+        color: var(--af-mint-ink);
+        border: 0;
+        border-radius: var(--af-r-pill);
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 14.5px;
+        span{ color: var(--af-mint-ink); }
+    }
+}

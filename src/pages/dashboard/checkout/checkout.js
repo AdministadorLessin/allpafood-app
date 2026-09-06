@@ -446,7 +446,13 @@ const CheckoutPage = (props) => {
     },[])
 
     return (
-        <LayoutDasboard claseStyle={false}>
+        <LayoutDasboard claseStyle={'afCheckout'}>
+            {/* La pantalla no decia en ningun momento donde estaba el cliente:
+                abria con "Resumen de compra:" y ya. */}
+            <h1 className="afCheckout__titular">
+                <span className="t1">Último paso,</span>
+                confirma y paga
+            </h1>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={12} md={8}>
                     <Grid container spacing={2}>
@@ -482,7 +488,6 @@ const CheckoutPage = (props) => {
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><img src={icoCalorias} alt="" /> Calorías</p>
-                                                                            {carloriasRed} - {(metricasCal.bmr).toFixed(2)}
                                                                             <p>{carloriasRed+item.properties[0]?.value}/{(metricasCal.bmr).toFixed(2)}</p>
                                                                         </div>
                                                                         <div className="line">
