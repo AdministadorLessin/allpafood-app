@@ -5,6 +5,7 @@ import dashHello from '../../../assets/img/dash_emoticon_1.png';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
+import { API_URL } from '../../../config';
 
 const CardPaperGreen = ({planes,data}) => {
 
@@ -21,7 +22,7 @@ const CardPaperGreen = ({planes,data}) => {
   };
 
   const getPlandData = () =>{
-    axios.get('http://localhost:8443/api-af/v1/dashboard/plan',{
+    axios.get(`${API_URL}dashboard/plan`,{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
       setPlanData(resp.data.data);

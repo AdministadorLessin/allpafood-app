@@ -21,3 +21,117 @@
 }
 
 
+
+/* Panel rediseñado: una sola columna, como se usa en el teléfono. La rejilla
+   de dos columnas repartía cinco tarjetas del mismo peso y no dejaba ver por
+   dónde empezar. */
+.afPanel{
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+
+    &__titular{
+        font-size: var(--af-t-xxl) !important;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -.035em;
+        margin: 4px 0 16px !important;
+        color: var(--af-ink) !important;
+        text-wrap: balance;
+    }
+
+    .paperItem{ margin-top: 2px; }
+}
+
+.afPanel__saludo{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.afPanel__nombre{
+    font-size: var(--af-t-m);
+    font-weight: 700;
+    color: var(--af-ink);
+    margin: 0;
+}
+.afPanel__fecha{
+    font-size: 12.5px;
+    color: var(--af-muted);
+    margin: 0;
+    /* capitalize ponia mayuscula en cada palabra: "Jueves 3 De Septiembre".
+       Solo la primera letra. */
+    &::first-letter{ text-transform: uppercase; }
+}
+
+/* Encabezado tipo app: el nombre en una píldora blanca y la fecha al costado,
+   como en las apps donde la identidad va arriba a la izquierda. */
+.afPanel__top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+
+    /* Se queda arriba al bajar, con el mismo vidrio de la barra de navegación:
+       el cliente no pierde de vista quién es ni qué día es. */
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: 10px 4px;
+    margin-left: -4px;
+    margin-right: -4px;
+    transition: background .3s ease, box-shadow .3s ease,
+                backdrop-filter .3s ease, border-radius .3s ease;
+}
+.afPanel__top--pegado{
+    background: rgba(247, 250, 244, .72);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 6px 18px -12px rgba(16,31,24,.4);
+}
+.afChipUser{
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--af-paper);
+    box-shadow: var(--af-shadow-s);
+    border-radius: var(--af-r-pill);
+    padding: 6px 16px 6px 6px;
+    font-size: 13.5px;
+    color: var(--af-muted);
+    b{ color: var(--af-ink); font-weight: 700; }
+    &__ava{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--af-accent-soft);
+        flex: 0 0 auto;
+        overflow: hidden;
+        img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+}
+.afChipFecha{
+    /* Tambien en pildora opaca. Al quedarse pegado el encabezado, un texto
+       suelto se transparentaba sobre las tarjetas oscuras de abajo. */
+    display: inline-block;
+    background: var(--af-paper);
+    box-shadow: var(--af-shadow-s);
+    border-radius: var(--af-r-pill);
+    padding: 7px 14px;
+    font-size: var(--af-t-xs);
+    font-weight: 600;
+    color: var(--af-muted);
+    line-height: 1.25;
+    white-space: nowrap;
+    &::first-letter{ text-transform: uppercase; }
+}
+
+/* Titular a dos tonos: gris ligero arriba, negro sólido en el dato. */
+.afPanel__t1{
+    display: block;
+    font-weight: 500;
+    color: var(--af-muted);
+}

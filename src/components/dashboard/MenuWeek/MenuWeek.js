@@ -34,9 +34,12 @@ const MenuWeek = ({data,reproOrder,getMenus}) => {
                     <figure>
                         <img src={icoMenuEmpty} alt="" />
                     </figure>
+                    {/* Antes: "¡Lo sentimos! Aun no tiene ordenes programadas" con una
+                        carita triste. Pedirle perdon al cliente por algo que depende de
+                        el, y sin darle la salida, no ayuda: un estado vacio guia. */}
                     <div className="txt">
-                        <h5>¡Lo sentimos!</h5>
-                        <p>Aun no tiene ordenes programadas</p>
+                        <h5>Todavía no eliges tus platos</h5>
+                        <p>Elige tus almuerzos en «Programa tu menú» y aparecerán aquí.</p>
                     </div>
                     
                 </div>

@@ -14,7 +14,11 @@
     width: 100%;
     display: block;
     min-height: 100vh;
-    overflow: hidden;
+    /* Era overflow:hidden, puesto para recortar las manchas radiales que ya no
+       existen. Cualquier ancestro con overflow:hidden anula position:sticky, y
+       por eso el encabezado del panel no se quedaba arriba. 'clip' recorta en
+       horizontal sin crear un contenedor de scroll. */
+    overflow-x: clip;
 }
 
 .mainLayoutBox{
@@ -23,25 +27,31 @@
     min-height: 100vh;
     display: block;
     height: auto;
-    background: rgba(224,245,205,0.2);
+    /* Antes: un velo verde con blur(50px) sobre cinco manchas radiales. Todo
+       quedaba verde sobre verde y las tarjetas se fundian con el fondo. Ahora
+       el contenedor es transparente y deja ver el degradado del body. */
+    background: transparent;
     position: relative;
-    backdrop-filter: blur(50px);
     padding: 30px 30px 30px 140px;
+    /* Ese relleno de 120px reservaba sitio para la barra blanca superior, que
+       ya no existe: el panel empieza arriba del todo. */
     @include mediaTablet{
-        padding: 120px 20px 20px 20px;
+        padding: 22px 18px 20px 18px;
     }
     @include mediaPhone{
-        padding: 90px 10px 10px 10px;
+        padding: 18px 15px 16px 15px;
     }
 }
 
+/* Las manchas de color se apagan casi del todo: aportaban ruido y competian
+   con las tarjetas. Quedan como una insinuacion, no como protagonistas. */
 .mlDetalle{
     width: 1000px;
     height: 1000px;
     border-radius: 50%;
     position: absolute;
     z-index: 1;
-    opacity: .8;
+    opacity: .12;
 }
 
 .mlDetalle1{

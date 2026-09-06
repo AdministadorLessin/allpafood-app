@@ -15,6 +15,7 @@ import {useAuthContext} from '../../../context/authContext';
 
 import { useNavigate } from "react-router-dom";
 import ErrorForm from './../../ultil/ErrorForm/ErrorForm';
+import { API_URL } from '../../../config';
 
 const LOCAL_STORAGE_KEY = 'form_datos_cache';
 
@@ -104,7 +105,7 @@ const FormDatos = ({telefono}) => {
 
     const sendData = (data) => {
         setFormRegLoad(true);
-        axios.post('http://localhost:8443/api-af/v1/register/user',
+        axios.post(`${API_URL}register/user`,
             {
                 email: data.fdcorreo,
                 password: data.fdclave,

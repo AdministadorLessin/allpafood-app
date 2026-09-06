@@ -22,6 +22,7 @@ import PlanUser from './../../../components/dashboard/PlanUser/PlanUser';
 import TitleCard from './../../../components/ultil/TitleCard/TitleCard';
 
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import { API_URL } from '../../../config';
 
 const paginationModel = { page: 0, pageSize: 5 };
 
@@ -55,7 +56,7 @@ const FacturacionPage = (props) => {
 
   const getFacturas = () =>{
     const rowsTmp = [];
-    axios.get('http://localhost:8443/api-af/v1/invoice/list',{
+    axios.get(`${API_URL}invoice/list`,{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
       if(resp.data.data && resp.data.data.length){
@@ -78,7 +79,7 @@ const FacturacionPage = (props) => {
   const [helloCard,setHelloCard] = useState();
 
   const getPlan = ()=>{
-      axios.get('http://localhost:8443/api-af/v1/dashboard/plan',{
+      axios.get(`${API_URL}dashboard/plan`,{
           headers: {"Authorization" : `Bearer ${token}`} 
       })
       .then((resp)=>{

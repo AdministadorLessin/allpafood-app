@@ -16,6 +16,9 @@ import LoginPage from './pages/autenticacion/login/login';
 import RegistroPage from './pages/autenticacion/registro/registro';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
+import MenuPage from './pages/dashboard/menu/menu';
+import MiPlanPage from './pages/dashboard/miplan/miplan';
+import PreviewPanel from './pages/dev/PreviewPanel';
 
 import AuthContextProvider from './context/authContext';
 import RegistroPageProfile from './pages/autenticacion/registro/profile';
@@ -41,11 +44,20 @@ function App() {
                     <Route path='/ubicaciones' element={ <UbicacionesPage /> } />
                     <Route path='/planes' element={ <PlanesPage /> } />
                     <Route path='/checkout' element={ <CheckoutPage /> } />
+                    {/* Pantalla propia para elegir el menu, la tarea semanal del
+                        cliente. Antes solo existia dentro del panel. */}
+                    <Route path='/menu' element={ <MenuPage /> } />
+                    {/* Pantalla propia del plan: envios restantes, vencimiento,
+                        creditos y compras. Antes no existia en ningun lado. */}
+                    <Route path='/mi-plan' element={ <MiPlanPage /> } />
                     <Route path='/registro/perfil' element={ <RegistroPageProfile /> } />
                   </Route>
                   { 
                     // Rutas Publicas
                   }
+                  {/* SOLO DESARROLLO: revision visual del panel sin sesion.
+                      Borrar esta ruta y src/pages/dev antes de desplegar. */}
+                  <Route path='/preview-ux' element={ <PreviewPanel /> } />
                   <Route path='/ingresar' element={ <LoginPage /> } />
                   <Route path='/registro' element={ <RegistroPage /> } />
                 </Routes>

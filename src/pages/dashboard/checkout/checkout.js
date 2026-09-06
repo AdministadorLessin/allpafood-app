@@ -60,6 +60,7 @@ import icoCheckProteina from '../../../assets/img/ico_check_proteina.png';
 import icoCheckSnack from '../../../assets/img/ico_check_snack.png';
 import icoCheckFruta from '../../../assets/img/ico_check_fruta.png';
 import icoCheckDesayuno from '../../../assets/img/ico_check_desayuno.png';
+import { API_URL } from '../../../config';
 
 // Clave de idempotencia del pago. Debe ser ESTABLE durante todo el intento de
 // compra: es lo que impide que un reintento o un doble clic se cobre dos veces.
@@ -307,7 +308,7 @@ const CheckoutPage = (props) => {
             })
         }
 
-        axios.post('http://localhost:8443/api-af/v1/subscriptions/payments/secure/tokens/mercadopago/yape',{
+        axios.post(`${API_URL}subscriptions/payments/secure/tokens/mercadopago/yape`,{
             phone: data.ynumero,
             otp: data.yotp,
             requestId: requestIdRef.current
@@ -315,7 +316,7 @@ const CheckoutPage = (props) => {
         {
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
-            axios.post('http://localhost:8443/api-af/v1/invoice/create',
+            axios.post(`${API_URL}invoice/create`,
                 {
                     //complementsId: adicionalesList,
                     additional: aditionalsTmp,

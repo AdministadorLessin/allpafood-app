@@ -1,0 +1,43 @@
+.afAccesos{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.afAcceso{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 16px 8px 14px;
+    border: 0;
+    border-radius: var(--af-r-card);
+    background: var(--af-paper);
+    box-shadow: var(--af-shadow-s);
+    font-family: inherit;
+    cursor: pointer;
+
+    /* Un color por destino. No es decoracion: el cliente aprende a reconocer
+       el atajo por su color antes de leer la etiqueta. */
+    &__circulo{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &--verde{ background: var(--af-accent-soft); color: var(--af-accent); }
+        &--azul{  background: #E4EFFA;               color: #1D4E7C; }
+        &--coral{ background: #FBEAE4;               color: #A8543A; }
+    }
+    &__ic{ width: 19px; height: 19px; }
+    &__txt{
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--af-ink);
+        line-height: 1.2;
+        text-align: center;
+    }
+}

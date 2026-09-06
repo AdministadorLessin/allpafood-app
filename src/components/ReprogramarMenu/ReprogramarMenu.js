@@ -25,6 +25,7 @@ import axios from 'axios';
 
 import {useAuthContext} from '../../context/authContext';
 import "dayjs/locale/es";
+import { API_URL } from '../../config';
 
 
 function getRandomNumber(min, max) {
@@ -95,7 +96,7 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
     const [highlightedDays, setHighlightedDays] = useState([]);
 
     const getAllprogam = () =>{
-        axios.get('http://localhost:8443/api-af/v1/order/plan',
+        axios.get(`${API_URL}order/plan`,
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }
@@ -176,7 +177,7 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
                     <div className="ico">
                         <img src={icoNotificacion} alt="" />
                     </div>
-                    <h3>Historial de entregas:</h3>
+                    <h3>Tu calendario de entregas</h3>
                 </div>
                 {datePlan && datePlan.plan &&
                     <div className="displayFlex rMenuExpiracion">
@@ -185,7 +186,7 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
                                 <img src={icoDisponible} alt="" />
                             </figure>
                             <div className="txt">
-                                <small>Envios:</small>
+                                <small>Envíos:</small>
                                 <h5>{datePlan.plan.consumption.orders.consumed} de {datePlan.plan.consumption.orders.total}</h5>
                             </div>
                         </div>
@@ -194,7 +195,7 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
                                 <img src={icoExpiracion} alt="" />
                             </figure>
                             <div className="txt">
-                                <small>Expiera el</small>
+                                <small>Expira el</small>
                                 <h5>
                                     <Moment format="D MMM">
                                         {datePlan.plan.expirationDate}

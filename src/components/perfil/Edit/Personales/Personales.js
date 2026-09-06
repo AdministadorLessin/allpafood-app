@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined';
 import { useAuthContext } from './../../../../context/authContext';
+import { API_URL } from '../../../../config';
 
 const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
 
@@ -43,7 +44,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
 
     const updateDataPrivacity = (dataTmp) =>{
         setLoadingForm(true);
-        axios.put('http://localhost:8443/api-af/v1/profile/data/personal',
+        axios.put(`${API_URL}profile/data/personal`,
             {
                 name: dataTmp.fpnombres,
                 lastname: dataTmp.fpapellos,

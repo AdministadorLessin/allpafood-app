@@ -1,0 +1,72 @@
+.afTabs{
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    /* Vidrio: el contenido se intuye detras en vez de cortarse en seco. */
+    background: rgba(18, 30, 24, .84);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: var(--af-r-pill);
+    padding: 7px;
+    box-shadow: 0 4px 12px rgba(16,31,24,.10), 0 18px 40px -18px rgba(16,31,24,.45);
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.afTab{
+    text-decoration: none;
+    color: rgba(241, 246, 242, .6);
+    min-width: 0;
+
+    &__caja{
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 11px;
+        border-radius: var(--af-r-pill);
+        transition: background .28s cubic-bezier(.16,.84,.44,1),
+                    padding .28s cubic-bezier(.16,.84,.44,1);
+    }
+    &__ic{ width: 21px; height: 21px; flex: 0 0 auto; }
+    &__txt{
+        font-size: 13.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-width .3s cubic-bezier(.16,.84,.44,1),
+                    opacity .2s ease,
+                    margin-left .3s cubic-bezier(.16,.84,.44,1);
+    }
+
+    &--on{
+        color: var(--af-ink);
+        .afTab__caja{
+            background: var(--af-mint);
+            padding: 11px 17px 11px 13px;
+        }
+        .afTab__txt{
+            max-width: 110px;
+            opacity: 1;
+            margin-left: 8px;
+        }
+    }
+}
+
+/* La pildora flota sobre el contenido: el espacio va en el contenedor que de
+   verdad hace scroll. */
+.pageLayout{ padding-bottom: 40px; }
+.mainLayoutBox{ padding-bottom: 110px !important; }
+
+@media (min-width: 992px){
+    .afTabs{ display: none; }
+    .pageLayout{ padding-bottom: 0; }
+    .mainLayoutBox{ padding-bottom: 30px !important; }
+}

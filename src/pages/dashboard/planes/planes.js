@@ -20,6 +20,7 @@ import icoCarbo from '../../../assets/img/ico_carbo.png';
 import icoGrasas from '../../../assets/img/ico_grasas.png';
 
 import icoCalorias from '../../../assets/img/ico_cal.png';
+import { API_URL } from '../../../config';
 
 const PlanesPage = (props) => {
 
@@ -28,7 +29,7 @@ const PlanesPage = (props) => {
 
   const [recomendPlans,setRecomendPlans] = useState();
   const getRecomend = () =>{
-    axios.get('http://localhost:8443/api-af/v1/private/catalog/subscription-plans/recommended',{
+    axios.get(`${API_URL}private/catalog/subscription-plans/recommended`,{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
 

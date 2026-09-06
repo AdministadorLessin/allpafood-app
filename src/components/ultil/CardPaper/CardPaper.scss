@@ -2,13 +2,14 @@
 
 // Items
 .paperItem{
-    background: rgba(255,255,255,.8);
-    padding: 30px;
+    /* Blanco solido en vez de 80% con blur: sobre un fondo verde el blanco
+       translucido se tenia de verde y la tarjeta perdia el borde. */
+    background: var(--af-paper);
+    padding: 26px;
     display: inline-block;
     width: 100%;
-    border-radius: 25px;
-    backdrop-filter: blur(1000px);
-    box-shadow: 0px 10px 30px 0px rgba(0,0,0,.05);
+    border-radius: var(--af-r-card);
+    box-shadow: var(--af-shadow-s);
     overflow: hidden;
     .title{
         width: 100%;
@@ -26,7 +27,7 @@
             bottom: 0px;
             margin-top: auto;
             margin-bottom: auto;
-            background: linear-gradient(to bottom,  rgba(225,243,228,1) 0%,rgba(255,248,226,1) 100%);
+            background: var(--af-accent-soft);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -38,7 +39,9 @@
             }
         }
         h3{
-            font-size: 16px;
+            font-size: 17px;
+            letter-spacing: -.015em;
+            color: var(--af-ink);
         }
     }
     @include mediaLaptop{

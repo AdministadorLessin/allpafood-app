@@ -27,24 +27,12 @@
             height: auto;
         }
     }
+    /* En movil esta barra blanca superior duplicaba el avatar y empujaba todo
+       el contenido 65px hacia abajo. La identidad del cliente vive ahora
+       dentro del panel, junto al saludo, y la navegacion en la pildora de
+       abajo: aqui ya no queda nada que mostrar. */
     @include mediaTablet{
-        position: fixed;
-        top: 0px;
-        height: 100px;
-        width: 100%;
-        left: 0px;
-        z-index: 99;
-        background: white;
-        flex-direction: row;
-        border-radius: 0px 0px 20px 20px;
-    }
-    @include mediaPhone{
-        padding: 0px 20px 0px 20px;
-        height: 65px;
-        border-radius: 0px 0px 20px 20px;
-        .sideLogo{
-            width: 40px;
-        }
+        display: none;
     }
 }
 
@@ -201,10 +189,14 @@
     }
 }
 
+/* La navegacion pasa a la barra de pestanas flotante (TabBar). Las cuatro
+   paginas que solo vivian aqui —Facturacion, Datos de entrega, Salud y
+   bienestar, Soporte— estan ahora dentro de Cuenta, asi que nada queda sin
+   puerta. El componente sigue montado por si hace falta volver atras. */
 .sideHamburger{
-    display: none;
+    display: none !important;
     @include mediaTablet{
-        display: block;
+        display: none;
         width: 40px;
         height: 40px;
         display: flex;

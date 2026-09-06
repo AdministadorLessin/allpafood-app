@@ -1,0 +1,102 @@
+.afCard{
+    background: var(--af-paper);
+    border-radius: var(--af-r-card);
+    box-shadow: var(--af-shadow-s);
+    padding: 17px 18px;
+    margin-bottom: 14px;
+
+    &__head{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    &__title{
+        font-size: var(--af-t-m);
+        font-weight: 700;
+        letter-spacing: -.012em;
+        color: var(--af-ink);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    &__label{ font-size: 12px; color: var(--af-muted); }
+}
+
+.afIc{ width: 16px; height: 16px; opacity: .6; flex: 0 0 auto; }
+
+.afSemana{
+    &__dias{
+        display: flex;
+        gap: 6px;
+    }
+}
+
+.afDia{
+    flex: 1;
+    border: 0;
+    font-family: inherit;
+    border-radius: 14px;
+    padding: 10px 2px 9px;
+    text-align: center;
+    background: rgba(16,31,24,.04);
+    cursor: default;
+
+    &__n{
+        display: block;
+        font-size: 10px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+        font-weight: 700;
+    }
+    &__d{
+        display: block;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -.02em;
+        color: var(--af-ink);
+    }
+    &__s{
+        display: block;
+        font-size: 9px;
+        margin-top: 3px;
+        font-weight: 600;
+        color: var(--af-muted);
+        line-height: 1.15;
+    }
+
+    /* Ya resueltos: verde suave, presentes pero sin pedir atencion. */
+    &--entregado, &--listo{
+        background: var(--af-accent-soft);
+        .afDia__s{ color: var(--af-accent); }
+    }
+    &--enRuta{
+        background: var(--af-sky);
+        .afDia__s{ color: var(--af-sky-ink); }
+    }
+    /* Lo unico accionable de la tira lleva el menta y un latido lento: llama
+       sin agitar. Se detiene para quien pidio movimiento reducido. */
+    &--elegir{
+        background: var(--af-mint);
+        cursor: pointer;
+        animation: afLatido 2.6s ease-in-out infinite;
+        .afDia__n, .afDia__d{ color: var(--af-mint-ink); }
+        .afDia__s{ color: var(--af-mint-ink); }
+    }
+    /* Fuera de plazo: se muestra apagado en vez de desaparecer, para que el
+       cliente entienda que existio y ya cerro. */
+    &--cerrado, &--pasado{ opacity: .38; }
+}
+
+
+@keyframes afLatido{
+    0%, 100%{ box-shadow: 0 0 0 0 rgba(60, 251, 159, .55); }
+    55%     { box-shadow: 0 0 0 7px rgba(60, 251, 159, 0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .afDia--elegir{ animation: none; }
+}

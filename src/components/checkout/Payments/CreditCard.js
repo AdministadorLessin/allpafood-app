@@ -22,6 +22,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthContext } from './../../../context/authContext';
 import CheckoutPaymentFail from './FailPayment';
 import { useEffect } from "react";
+import { API_URL } from '../../../config';
 
 const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => {
 
@@ -61,16 +62,15 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
 
         const paymentMethods = await getPaymentMethods({ bin: response.first_six_digits });
         
-        const adicionalesList = []
-        if(cartAdicionales && cartAdicionales.length > 0){
-            cartAdicionales.map((item,index)=>{
-                adicionalesList.push(item.id);
-            })
-        }
         
         if(paymentMethods && paymentMethods.results.length){
-            axios.post('http://localhost:8443/api-af/v1/invoice/create',{
-                complementsId: adicionalesList,
+            axios.post(`${API_URL}invoice/create`,{
+                // complementsId espera ids numericos de menus y esta marcado como
+                // DEPRECATED en el backend; aqui se enviaban los ids de texto de los
+                // complementos ("ad02"), y Jackson rechazaba el cuerpo entero: elegir
+                // cualquier complemento hacia fallar la compra con tarjeta. Los
+                // complementos viajan por 'additional', que si es lista de texto.
+                // En el flujo de Yape esta linea ya estaba comentada.
                 // El backend hace dto.additional().stream() sin comprobar null:
                 // si este campo no viaja, revienta con NullPointerException (500)
                 // y el cliente ve "tarjeta rechazada". Mandarlo vacio lo evita.

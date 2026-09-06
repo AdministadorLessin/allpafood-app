@@ -24,6 +24,7 @@ import LayoutTransition from './../../../components/LayoutTransition/LayoutTrans
 import FormDatos from './../../../components/auth/FormDatos/FormDatos';
 import Backdrop from './../../../components/ultil/Backdrop/Backdrop';
 import RegistroSidebar from './../../../components/Registro/Sidebar/Sidebar';
+import { API_URL } from '../../../config';
 
 const RegistroPage = (props) => {
 
@@ -89,7 +90,7 @@ const RegistroPage = (props) => {
         setLoadingVal(true);
 
         const phoneVerify = '51' + numberVerify;
-        axios.post('http://localhost:8443/api-af/v1/auth/send-code',{phoneNumber:phoneVerify })
+        axios.post(`${API_URL}auth/send-code`,{phoneNumber:phoneVerify })
             .then((resp)=>{
                 handleUpdateToken(resp.data.data.token,resp.data.data);
                 setTimeout(() => {
@@ -117,7 +118,7 @@ const RegistroPage = (props) => {
     const [errorVerifyCode,setErrorVerifyCode] = useState();
     const sendCode = () =>{
         setLoadingVal(true)
-        axios.post('http://localhost:8443/api-af/v1/register/verify-code',
+        axios.post(`${API_URL}register/verify-code`,
             {
                 code:codeVerify
             },

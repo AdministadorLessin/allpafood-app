@@ -1,9 +1,12 @@
 @import '../../../assets/css/mixin.scss';
 
 .helloPaper{
-    background: linear-gradient(to bottom, rgb(221 255 216) 0%, rgb(143 255 235) 100%);
-    border-radius: 20px;
-    padding: 30px 10px 30px 30px;
+    /* El degradado verde-cian competia con el banner de estado, que es lo que de
+       verdad tiene que mirar el cliente. Un saludo no necesita gritar. */
+    background: var(--af-paper);
+    border-radius: var(--af-r-card);
+    box-shadow: var(--af-shadow-s);
+    padding: 26px 10px 26px 26px;
     height: 190px;
     align-items: center;
     display: flex;
@@ -19,14 +22,16 @@
         width: 100%;
         small{
             text-transform: capitalize;
+            color: var(--af-muted);
+            font-size: 13px;
         }
         h1{
-            
             font-weight: normal;
-            font-size: 30px;
-            line-height: 1;
+            font-size: 27px;
+            line-height: 1.08;
+            letter-spacing: -.025em;
             position: relative;
-            margin: 10px 0px 5px 0px;
+            margin: 8px 0px 5px 0px;
             strong{
                 font-weight: 700;
             }

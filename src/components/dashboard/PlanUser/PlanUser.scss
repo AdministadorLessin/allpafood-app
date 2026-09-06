@@ -1,12 +1,13 @@
 @import '../../../assets/css/mixin.scss';
 
+/* Crema: en el sistema nuevo cada color dice algo, y el crema es el plan.
+   Antes era un celeste translucido que no significaba nada. */
 .dashPlanUser{
-    background: rgb(141 235 251 / 30%);
+    background: var(--af-cream);
     display: flex;
     width: 100%;
-    border-radius: 25px;
-    backdrop-filter: blur(1000px);
-    box-shadow: 0px 10px 100px 0px rgba(0,0,0,.15);
+    border-radius: var(--af-r-card);
+    box-shadow: var(--af-shadow-s);
 }
 
 .dashPlanUserBox{
@@ -19,9 +20,11 @@
     padding: 20px 30px 30px 50px;
     transition: ease-in-out all .3ms;
     h2{
-        font-size: 40px;
-        font-weight: 900;
-        line-height: 1;
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.04;
+        letter-spacing: -.03em;
+        color: var(--af-cream-ink) !important;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -29,7 +32,7 @@
             width: 15px;
             height: 15px;
             border-radius: 50%;
-            background: #7cdf71;
+            background: var(--af-accent);
             content: '';
             position: absolute;
             top: 15px;
@@ -99,27 +102,33 @@
     }
 }
 
+/* La nota va discreta dentro de la tarjeta crema, no como una etiqueta oscura
+   pegada encima. */
 .dpubNote{
-    background: var(--dark-blue);
-    border-radius: 5px;
+    background: rgba(122,90,17,.10);
+    border-radius: 8px;
     padding: 3px 5px 3px 5px;
     margin: 10px 0px 5px;
     width: auto;
     display: flex;
     p{
+        color: var(--af-cream-ink) !important;
         font-size: 10px;
         color: white;
         line-height: 1.2;
     }
 }
 
+/* Los creditos son buena noticia (el cliente ya pago otro plan): verde solido
+   y legible, no menta claro con texto blanco encima. */
 .dpubCredits{
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--green);
-    padding: 3px 10px 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+    top: 14px;
+    right: 14px;
+    background: var(--af-accent);
+    padding: 4px 12px;
+    border-radius: var(--af-r-pill);
+    font-size: 11.5px;
+    font-weight: 700;
     color: white;
 }

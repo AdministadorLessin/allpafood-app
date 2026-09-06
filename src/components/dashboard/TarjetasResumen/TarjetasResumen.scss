@@ -1,0 +1,74 @@
+/* Las tarjetas informativas son blancas. El color se reserva para el estado:
+   antes cada tarjeta tenia su tinte (crema, azul) y la pantalla parecia un
+   semaforo. El significado va en el acento —la barra, el icono, la etiqueta—,
+   no en el fondo. */
+
+.afBarra{
+    height: 8px;
+    border-radius: var(--af-r-pill);
+    background: rgba(16,31,24,.07);
+    overflow: hidden;
+    margin: 12px 0 8px;
+    i{
+        display: block;
+        height: 100%;
+        border-radius: var(--af-r-pill);
+        background: var(--af-ink);
+        transition: width .45s cubic-bezier(.4,0,.2,1);
+    }
+    /* Verde cuando queda holgura, ambar cuando el plan se acaba. Un solo dato
+       de color, en el sitio donde el cliente ya esta mirando. */
+    &--ok i{ background: var(--af-accent); }
+    &--bajo i{ background: #C58A2E; }
+    &--sky i{ background: var(--af-accent); opacity: .55; }
+}
+
+.afFila{
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: var(--af-muted);
+    b{ color: var(--af-ink); font-weight: 700; }
+    &--top{ margin-bottom: 2px; }
+}
+
+.afPlan, .afHoy{
+    background: var(--af-paper);
+}
+
+.afPlan{
+    &__creditos{
+        margin: 14px 0 0;
+        padding: 11px 12px;
+        border-radius: 12px;
+        background: var(--af-accent-soft);
+        font-size: 12.5px;
+        line-height: 1.45;
+        color: var(--af-accent);
+    }
+    &__chip{
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: var(--af-r-pill);
+        background: rgba(16,31,24,.06);
+        color: var(--af-muted);
+        white-space: nowrap;
+        &--bajo{ background: #FBF0DC; color: #8A5F14; }
+    }
+}
+
+.afHoy{
+    &__vacio{
+        margin: 4px 0 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--af-muted);
+    }
+    &__plato{
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--af-ink);
+        margin: 0 0 2px;
+    }
+}

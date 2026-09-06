@@ -18,6 +18,7 @@ import FormControl from '@mui/material/FormControl';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuthContext } from './../../../../context/authContext';
+import { API_URL } from '../../../../config';
 
 
 const ProfileChangePassword = ({iconImg,closeModal}) => {
@@ -62,7 +63,7 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
             data:null
         });
 
-        axios.put('http://localhost:8443/api-af/v1/profile/data/authentication',
+        axios.put(`${API_URL}profile/data/authentication`,
             {
                 password: dataTmp.oldPassword,
                 newPassword: dataTmp.password

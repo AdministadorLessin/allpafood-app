@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthContext } from './../../../../context/authContext';
+import { API_URL } from '../../../../config';
 
 const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
 
@@ -51,7 +52,7 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
 
     const updateDataPrivacity = (dataTmp) =>{
         setLoadingForm(true);
-        axios.put('http://localhost:8443/api-af/v1/profile/data/privacy',
+        axios.put(`${API_URL}profile/data/privacy`,
             {
                 documentNumber: dataTmp.fpdni,
                 phoneNumber: dataTmp.fpwhatsapp,

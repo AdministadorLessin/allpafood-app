@@ -9,13 +9,14 @@ import BlockAnimate from './../../ultil/BlockAnimate/BlockAnimate';
 
 import caritaFelis from '../../../assets/img/dash_emoticon_1.png';
 import caritaTriste from '../../../assets/img/ico_renewplan.png';
-import { Link } from 'react-router-dom';
 
 const HelloPaper = ({data}) => {
 
   
-  const today = moment(new Date()).format('MMMM Do YYYY');
+  // El locale se fijaba DESPUES de formatear, y el patron era el ingles
+  // ('MMMM Do YYYY'), asi que salia "Septiembre 3o 2026".
   moment.locale('es');
+  const today = moment(new Date()).format('dddd D [de] MMMM');
 
   const [userData,setUserData] = useState();
   useEffect(()=>{
@@ -40,12 +41,11 @@ const HelloPaper = ({data}) => {
 
             <div className="txt">
               <small>{today}</small>
-              <h1><strong>Buen dia, {userData && userData.profile.name.split(" ")[0]}</strong></h1>
-              {userData && userData.plan && userData.plan.consumption && parseFloat(userData.plan.consumption.orders.consumed) >= 15 ?
-                <p> <strong>Tu plan esta por acabarse</strong><br /> <Link to={'/planes'}>Renovar</Link> </p>
-              :
-                <p>¡Bienvenido a tu panel <br />de control!</p>
-              }
+              <h1><strong>Buen día, {userData && userData.profile && userData.profile.name ? userData.profile.name.split(" ")[0] : ''}</strong></h1>
+              {/* El aviso de renovacion y el saludo generico se fueron al banner
+                  de estado, que decide segun la situacion real del cliente.
+                  Aqui quedaba ademas "Bienvenido" en masculino para todos. */}
+              <p>Aquí ves tu semana y tu plan.</p>
             </div>
             <figure>
               {userData && userData.plan && userData.plan.consumption && parseFloat(userData.plan.consumption.orders.consumed) >= 15 ?

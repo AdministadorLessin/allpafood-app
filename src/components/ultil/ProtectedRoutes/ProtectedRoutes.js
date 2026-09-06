@@ -5,6 +5,7 @@ import React,{useState,useEffect} from "react"
 import axios from 'axios';
 
 import { useNavigate } from "react-router-dom";
+import { API_URL } from '../../../config';
 
 
 
@@ -20,7 +21,7 @@ const ProtectedRoutes = ({
 
     const validateToken = () =>{
         if(loadApp){
-            axios.get('http://localhost:8443/api-af/v1/auth/validate-token',
+            axios.get(`${API_URL}auth/validate-token`,
                 {
                     headers: {"Authorization" : `Bearer ${loadApp}`} 
                 }

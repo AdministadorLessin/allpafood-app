@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { API_URL } from '../config';
 //import axios from 'axios';
 export const AuthContext = createContext();
 
@@ -7,7 +8,7 @@ const storageInfo = 'inf';
 
 export default function AuthContextProvider({children}) {
 
-    const baseUrl= 'http://localhost:8443/api-af/v1/';
+    const baseUrl= `${API_URL}`;
     
     const [token,setToken] = useState(() =>
         window.localStorage.getItem(storageToken)

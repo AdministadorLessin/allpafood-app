@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
+import { API_URL } from '../config';
 
 export const AuthContext = createContext();
 
@@ -32,7 +33,7 @@ function useLocalStorageState(key, defaultValue) {
 }
 
 export default function AuthContextProvider({ children }) {
-  const baseUrl = 'http://localhost:8443/api-af/v1/';
+  const baseUrl = `${API_URL}`;
 
   // Estados sincronizados automáticamente con LocalStorage
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEYS.TOKEN) || null);
@@ -112,6 +113,25 @@ export default function AuthContextProvider({ children }) {
     ['regfrm', 'registro_step_cache', 'valfact','registro_data_cache'].forEach((key) => localStorage.removeItem(key));
   }, []);
 
+  /**
+   * Cerrar sesion. No existia en toda la app: quien entraba no podia salir, y
+   * en un telefono prestado la siguiente persona veia su direccion, su
+   * telefono y sus compras.
+   *
+   * Se borra TODO lo del cliente, no solo el token: los datos del perfil viven
+   * en 'inf' y sobrevivian a cualquier limpieza parcial.
+   */
+  const logout = useCallback(() => {
+    Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+    ['needBrm', 'regfrm', 'registro_step_cache', 'valfact', 'registro_data_cache']
+      .forEach((key) => localStorage.removeItem(key));
+
+    setToken(null);
+    setPlanInfo(null);
+    setCartItems([]);
+    setCartAdicionales([]);
+  }, [setCartItems, setCartAdicionales]);
+
   const coverCities = ([
     {lat: -12.071775, lng: -77.127376},
     {lat: -12.050166012430507, lng: -77.12321506194232},
@@ -150,6 +170,7 @@ export default function AuthContextProvider({ children }) {
       deleteItemAdToCart,
       emptyCart,
       removeLocalstorage,
+      logout,
       coverCities
     }),
     [
@@ -166,6 +187,7 @@ export default function AuthContextProvider({ children }) {
       deleteItemAdToCart,
       emptyCart,
       removeLocalstorage,
+      logout,
       coverCities
     ]
   );

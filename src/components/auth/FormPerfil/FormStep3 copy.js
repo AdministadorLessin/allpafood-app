@@ -10,7 +10,8 @@ import axios from 'axios';
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import icoMarkerPin from '../../../assets/img/ico_marker_pin.png';
+// El pin del mapa traia el logo antiguo (un arbol).
+import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
 import FormHelperText from '@mui/material/FormHelperText';
 
 import {useAuthContext} from '../../../context/authContext';
@@ -28,6 +29,7 @@ import {
     useAdvancedMarkerRef
   } from '@vis.gl/react-google-maps';
 import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
+import { API_URL } from '../../../config';
 
 
 
@@ -323,7 +325,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         }
         
 
-        axios.put('http://localhost:8443/api-af/v1/register/profile', {
+        axios.put(`${API_URL}register/profile`, {
             bornDate: formatDate(newObjet2.bornDate),
             district: newObjet2.district,
             address: newObjet2.address,
@@ -350,7 +352,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
 
-            axios.patch('http://localhost:8443/api-af/v1/plan/user/need-day',
+            axios.patch(`${API_URL}plan/user/need-day`,
                 {
                     needDay:JSON.stringify(getCaloriesAllDays(newObjet2))
                 },
@@ -365,7 +367,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
 
 
-            axios.post('http://localhost:8443/api-af/v1/auth/refresh-token',
+            axios.post(`${API_URL}auth/refresh-token`,
             {},
             {
                 headers: { "Authorization": `Bearer ${token}` }

@@ -1,0 +1,89 @@
+.afBanner{
+    border-radius: 22px;
+    padding: 20px 20px 19px;
+    margin-bottom: 16px;
+
+    &__kick{
+        font-size: 11px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        font-weight: 700;
+        opacity: .65;
+        margin: 0 0 8px;
+    }
+    &__titulo{
+        font-size: var(--af-t-xl) !important;
+        line-height: 1.15;
+        letter-spacing: -.02em;
+        font-weight: 700;
+        margin: 0 0 7px !important;
+        color: inherit !important;
+    }
+    &__detalle{
+        font-size: var(--af-t-s);
+        line-height: 1.45;
+        opacity: .78;
+        margin: 0 0 16px;
+        color: inherit !important;
+    }
+    &__accion{
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 13px 16px;
+        border-radius: var(--af-r-pill);
+        background: var(--af-ink);
+        color: #F1F6F2;
+    }
+
+    /* Falta elegir dias: menta, el unico color grande de la pantalla. */
+    &--accion{
+        background: linear-gradient(155deg, #3CFB9F 0%, #7FEFB8 100%);
+        color: var(--af-mint-ink);
+        .afBanner__accion{ background: var(--af-ink); color: #F1F6F2; }
+    }
+    /* Cierra hoy: tinta con el contador en menta. El crema amarillo no leia
+       como urgencia, leia como aviso decorativo, y encima chocaba con el verde
+       de la marca. */
+    &--urgente{
+        background: var(--af-ink);
+        color: #F1F6F2;
+        .afBanner__kick{ color: var(--af-mint); opacity: 1; }
+        .afBanner__accion{ background: var(--af-mint); color: var(--af-mint-ink); }
+    }
+    /* Renovacion o sin plan: tinta, maximo contraste. */
+    &--dark{
+        background: var(--af-ink);
+        color: #F1F6F2;
+        .afBanner__accion{ background: var(--af-mint); color: var(--af-mint-ink); }
+    }
+    /* Todo listo: no hay nada que hacer, no debe competir por atencion. */
+    &--calmo{
+        background: var(--af-paper);
+        color: var(--af-ink);
+        box-shadow: var(--af-shadow-s);
+        .afBanner__kick{ color: var(--af-accent); opacity: 1; }
+        .afBanner__accion{
+            background: transparent;
+            color: var(--af-ink);
+            border: 1.5px solid var(--af-line);
+        }
+    }
+    &--esqueleto{
+        background: var(--af-paper);
+        box-shadow: var(--af-shadow-s);
+    }
+}
+
+
+/* El boton principal late igual que los dias: es la misma accion, vista desde
+   otro sitio de la pantalla. */
+.afBanner--accion .afBanner__accion,
+.afBanner--urgente .afBanner__accion{
+    animation: afLatido 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce){
+    .afBanner__accion{ animation: none !important; }
+}

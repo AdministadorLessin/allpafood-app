@@ -1,0 +1,161 @@
+.afHoyPedido{
+    background: var(--af-ink);
+    transition: background .4s ease;
+    color: #F1F6F2;
+    border-radius: var(--af-r-card);
+    padding: 20px 20px 18px;
+    margin-bottom: 14px;
+
+    &__cab{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    &__et{
+        font-size: var(--af-t-xs);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        font-weight: 800;
+        color: var(--af-mint);
+    }
+    &__plato{
+        font-size: 12.5px;
+        color: rgba(241,246,242,.72);
+        text-align: right;
+    }
+
+    /* La promesa es lo único grande: es la respuesta a la pregunta que el
+       cliente venía a hacer por WhatsApp. */
+    &__promesa{
+        font-size: var(--af-t-xl);
+        font-weight: 700;
+        letter-spacing: -.025em;
+        line-height: 1.15;
+        margin: 0 0 20px;
+        color: #F1F6F2;
+        b{ color: var(--af-mint); font-weight: 700; }
+    }
+
+    /* Ambar, no rojo. El rojo dice "error grave" y dispara alarma; el ambar
+       dice "atencion, algo cambio". La comida viene igual. */
+    &--retraso{
+        background: #3A2A12;
+        .afHoyPedido__et{ color: #F0B450; }
+        .afHoyPedido__promesa b{ color: #F0B450; }
+        .afPaso__marca--hecho{ background: #F0B450; border-color: #F0B450; }
+        .afPaso__marca--actual{
+            border-color: #F0B450;
+            box-shadow: 0 0 0 4px rgba(240,180,80,.18);
+        }
+        .afPaso--activo:not(:last-child)::before{ background: rgba(240,180,80,.4); }
+    }
+
+    &__aviso{
+        font-size: 13px;
+        line-height: 1.5;
+        color: rgba(241,246,242,.82);
+        background: rgba(255,255,255,.07);
+        border-radius: 12px;
+        padding: 13px 14px;
+        margin: 0 0 18px;
+
+        &--suave{
+            background: none;
+            padding: 0;
+            color: rgba(241,246,242,.6);
+            font-size: 12.5px;
+        }
+    }
+
+    &__salida{
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: rgba(241,246,242,.62);
+        margin: 16px 0 0;
+    }
+
+    &__dir{
+        font-size: 12.5px;
+        line-height: 1.45;
+        color: rgba(241,246,242,.68);
+        margin: 16px 0 0;
+        b{ color: #F1F6F2; }
+    }
+
+    &__ayuda{
+        display: block;
+        text-align: center;
+        margin: 16px 0 0;
+        padding: 12px;
+        border-radius: var(--af-r-pill);
+        border: 1px solid rgba(255,255,255,.22);
+        color: rgba(241,246,242,.85);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+.afPasos{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.afPaso{
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    position: relative;
+    padding-bottom: 16px;
+
+    /* La línea que une los pasos: da la sensación de recorrido, que es
+       justamente lo que el cliente no percibe hoy. */
+    &:not(:last-child)::before{
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 22px;
+        bottom: 2px;
+        width: 2px;
+        background: rgba(255,255,255,.14);
+    }
+    &--activo:not(:last-child)::before{ background: rgba(60,251,159,.4); }
+    &:last-child{ padding-bottom: 0; }
+
+    &__marca{
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.22);
+        flex: 0 0 auto;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--af-ink);
+        svg{ width: 12px; height: 12px; color: var(--af-mint-ink); }
+
+        &--hecho{ background: var(--af-mint); border-color: var(--af-mint); }
+        &--actual{
+            border-color: var(--af-mint);
+            box-shadow: 0 0 0 4px rgba(60,251,159,.16);
+            animation: afLatido 2.6s ease-in-out infinite;
+        }
+    }
+
+    &__txt{
+        display: block;
+        padding-top: 1px;
+        b{ display: block; font-size: 14px; font-weight: 700; color: rgba(241,246,242,.5); }
+        small{ display: block; font-size: 11.5px; color: rgba(241,246,242,.38); margin-top: 1px; }
+    }
+    &--activo &__txt b{ color: #F1F6F2; }
+    &--activo &__txt small{ color: rgba(241,246,242,.6); }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .afPaso__marca--actual{ animation: none; }
+}

@@ -1,0 +1,45 @@
+.afPlanHero{
+    &__nombre{
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+        margin: 0 0 10px;
+    }
+    &__cifra{
+        display: flex;
+        align-items: baseline;
+        gap: 9px;
+        margin-bottom: 4px;
+    }
+    &__n{
+        /* La cifra que importa: cuantos envios le quedan. Todo lo demas de la
+           tarjeta es contexto de ese numero. */
+        font-size: 52px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -.04em;
+        color: var(--af-ink);
+    }
+    &__u{ font-size: 14px; color: var(--af-muted); font-weight: 600; }
+    &__vence{
+        margin: 14px 0 0;
+        font-size: 13px;
+        color: var(--af-muted);
+        b{ color: var(--af-ink); font-weight: 700; }
+    }
+}
+
+.afCredito{
+    background: var(--af-accent-soft) !important;
+    &__t{ margin: 0 0 5px; font-size: 14.5px; font-weight: 700; color: var(--af-accent); }
+    &__d{ margin: 0; font-size: 13px; line-height: 1.5; color: var(--af-accent); opacity: .9; }
+}
+
+.afSinPlan{
+    text-align: center;
+    padding: 30px 20px !important;
+    &__t{ margin: 0 0 6px; font-size: 17px; font-weight: 700; color: var(--af-ink); }
+    &__d{ margin: 0 0 20px; font-size: 13.5px; color: var(--af-muted); line-height: 1.5; }
+}

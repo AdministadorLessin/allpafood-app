@@ -1,0 +1,70 @@
+/* El flujo reutiliza las piezas ya definidas en global.scss (afPlato, afDir,
+   afSrow, afBtn, afTag). Aqui solo lo propio. */
+
+.afMenu__error{
+    background: var(--error-back);
+    color: var(--error-txt);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 0 0 14px;
+}
+
+.afPlato__img{
+    background-size: cover;
+    background-position: center;
+}
+
+.afBtn:disabled{
+    opacity: .45;
+    cursor: default;
+}
+
+/* Fila de un día ya pedido: se toca para ver el detalle y poder cancelarlo. */
+.afPedidoFila{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--af-line);
+    padding: 14px 0;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:last-child{ border-bottom: 0; }
+
+    &__txt{
+        display: block;
+        b{
+            display: block;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--af-ink);
+            text-transform: capitalize;
+        }
+        small{
+            display: block;
+            font-size: 12.5px;
+            color: var(--af-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+    }
+    &__ir{ color: var(--af-muted); font-size: 22px; line-height: 1; flex: 0 0 auto; }
+}
+
+.afVolver{
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--af-muted);
+    padding: 0 0 10px;
+    cursor: pointer;
+}

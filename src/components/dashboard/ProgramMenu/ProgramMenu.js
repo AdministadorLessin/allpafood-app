@@ -29,6 +29,11 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import RoomIcon from '@mui/icons-material/Room';
 import ProgramMenuMap from './ubicacion/ubicacion';
+import { API_URL } from '../../../config';
+
+// Debe coincidir con schedule.order.max_hour del backend. Si alla cambia, aqui
+// tambien: hoy el cliente puede elegir para manana hasta esta hora.
+export const HORA_LIMITE = 22;
 
 const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
 
@@ -56,7 +61,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
       
       const planNameFnc = data.planName;
       if(lastDateProgram){
-        axios.get('http://localhost:8443/api-af/v1/dashboard/menus?initDate='+moment(lastDateProgram).add(1,'days').format('YYYY-MM-DD'),
+        axios.get(`${API_URL}dashboard/menus?initDate=`+moment(lastDateProgram).add(1,'days').format('YYYY-MM-DD'),
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }
@@ -113,7 +118,10 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
           })
       }else{
         
-        axios.get('http://localhost:8443/api-af/v1/dashboard/menus?initDate='+moment().add(1,'days').format('YYYY-MM-DD'),
+        // Misma regla que el camino de arriba: antes este else sumaba siempre 1
+        // dia, asi que segun por donde entrara el cliente veia una ventana
+        // distinta de dias disponibles.
+        axios.get(`${API_URL}dashboard/menus?initDate=`+moment().add(moment().hour() >= HORA_LIMITE ? 2 : 1,'days').format('YYYY-MM-DD'),
             {
               headers: {"Authorization" : `Bearer ${token}`} 
             }
@@ -181,13 +189,16 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
     // 1. Determinar la fecha base (lastDateProgram o la fecha actual)
     const baseDate = lastDateProgram ? moment(lastDateProgram) : moment();
 
-    // 2. Si es a partir de las 4 PM (16:00 hrs), sumamos 2 días; si no, 1 día
-    const daysToAdd = moment().hour() >= 9 ? 2 : 1;
+    // El servidor acepta pedidos para el dia siguiente hasta las 22:00
+    // (schedule.order.max_hour). Aqui estaba escrito 9, con un comentario que
+    // decia 16: se cerraba la ventana trece horas antes de tiempo y el cliente
+    // perdia un dia entero de eleccion sin motivo.
+    const daysToAdd = moment().hour() >= HORA_LIMITE ? 2 : 1;
     const initDate = baseDate.add(daysToAdd, 'days').format('YYYY-MM-DD');
 
     try {
       const resp = await axios.get(
-        `http://localhost:8443/api-af/v1/dashboard/menus?initDate=${initDate}`,
+        `${API_URL}dashboard/menus?initDate=${initDate}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -224,7 +235,10 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
   };
 
   const getDayTmp = (date) =>{
-    var days = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'];
+    // getDay() devuelve 0 para DOMINGO, no para lunes. El arreglo empezaba en
+    // 'LUN', asi que todas las etiquetas salian corridas un dia: el jueves se
+    // rotulaba VIE y el cliente pedia su plato para el dia equivocado.
+    var days = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
     var d = new Date(date);
     var dayName = days[d.getDay()];
     return dayName;
@@ -422,7 +436,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
 
   const getDirections = () => {
       setLoadPl(true)
-      axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
+      axios.get(`${API_URL}delivery/find/points`,{
         headers: {"Authorization" : `Bearer ${token}`} 
       }).then((resp)=>{
         
@@ -444,7 +458,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
   }
 
   const removeUbi = (item) =>{
-      axios.delete('http://localhost:8443/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
+      axios.delete(`${API_URL}delivery/delete/point?deliveryPointId=`+item.id,{
           headers: {"Authorization" : `Bearer ${token}`} 
       }).then((resp)=>{
           getDirections();
@@ -721,7 +735,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
             </figure>
           </div>
           <p>
-            Ya programo todos los envios de esta semana. todos los viernes se agregan el nuevo menu para la siguiente semana.
+            Ya elegiste todos los días disponibles. Los viernes publicamos el menú de la próxima semana.
           </p>
         </div>
       :

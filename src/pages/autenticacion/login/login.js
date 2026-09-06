@@ -21,6 +21,7 @@ import axios from 'axios';
 import {useAuthContext} from '../../../context/authContext';
 import { useNavigate } from "react-router-dom";
 import Backdrop from './../../../components/ultil/Backdrop/Backdrop';
+import { API_URL } from '../../../config';
 
 const LoginPage = (props) => {
   
@@ -59,7 +60,7 @@ const LoginPage = (props) => {
 
   const [errorAxios,setErrorAxios] = useState(false);
   const sendData = () =>{
-    axios.post('http://localhost:8443/api-af/v1/auth/login',
+    axios.post(`${API_URL}auth/login`,
         {
           username:bodyFields.lfcorreo,
           password:bodyFields.lfpassword

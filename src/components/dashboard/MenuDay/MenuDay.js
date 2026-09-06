@@ -25,6 +25,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
 import { useAuthContext } from "context/authContext";
 import ProgramMenuMap from "../ProgramMenu/ubicacion/ubicacion";
+import { API_URL } from '../../../config';
 
 const MenuDay = ({data,reproOrder,getMenus}) => {
 
@@ -108,7 +109,7 @@ const MenuDay = ({data,reproOrder,getMenus}) => {
 
     const getDirections = () => {
         setLoadPl(true)
-        axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
+        axios.get(`${API_URL}delivery/find/points`,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
 
@@ -145,7 +146,7 @@ const MenuDay = ({data,reproOrder,getMenus}) => {
     }
 
     const removeUbi = (item) =>{
-        axios.delete('http://localhost:8443/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
+        axios.delete(`${API_URL}delivery/delete/point?deliveryPointId=`+item.id,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
 
@@ -174,7 +175,7 @@ const MenuDay = ({data,reproOrder,getMenus}) => {
         setLoadResp(true);
 
         axios.put(
-            'http://localhost:8443/api-af/v1/order/scheduled',
+            `${API_URL}order/scheduled`,
             requestBody, // <-- Enviamos la variable local fresca
             {
                 headers: { "Authorization": `Bearer ${token}` }

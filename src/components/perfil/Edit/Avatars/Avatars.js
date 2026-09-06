@@ -6,6 +6,7 @@ import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
 import  axios from 'axios';
 import { useAuthContext } from './../../../../context/authContext';
+import { API_URL } from '../../../../config';
 
 const ProfileEditAvatar = ({closeModal,data,updatePerson}) => {
 
@@ -17,7 +18,7 @@ const ProfileEditAvatar = ({closeModal,data,updatePerson}) => {
 
   const updateAvatar = ()=>{
     setLoadingForm(true);
-    axios.put('http://localhost:8443/api-af/v1/profile/data/personal',
+    axios.put(`${API_URL}profile/data/personal`,
         {
             name: data.name,
             lastname: data.lastname,

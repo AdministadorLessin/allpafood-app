@@ -1,0 +1,58 @@
+.afKpis{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.afKpi{
+    background: var(--af-paper);
+    border-radius: var(--af-r-card);
+    box-shadow: var(--af-shadow-s);
+    padding: 15px 12px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+
+    &__circulo{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+    &__ic{ width: 15px; height: 15px; }
+
+    /* El numero es lo unico grande: el icono y el pie son contexto. */
+    &__valor{
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -.035em;
+        color: var(--af-ink);
+        font-variant-numeric: tabular-nums;
+    }
+    &__pie{
+        font-size: 11px;
+        line-height: 1.25;
+        color: var(--af-muted);
+        font-weight: 600;
+    }
+
+    &--verde .afKpi__circulo{ background: var(--af-accent-soft); color: var(--af-accent); }
+    &--azul  .afKpi__circulo{ background: #E4EFFA;               color: #1D4E7C; }
+    &--coral .afKpi__circulo{ background: #FBEAE4;               color: #A8543A; }
+
+    /* El ahorro es la unica cifra que celebra algo, asi que se destaca:
+       fondo tinta y el numero en menta. Es el dato que hace sentir que el
+       plan valio la pena. */
+    &--destacado{
+        background: var(--af-ink);
+        .afKpi__valor{ color: var(--af-mint); }
+        .afKpi__pie{ color: rgba(241,246,242,.7); }
+        .afKpi__circulo{ background: rgba(60,251,159,.16); color: var(--af-mint); }
+    }
+}

@@ -27,6 +27,8 @@ import ProfileChangePerson from './../../../components/perfil/Edit/Personales/Pe
 import ProfileChangePrivacity from './../../../components/perfil/Edit/Privacidad/Privacidad';
 import ProfileEditAvatar from './../../../components/perfil/Edit/Avatars/Avatars';
 import { Link } from 'react-router-dom';
+import CerrarSesion from './../../../components/perfil/CerrarSesion/CerrarSesion';
+import { API_URL } from '../../../config';
 
 const PerfilPage = (props) => {
 
@@ -51,7 +53,7 @@ const PerfilPage = (props) => {
   const [person,setPerson] = useState();
   const [imgProfile,setImgProfile] = useState(null);
   const getInfo = ()=>{
-    axios.get('http://localhost:8443/api-af/v1/profile/data/personal',
+    axios.get(`${API_URL}profile/data/personal`,
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -81,7 +83,7 @@ const PerfilPage = (props) => {
   // Delivery Point
   const [delivery,setDelivery] = useState();
   const getDelivery = () =>{
-    axios.get('http://localhost:8443/api-af/v1/profile/data/delivery',
+    axios.get(`${API_URL}profile/data/delivery`,
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -97,7 +99,7 @@ const PerfilPage = (props) => {
   // Privacidad
   const [privacity,setPrivacity] = useState();
   const getPrivacity = () =>{
-    axios.get('http://localhost:8443/api-af/v1/profile/data/privacy',
+    axios.get(`${API_URL}profile/data/privacy`,
       {
         headers: {"Authorization" : `Bearer ${token}`} 
       }
@@ -188,6 +190,29 @@ const PerfilPage = (props) => {
             </div>
             <CardProfilePassword />
           </CardPaper>
+
+          {/* Estas cuatro paginas solo existian dentro del menu hamburguesa. Al
+              pasar la navegacion a las pestanas quedaban sin puerta, asi que
+              viven aqui, dentro de Cuenta. */}
+          <CardPaper
+              data={
+                {
+                  titulo:'Más opciones',
+                  ico:icoPrivacidad,
+                  className:false
+                }
+              }
+          >
+            <nav className="afMasOpciones">
+              <Link to="/facturacion">Facturación<span>&rsaquo;</span></Link>
+              <Link to="/ubicaciones">Datos de entrega<span>&rsaquo;</span></Link>
+              <Link to="/salud-y-bienestar">Salud y bienestar<span>&rsaquo;</span></Link>
+              <Link to="/preguntas-frecuentes">Soporte<span>&rsaquo;</span></Link>
+            </nav>
+          </CardPaper>
+
+          {/* No existia forma de cerrar sesion en toda la app. */}
+          <CerrarSesion />
         </Grid>
       </Grid>
         

@@ -1,3 +1,5 @@
+import moment from 'moment';
+import 'moment/locale/es';
 import React,{useState,useEffect} from "react";
 import './PlanUser.scss';
 import Moment from 'react-moment';
@@ -30,16 +32,22 @@ const PlanUser = ({data}) => {
                 { plan  ?
                     <div className={'dashPlanUserBox'}>
                         
-                        {plan.credits &&
+                        {/* Antes decia "Creditos: 1" con el 1 escrito a mano: siempre 1,
+                            compraras uno o cinco planes. Ahora dice cuantos envios tiene
+                            esperando, que es lo que el cliente acaba de pagar. */}
+                        {plan.credits && plan.credits.orders &&
                             <div className="dpubCredits">
-                                Creditos: <strong>1</strong>
+                                {plan.credits.orders.total} envíos esperando
                             </div>
                         }
                         <h2>
                             {plan.planName}
                         </h2>
+                        {/* Decia "45 dias calendario" fijo, mientras el plan real dura
+                            los dias que marque su vencimiento (hoy 30). Prometia dos
+                            semanas que el sistema no da. */}
                         <div className="dpubNote">
-                            <p>Recuerda que puedes utilizar tu plan hasta 45 días calendario.</p>
+                            <p>Puedes usar tu plan hasta el {plan.expirationDate ? moment(plan.expirationDate).format('D [de] MMMM') : 'vencimiento'}.</p>
                         </div>
                         {plan.consumption.orders.consumed === plan.consumption.orders.total ? 
                             <ul>

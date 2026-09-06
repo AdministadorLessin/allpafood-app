@@ -4,7 +4,8 @@ import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboar
 
 import icoPreguntasFrecuentes from '../../../assets/img/ico_preguntas_frecuentes.svg';
 import icoMarker from '../../../assets/img/ico_marker.svg';
-import icoMarkerPin from '../../../assets/img/ico_marker_pin.png';
+// El pin traia el logo antiguo (un arbol). Este es el isotipo actual.
+import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
 import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
 
 import TextField from '@mui/material/TextField';
@@ -35,6 +36,7 @@ import {
   } from '@vis.gl/react-google-maps';
   
 import {  Polygon } from './circulo';
+import { API_URL } from '../../../config';
 
 const UbicacionesPage = (props) => {
     const [selectedPlace, setSelectedPlace] = useState(null);
@@ -115,12 +117,17 @@ const UbicacionesPage = (props) => {
     }
 
     const validationSchema = Yup.object().shape({
+        // Los dos campos pedian "un telefono valido": copiado del formulario de
+        // registro y nunca corregido.
+        name: Yup.string()
+                        .required('Ponle un nombre para reconocerlo después.')
+                        .max(40,'Un nombre corto se lee mejor: "Casa", "Oficina".'),
         address: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
+                        .required('Escribe el número de tu casa, departamento u oficina.')
+                        .min(1,'Escribe el número de tu casa, departamento u oficina.'),
         description: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
+                        .required('Una referencia ayuda al repartidor a encontrarte.')
+                        .min(1,'Una referencia ayuda al repartidor a encontrarte.'),
     });
 
     const {
@@ -137,7 +144,7 @@ const UbicacionesPage = (props) => {
     const [loadPl,setLoadPl] = useState(false);
     const getDirections = () => {
         setLoadPl(true)
-        axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
+        axios.get(`${API_URL}delivery/find/points`,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
             setPointList(resp.data.data)
@@ -153,45 +160,61 @@ const UbicacionesPage = (props) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
-        axios.post('http://localhost:8443/api-af/v1/delivery/create/point',
-            dataAddPoint
+        // Se guarda la calle del mapa junto al numero que escribio el cliente.
+        // Antes solo viajaba el numero, asi que en la base quedaban direcciones
+        // como "776" sin ninguna calle.
+        const detalle = (dataAddPoint.address || '').trim();
+        const direccionCompleta = calleDelMapa
+            ? (detalle ? `${calleDelMapa}, ${detalle}` : calleDelMapa)
+            : detalle;
+
+        axios.post(`${API_URL}delivery/create/point`,
+            { ...dataAddPoint, address: direccionCompleta }
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
-        }).then((resp)=>{
+        }).then(()=>{
             getDirections()
         }).catch((error)=>{
-            console.log(error)
+            setErrorUbi(error?.response?.data?.message || 'No pudimos guardar la dirección. Revisa los datos e intenta de nuevo.');
         })
     };
 
     // Update ubi
+    // Marca cual de las direcciones se usa para las entregas.
+    //
+    // Se llamaba con PUT y el servidor expone PATCH: devolvia 405 y el catch
+    // solo escribia en consola, asi que el cliente tocaba y no pasaba nada.
+    // Ademas el boton estaba dentro de un {false && ...}: la accion existia
+    // pero nadie podia verla.
+    const [errorUbi,setErrorUbi] = useState('');
     const updateUbi = (item) =>{
-        if(token){
-            axios.put('http://localhost:8443/api-af/v1/delivery/update/point?deliveryPointId='+item.id,
-                {},
-            {
-                headers: {"Authorization" : `Bearer ${token}`} 
-            }).then((resp)=>{
-                console.log('ubicacion actualizada')
-                getDirections()
-            }).catch((error)=>{
-                console.log(error)
-            })
-        }
+        if(!token) return;
+        setErrorUbi('');
+        axios.patch(`${API_URL}delivery/update/point?deliveryPointId=`+item.id,
+            {},
+            { headers: {"Authorization" : `Bearer ${token}`} }
+        ).then(()=>{
+            getDirections()
+        }).catch((error)=>{
+            setErrorUbi(error?.response?.data?.message || 'No pudimos cambiar tu dirección de entrega.');
+        })
     }
 
     const removeUbi = (item) =>{
-        axios.delete('http://localhost:8443/api-af/v1/delivery/delete/point?deliveryPointId='+item.id,{
+        setErrorUbi('');
+        axios.delete(`${API_URL}delivery/delete/point?deliveryPointId=`+item.id,{
             headers: {"Authorization" : `Bearer ${token}`} 
-        }).then((resp)=>{
+        }).then(()=>{
             getDirections()
         }).catch((error)=>{
-            console.log(error)
+            setErrorUbi(error?.response?.data?.message || 'No pudimos eliminar esta dirección.');
         })
     }
 
 
     const [distrito,setDistrito] = useState();
+    // Calle que devuelve el mapa para el punto marcado.
+    const [calleDelMapa,setCalleDelMapa] = useState(null);
     const getDistrictFromCoords = (latLng) => {
 
         if (!window.google?.maps?.Geocoder) return;
@@ -279,6 +302,20 @@ const UbicacionesPage = (props) => {
 
                 setDistrito(district);
 
+                // La calle ya venia en la respuesta del mapa y se descartaba:
+                // solo se aprovechaba el distrito. Por eso lo unico que quedaba
+                // guardado era el numero suelto que escribia el cliente ("776"),
+                // sin ninguna calle que el repartidor pudiera usar.
+                const conCalle = results.find(r =>
+                    r.address_components.some(c => c.types.includes('route')));
+                let calle = null;
+                if (conCalle) {
+                    const via = conCalle.address_components.find(c => c.types.includes('route'));
+                    const num = conCalle.address_components.find(c => c.types.includes('street_number'));
+                    calle = num ? `${via.long_name} ${num.long_name}` : via.long_name;
+                }
+                setCalleDelMapa(calle);
+
                 setDataAddPoint(prev => ({
                     ...prev,
                     district
@@ -297,7 +334,7 @@ const UbicacionesPage = (props) => {
             <CardPaper
                 data={
                     {
-                        titulo:'Marque su lugar de envio:',
+                        titulo:'¿Dónde te entregamos?',
                         ico:icoPreguntasFrecuentes,
                         className:false
                     }
@@ -310,19 +347,47 @@ const UbicacionesPage = (props) => {
                         <CardPaper
                             data={
                                 {
-                                    titulo:'Agregar lugar de entrega:',
+                                    titulo:'Datos de la entrega',
                                     ico:icoMarker,
                                     className:false
                                 }
                             }
                         >
                             <form onSubmit={handleSubmit(onSubmitHandler)} className={dataAddPoint.location.latitude !== 0 ? '' : 'ubiFormDisabled'}>
+
+                                {/* La direccion que sale del mapa, a la vista. Antes el
+                                    cliente escribia "402" sin saber de que calle, y eso
+                                    era todo lo que quedaba guardado. */}
+                                {dataAddPoint.location.latitude !== 0 &&
+                                    <div className="ubiCalle">
+                                        <span className="ubiCalle__et">Dirección del punto que marcaste</span>
+                                        <strong>{calleDelMapa || 'Sin nombre de calle en este punto'}</strong>
+                                        {distrito && <em>{distrito}</em>}
+                                    </div>
+                                }
+
+                                {/* El nombre va primero: es como el cliente piensa el
+                                    lugar antes de dar cualquier detalle. */}
+                                <div className="textFieldBox">
+                                    <TextField
+                                        id="name"
+                                        name="name"
+                                        label="¿Cómo le llamas a este lugar?"
+                                        placeholder="Casa · Oficina · Casa de mis papás"
+                                        variant="filled"
+                                        error={errors.name ? true : false}
+                                        {...register("name")}
+                                        onChange={changeFields}
+                                        value={dataAddPoint.name || ''}
+                                    />
+                                </div>
+
                                 <div className="textFieldBox">
                                     <TextField
                                         id="address" 
                                         name="address"
-                                        label="N° Dep. / Oficina / Piso:"
-                                        type={'tel'}
+                                        label="Número, departamento u oficina"
+                                        placeholder="Dpto. 402 · Oficina B · Casa 15"
                                         variant="filled" 
                                         error={errors.address ? true : false}
                                         {...register("address")} 
@@ -362,7 +427,7 @@ const UbicacionesPage = (props) => {
                         <CardPaper
                             data={
                                 {
-                                    titulo:'Puntos de entrega:',
+                                    titulo:'Tus direcciones',
                                     ico:icoMarker,
                                     className:false
                                 }
@@ -378,6 +443,9 @@ const UbicacionesPage = (props) => {
                                     transition={{ duration: 0.2 }}
                                     className={'ubiPageMapList'}
                                 >
+                                    {errorUbi &&
+                                        <p className="ubiError">{errorUbi}</p>}
+
                                     {!loadPl && pointList && pointList.length > 0 ?
                                         <div 
                                             className="ubiPageMapListBox"
@@ -389,26 +457,38 @@ const UbicacionesPage = (props) => {
                                                     activeClass = true;
                                                 }
                                                 return (
-                                                    <div 
-                                                        //className={activeClass ? 'ubiPageMapItem ubiPageMapItemAct':'ubiPageMapItem'}
+                                                    <div
                                                         className={activeClass ? 'ubiPageMapItem ubiPageMapItemAct':'ubiPageMapItem'}
                                                     >
+                                                        {/* El titulo era la referencia y el subtitulo la direccion:
+                                                            el cliente veia "Frente al parque" como nombre del lugar.
+                                                            Va primero lo que identifica el sitio. */}
                                                         <div className="txt">
-                                                            <p>{item.address} - {item.district}</p>
-                                                            <h3>{item.description}</h3>
+                                                            <h3>{item.name || item.address}</h3>
+                                                            <p className="ubiDistrito">
+                                                                {item.name ? `${item.address} · ${item.district}` : item.district}
+                                                            </p>
+                                                            {item.description &&
+                                                                <p className="ubiRef">{item.description}</p>}
                                                         </div>
-                                                        {!activeClass &&
+
                                                         <div className="actions">
-                                                            {false &&
-                                                                <div onClick={()=>updateUbi(item)} className="check">
-                                                                    <span></span>
-                                                                </div>
+                                                            {activeClass ?
+                                                                <span className="ubiEnUso">Aquí entregamos</span>
+                                                            :
+                                                                <>
+                                                                    {/* Estaba escondido tras un {false &&}: el cliente
+                                                                        no tenia forma de cambiar su direccion. */}
+                                                                    <button type="button" className="ubiUsar"
+                                                                        onClick={()=>updateUbi(item)}>
+                                                                        Entregar aquí
+                                                                    </button>
+                                                                    <div onClick={()=>removeUbi(item)} className="remove">
+                                                                        <DeleteIcon />
+                                                                    </div>
+                                                                </>
                                                             }
-                                                            <div onClick={()=>removeUbi(item)} className="remove">
-                                                                <DeleteIcon />
-                                                            </div>
                                                         </div>
-                                                        }
                                                     </div>
                                                 )
                                             })}
@@ -447,12 +527,12 @@ const UbicacionesPage = (props) => {
                                             handleLocationChange(e.latLng);
                                         }}
                                     >
-                                        <img 
-                                            width={40} 
-                                            height={49.68} 
-                                            src={icoMarkerPin}
-                                            alt=""
-                                        />
+                                        {/* Antes era el logo suelto flotando sobre el mapa.
+                                            Un marcador necesita punta: sin ella no se
+                                            entiende que punto exacto esta señalando. */}
+                                        <span className="ubiPin">
+                                            <img src={icoMarkerPin} alt="" />
+                                        </span>
                                     </AdvancedMarker>
                                     <Polygon
                                         paths={cover}
@@ -478,7 +558,7 @@ const UbicacionesPage = (props) => {
                             </APIProvider>
                             {!statusUbi &&
                             <div className="searchNotCobertura">
-                                <p>Lo sentimos estas fuera de nuestra cobertura</p>
+                                <p>Todavía no llegamos a esa zona. Prueba con otro punto del mapa.</p>
                             </div>
                             }
                         </div>

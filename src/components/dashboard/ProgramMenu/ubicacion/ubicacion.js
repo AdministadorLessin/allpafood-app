@@ -1,7 +1,8 @@
 import React,{useState, useEffect, useRef} from "react";
 import './ubicacion.scss';
 
-import icoMarkerPin from '../../../../assets/img/ico_marker_pin.png';
+// El pin del mapa traia el logo antiguo (un arbol).
+import icoMarkerPin from '../../../../assets/img/isotipo_allpafood.png';
 
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
@@ -27,6 +28,7 @@ import {
   } from '@vis.gl/react-google-maps';
 
 import { Polygon } from './../../../../pages/dashboard/ubicaciones/circulo';
+import { API_URL } from '../../../../config';
 
 const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
 
@@ -140,7 +142,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
     
 
     const getDirections = () => {
-        axios.get('http://localhost:8443/api-af/v1/delivery/find/points',{
+        axios.get(`${API_URL}delivery/find/points`,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
             //console.log(resp)
@@ -155,7 +157,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
-        axios.post('http://localhost:8443/api-af/v1/delivery/create/point',
+        axios.post(`${API_URL}delivery/create/point`,
             dataAddPoint
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
