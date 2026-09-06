@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import Skeleton from '@mui/material/Skeleton';
 
 // Iconos
-import icoMenu from '../../../assets/img/icon_notify.svg';
 import StatusBanner from './../../../components/dashboard/StatusBanner/StatusBanner';
 import PanelSemana from './../../../components/dashboard/PanelSemana/PanelSemana';
 import { TarjetaPlan, TarjetaHoy } from './../../../components/dashboard/TarjetasResumen/TarjetasResumen';
@@ -14,6 +13,7 @@ import { Cascada, Bloque } from './../../../components/ultil/Motion/Motion';
 import AccesosRapidos from './../../../components/dashboard/AccesosRapidos/AccesosRapidos';
 import PanelKpis from './../../../components/dashboard/PanelKpis/PanelKpis';
 import PedidoDeHoy from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
+import Campana from './../../../components/dashboard/Campana/Campana';
 import icoObjetivo from '../../../assets/img/ico_objetivo.svg';
 import icoFecha from '../../../assets/img/icon_fecha.svg';
 
@@ -285,7 +285,12 @@ const DashboadHome = (props) => {
               ? <>Hola, <b>{helloCard.profile.name.split(' ')[0]}</b></>
               : <Skeleton variant="text" width={90} />}
           </span>
-          <span className="afChipFecha">{fechaDeHoy}</span>
+          <span className="afPanel__topDer">
+            <span className="afChipFecha">{fechaDeHoy}</span>
+            {/* Solo aparece si hay algo que decir. Es el canal que descarga la
+                difusion de WhatsApp de las 11. */}
+            <Campana plan={plan} ordenes={menuList} aviso={avisoEntrega} />
+          </span>
         </Bloque>
 
         {/* Titular a dos tonos: la primera linea situa, la segunda es el dato.

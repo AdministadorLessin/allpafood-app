@@ -113,6 +113,12 @@
         img{ width: 100%; height: 100%; object-fit: cover; display: block; }
     }
 }
+.afPanel__topDer{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
 .afChipFecha{
     /* Tambien en pildora opaca. Al quedarse pegado el encabezado, un texto
        suelto se transparentaba sobre las tarjetas oscuras de abajo. */
