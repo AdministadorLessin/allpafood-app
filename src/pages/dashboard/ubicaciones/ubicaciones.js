@@ -511,7 +511,7 @@ const UbicacionesPage = (props) => {
                                     className={'ubiPageMapApiStyle'}
                                     defaultZoom={12.5}
                                     defaultCenter={defailtCenter}
-                                    gestureHandling={"greedy"}
+                                    gestureHandling={"cooperative"}
                                     disableDefaultUI={true}
                                 >
                                     <AdvancedMarker 

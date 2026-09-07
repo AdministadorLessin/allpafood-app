@@ -73,10 +73,30 @@ const MenuFlow = ({ plan, alTerminar }) => {
       .catch(() => setPuntos([]));
   }, [token, desde]);
 
-  const platosDe = (dia) =>
-    dia?.menuTypeGroups?.find((g) => g.type === 'lunch')?.menuTypes ?? [];
+  /* Que comidas trae el plan. Fitfuel da almuerzo Y cena, y el servidor
+     exige un plato por cada una: isMenuSelectedValid rechaza el pedido si
+     menuTypeIds.size() != principalBenefits.size(). Antes esto asumia
+     'lunch' siempre, asi que quien compraba Fitfuel —el plan mas caro— no
+     podia programar un solo dia. */
+  const comidas = useMemo(() => {
+    const b = plan?.consumption?.principalBenefits;
+    const lista = Array.isArray(b) && b.length ? b : ['lunch'];
+    // El almuerzo primero: es como el cliente piensa el dia.
+    return [...lista].sort((a) => (a === 'lunch' ? -1 : 1));
+  }, [plan]);
 
-  const elegidos = Object.keys(seleccion).filter((f) => seleccion[f]?.menuId);
+  const NOMBRE_COMIDA = { lunch: 'almuerzo', dinner: 'cena', breakfast: 'desayuno' };
+
+  const platosDe = (dia, tipo) =>
+    dia?.menuTypeGroups?.find((g) => g.type === tipo)?.menuTypes ?? [];
+
+  /** Un dia esta listo cuando tiene elegido un plato por cada comida. */
+  const diaCompleto = (fecha) => {
+    const m = seleccion[fecha]?.menus || {};
+    return comidas.every((c) => m[c]);
+  };
+
+  const elegidos = Object.keys(seleccion).filter(diaCompleto);
   const restan = tiempoRestante();
 
   /* ---------- guardar ---------- */
@@ -86,7 +106,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
 
     const pedidos = elegidos.map((fecha) => {
       const s = seleccion[fecha];
-      const base = { scheduleDate: fecha, menuTypeIds: [s.menuId] };
+      const base = { scheduleDate: fecha, menuTypeIds: comidas.map((c) => s.menus[c]) };
       // Solo se manda si el cliente eligio una: el backend conserva la
       // direccion anterior cuando llega nula.
       return s.puntoId ? { ...base, deliveryPointId: s.puntoId } : base;
@@ -317,7 +337,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
           </div>
           <div className="afSemana__dias">
             {dias.map((d) => {
-              const hecho = !!seleccion[d.localDate]?.menuId;
+              const hecho = diaCompleto(d.localDate);
               return (
                 <motion.button key={d.localDate} type="button"
                   className={`afDia afDia--${hecho ? 'listo' : 'elegir'}`}
@@ -383,14 +403,26 @@ const MenuFlow = ({ plan, alTerminar }) => {
   /* ---------- paso 2: plato y direccion ---------- */
   if (paso === 2) {
     const dia = dias.find((d) => d.localDate === diaActivo);
-    const platos = platosDe(dia);
     const sel = seleccion[diaActivo] || {};
-    const elegido = platos.find((p) => p.id === sel.menuId);
-    const kcal = elegido ? prop(elegido.menu, 'calorias') : 0;
+    const menusSel = sel.menus || {};
+
+    // Las calorias del dia son la suma de lo elegido en cada comida.
+    const kcal = comidas.reduce((suma, c) => {
+      const p = platosDe(dia, c).find((x) => x.id === menusSel[c]);
+      return suma + (p ? prop(p.menu, 'calorias') : 0);
+    }, 0);
     const meta = plan?.needDay?.bmr ? Math.round(plan.needDay.bmr) : null;
 
     const marcar = (campo, valor) =>
       setSeleccion((s) => ({ ...s, [diaActivo]: { ...s[diaActivo], [campo]: valor } }));
+
+    const marcarPlato = (comida, id) =>
+      setSeleccion((s) => ({
+        ...s,
+        [diaActivo]: { ...s[diaActivo], menus: { ...(s[diaActivo]?.menus || {}), [comida]: id } },
+      }));
+
+    const faltan = comidas.filter((c) => !menusSel[c]);
 
     return (
       <Cascada className="afPanel">
@@ -398,27 +430,51 @@ const MenuFlow = ({ plan, alTerminar }) => {
         <Bloque>
           <h1 className="afPanel__titular">{moment(diaActivo).format('dddd D')}</h1>
         </Bloque>
-        <Bloque><p className="afMenu__ayuda">Almuerzo · llega entre 14:00 y 16:00</p></Bloque>
+        <Bloque><p className="afMenu__ayuda">Llega entre 14:00 y 16:00</p></Bloque>
 
-        <Bloque><p className="afMenu__label">Elige tu plato</p></Bloque>
-        {platos.map((p) => (
-          <Bloque key={p.id}>
-            <motion.button type="button"
-              className={`afPlato${sel.menuId === p.id ? ' afPlato--sel' : ''}`}
-              onClick={() => marcar('menuId', p.id)} {...alToque}>
-              <span className="afPlato__img"
-                style={p.menu.imageUrl ? { backgroundImage: `url(${p.menu.imageUrl})` } : undefined} />
-              <span className="afPlato__txt">
-                <b>{p.menu.name}</b>
-                <small>
-                  {prop(p.menu, 'calorias')} kcal · {prop(p.menu, 'proteinas')} P
-                  · {prop(p.menu, 'carbo')} C · {prop(p.menu, 'grasas')} G
-                </small>
-              </span>
-              <span className="afPlato__tick" />
-            </motion.button>
-          </Bloque>
-        ))}
+        {/* Un bloque por comida del plan. Con un solo principal se ve igual que
+            antes; con dos aparecen "Tu almuerzo" y "Tu cena". */}
+        {comidas.map((comida) => {
+          const platos = platosDe(dia, comida);
+          return (
+            <React.Fragment key={comida}>
+              <Bloque>
+                <p className="afMenu__label">
+                  {comidas.length > 1
+                    ? `Tu ${NOMBRE_COMIDA[comida] || comida}`
+                    : 'Elige tu plato'}
+                </p>
+              </Bloque>
+
+              {platos.length === 0 &&
+                <Bloque>
+                  <p className="afMenu__nota afMenu__nota--suelta">
+                    Todavía no hay {NOMBRE_COMIDA[comida] || comida} publicada para este día.
+                  </p>
+                </Bloque>
+              }
+
+              {platos.map((p) => (
+                <Bloque key={comida + '-' + p.id}>
+                  <motion.button type="button"
+                    className={`afPlato${menusSel[comida] === p.id ? ' afPlato--sel' : ''}`}
+                    onClick={() => marcarPlato(comida, p.id)} {...alToque}>
+                    <span className="afPlato__img"
+                      style={p.menu.imageUrl ? { backgroundImage: `url(${p.menu.imageUrl})` } : undefined} />
+                    <span className="afPlato__txt">
+                      <b>{p.menu.name}</b>
+                      <small>
+                        {prop(p.menu, 'calorias')} kcal · {prop(p.menu, 'proteinas')} P
+                        · {prop(p.menu, 'carbo')} C · {prop(p.menu, 'grasas')} G
+                      </small>
+                    </span>
+                    <span className="afPlato__tick" />
+                  </motion.button>
+                </Bloque>
+              ))}
+            </React.Fragment>
+          );
+        })}
 
         {puntos.length > 0 &&
           <>
@@ -447,7 +503,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
           </>
         }
 
-        {elegido && meta &&
+        {kcal > 0 && meta &&
           <Bloque>
             <div className="afCard">
               <div className="afCard__head">
@@ -464,9 +520,11 @@ const MenuFlow = ({ plan, alTerminar }) => {
 
         <Bloque>
           <motion.button type="button" className="afBtn"
-            disabled={!sel.menuId}
+            disabled={faltan.length > 0}
             onClick={() => setPaso(1)} {...alToque}>
-            {sel.menuId ? 'Guardar y volver a los días' : 'Elige un plato para continuar'}
+            {faltan.length === 0
+              ? 'Guardar y volver a los días'
+              : `Elige tu ${NOMBRE_COMIDA[faltan[0]] || faltan[0]} para continuar`}
           </motion.button>
         </Bloque>
       </Cascada>
@@ -500,13 +558,15 @@ const MenuFlow = ({ plan, alTerminar }) => {
           </div>
           {elegidos.map((f) => {
             const dia = dias.find((d) => d.localDate === f);
-            const p = platosDe(dia).find((x) => x.id === seleccion[f].menuId);
+            const platosDelDia = comidas
+              .map((c) => platosDe(dia, c).find((x) => x.id === seleccion[f].menus?.[c]))
+              .filter(Boolean);
             const punto = puntos.find((x) => x.id === seleccion[f].puntoId);
             return (
               <React.Fragment key={f}>
                 <div className="afSrow">
                   <span>{moment(f).format('ddd D MMM')}</span>
-                  <b>{p?.menu?.name}</b>
+                  <b>{platosDelDia.map((x) => x.menu.name).join(' · ')}</b>
                 </div>
                 {punto &&
                   <div className="afSrow afSrow--sub">

@@ -601,7 +601,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                         className={'rsrMapUbiPageMapApiStyle'}
                         defaultZoom={11}
                         defaultCenter={defailtCenter}
-                        gestureHandling={"greedy"}
+                        gestureHandling={"cooperative"}
                         disableDefaultUI={true}
                     >
                         <AdvancedMarker
