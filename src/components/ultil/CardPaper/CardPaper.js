@@ -7,9 +7,12 @@ const CardPaper = ({data,children}) => {
       {data && data.titulo &&
         <div className="title">
           <div className="ico">
-            {data.ico && 
-              <img src={data.ico} alt="" />
-            }
+            {/* El icono podia ser solo la ruta de una imagen. Aceptar tambien
+                un nodo permite usar los SVG del sistema nuevo sin tener que
+                exportar un PNG por cada cabecera. */}
+            {typeof data.ico === 'string'
+              ? <img src={data.ico} alt="" />
+              : data.ico}
           </div>
           <h3>{data.titulo }</h3>
         </div>

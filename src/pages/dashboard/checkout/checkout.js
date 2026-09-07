@@ -8,9 +8,6 @@ import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboar
 import Grid from '@mui/material/Grid';
 import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
 
-import icoMenu from '../../../assets/img/icon_notify.svg';
-import iconPayment from '../../../assets/img/ico_checkout_payment.png';
-import iconTotal from '../../../assets/img/ico_checkout_total.png';
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -33,10 +30,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import icoProte from '../../../assets/img/ico_prote.png';
-import icoCarbo from '../../../assets/img/ico_carbo.png';
-import icoGrasas from '../../../assets/img/ico_grasas.png';
-import icoCalorias from '../../../assets/img/ico_cal.png';
 
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
@@ -78,6 +71,29 @@ const newRequestId = () =>
    Las cinco tarjetas decian solo su nombre y su precio, asi que las cinco se
    leian igual y ninguna daba una razon para tocarla. El argumento va por tipo
    y no por id, que es lo estable. */
+const IcoCab = ({ n }) => {
+    const c = { className: 'afIcoCab', viewBox: '0 0 24 24', fill: 'none',
+                stroke: 'currentColor', strokeWidth: 1.8,
+                strokeLinecap: 'round', strokeLinejoin: 'round' };
+    if (n === 'bolsa')  return <svg {...c}><path d="M5.4 8.4h13.2l-1.1 10.4a2 2 0 0 1-2 1.8H8.5a2 2 0 0 1-2-1.8z"/><path d="M9 8.4V6.6a3 3 0 0 1 6 0v1.8"/></svg>;
+    if (n === 'chispa') return <svg {...c}><path d="M12 3.6v4M12 16.4v4M4.8 12h4M15.2 12h4M7 7l2.6 2.6M14.4 14.4 17 17M17 7l-2.6 2.6M9.6 14.4 7 17"/></svg>;
+    if (n === 'tarjeta')return <svg {...c}><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18M6.6 14.4h3"/></svg>;
+    return <svg {...c}><path d="M6 3.4h12v17.2l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 8.6h6M9 12.4h6"/></svg>;
+};
+
+/* Los cuatro macros con la misma iconografia que la pantalla del calculo:
+   llama, espiga, gota y mancuerna. Antes eran PNG de colores planos, de otra
+   epoca del diseno. */
+const IcoMacro = ({ n }) => {
+    const c = { className: 'afIcoMacro', viewBox: '0 0 24 24', fill: 'none',
+                stroke: 'currentColor', strokeWidth: 1.9,
+                strokeLinecap: 'round', strokeLinejoin: 'round' };
+    if (n === 'kcal') return <svg {...c}><path d="M12 20.8a5.4 5.4 0 0 0 5.4-5.4c0-3.5-3-5.6-3-8.6 0 0-2 1.5-2 3.5 0 1.2-1 2-1.8 1.3-1.3-1.1-1.7-2.7-1.7-4.2 0 0-2.3 3-2.3 8a5.4 5.4 0 0 0 5.4 5.4z"/></svg>;
+    if (n === 'carb') return <svg {...c}><path d="M12 20.6V8.4"/><path d="M12 8.4c0-2 1.5-3.6 3.4-3.6 0 2-1.5 3.6-3.4 3.6zM12 8.4C12 6.4 10.5 4.8 8.6 4.8c0 2 1.5 3.6 3.4 3.6zM12 14c0-2 1.5-3.6 3.4-3.6 0 2-1.5 3.6-3.4 3.6zM12 14c0-2-1.5-3.6-3.4-3.6 0 2 1.5 3.6 3.4 3.6z"/></svg>;
+    if (n === 'gras') return <svg {...c}><path d="M12 3.6s5.2 5.5 5.2 9.1a5.2 5.2 0 1 1-10.4 0C6.8 9.1 12 3.6 12 3.6z"/></svg>;
+    return <svg {...c}><path d="M6.8 8.2v7.6M4.2 9.8v4.4M17.2 8.2v7.6M19.8 9.8v4.4M6.8 12h10.4"/></svg>;
+};
+
 const ADICIONAL = {
     breakfast:     { arg: 'Resuelve la primera comida del día',        tono: 'sol'   },
     snacks:        { arg: 'Para la media mañana, sin salir a comprar', tono: 'menta' },
@@ -486,7 +502,7 @@ const CheckoutPage = (props) => {
                                 data={
                                     {
                                         titulo:'Lo que llevas',
-                                        ico:icoMenu,
+                                        ico:<IcoCab n="bolsa" />,
                                         className:false
                                     }
                                 }
@@ -512,7 +528,7 @@ const CheckoutPage = (props) => {
                                                                 >
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
-                                                                            <p><img src={icoCalorias} alt="" /> Calorías</p>
+                                                                            <p><IcoMacro n="kcal" /> Calorías</p>
                                                                             <p>{Math.round(carloriasRed+item.properties[0]?.value)}/{Math.round(metricasCal.bmr)}</p>
                                                                         </div>
                                                                         <div className="line">
@@ -523,7 +539,7 @@ const CheckoutPage = (props) => {
 
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
-                                                                            <p><img src={icoCarbo} alt="" /> Carbohidratos</p>
+                                                                            <p><IcoMacro n="carb" /> Carbohidratos</p>
                                                                             <p>{Math.round(carboRed+item.properties[1]?.value)}/{Math.round(metricasCal.macros.carbs)}</p>
                                                                         </div>
                                                                         <div className="line">
@@ -532,7 +548,7 @@ const CheckoutPage = (props) => {
                                                                     </div>
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
-                                                                            <p><img src={icoGrasas} alt="" /> Grasas</p>
+                                                                            <p><IcoMacro n="gras" /> Grasas</p>
                                                                             <p>{Math.round(grasasRed+item.properties[2]?.value)}/{Math.round(metricasCal.macros.fat)}</p>
                                                                         </div>
                                                                         <div className="line">
@@ -541,7 +557,7 @@ const CheckoutPage = (props) => {
                                                                     </div>
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
-                                                                            <p><img src={icoProte} alt="" /> Proteinas</p>
+                                                                            <p><IcoMacro n="prot" /> Proteína</p>
                                                                             <p>{Math.round(proteinasRed+item.properties[3]?.value)}/{Math.round(metricasCal.macros.protein)}</p>
                                                                         </div>
                                                                         <div className="line">
@@ -623,7 +639,7 @@ const CheckoutPage = (props) => {
                                 data={
                                     {
                                         titulo:'Hazlo más completo',
-                                        ico:icoMenu,
+                                        ico:<IcoCab n="chispa" />,
                                         className:false
                                     }
                                 }
@@ -688,7 +704,7 @@ const CheckoutPage = (props) => {
                                 data={
                                     {
                                         titulo:'¿Cómo prefieres pagar?',
-                                        ico:iconPayment,
+                                        ico:<IcoCab n="tarjeta" />,
                                         className:'cCheckoutMetodos'
                                     }
                                 }
@@ -787,7 +803,7 @@ const CheckoutPage = (props) => {
                                 data={
                                     {
                                         titulo:'Tu pago',
-                                        ico: iconTotal,
+                                        ico:<IcoCab n="recibo" />,
                                         className:false
                                     }
                                 }

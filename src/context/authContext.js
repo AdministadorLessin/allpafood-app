@@ -75,13 +75,14 @@ export default function AuthContextProvider({ children }) {
     );
   }, []);
 
+  /* Una compra lleva UN plan. Elegir otro lo reemplaza.
+     Antes se anadia al carrito: quien tocaba "Elegir Nutrivital", volvia y
+     tocaba "Elegir Fitfuel" terminaba con los dos dentro. El total del
+     checkout suma todos los cartItems, pero al cobrar solo viaja
+     cartItems[0].id —tanto en tarjeta como en Yape—, asi que el cliente
+     pagaba los dos planes y recibia uno. */
   const addItemToCart = useCallback((product) => {
-    setCartItems((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
-      return exists
-        ? prev.map((item) => (item.id === product.id ? { ...item, amount: item.amount + 1 } : item))
-        : [...prev, { ...product, amount: 1 }];
-    });
+    setCartItems([{ ...product, amount: 1 }]);
   }, [setCartItems]);
 
   const deleteItemToCart = useCallback((product) => {

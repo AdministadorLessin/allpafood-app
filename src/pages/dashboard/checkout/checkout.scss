@@ -680,14 +680,17 @@
                 color: var(--af-ink) !important;
             }
             .ico{
-                width: 26px;
-                height: 26px;
+                width: 28px;
+                height: 28px;
                 border-radius: 50%;
                 background: var(--af-accent-soft);
+                color: var(--af-accent);
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                flex: 0 0 auto;
                 img{ width: 13px; height: 13px; }
+                .afIcoCab{ width: 15px; height: 15px; }
             }
         }
     }
@@ -761,12 +764,12 @@
             p{
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 7px;
                 font-size: 12.5px;
                 color: var(--af-muted);
                 margin: 0;
-                img{ width: 14px; height: 14px; }
             }
+            .afIcoMacro{ width: 15px; height: 15px; flex: 0 0 auto; }
             p:last-child{
                 color: var(--af-ink);
                 font-weight: 700;
@@ -786,12 +789,13 @@
             }
         }
     }
-    /* Un color por macro, no cuatro barras verdes iguales. El orden del
-       marcado es calorias, carbohidratos, grasas, proteinas. */
-    .lineItem:nth-of-type(1) .line span{ background: #E0A93F !important; }
-    .lineItem:nth-of-type(2) .line span{ background: #6FD79B !important; }
-    .lineItem:nth-of-type(3) .line span{ background: #7FB6E8 !important; }
-    .lineItem:nth-of-type(4) .line span{ background: var(--af-accent) !important; }
+    /* Un color por macro, los mismos que en la pantalla del calculo, en la
+       barra y en el icono. El orden del marcado es calorias, carbohidratos,
+       grasas, proteinas. */
+    .lineItem:nth-of-type(1){ .line span{ background: #E86A2B !important; } .afIcoMacro{ color: #E86A2B; } }
+    .lineItem:nth-of-type(2){ .line span{ background: #3F9BD8 !important; } .afIcoMacro{ color: #3F9BD8; } }
+    .lineItem:nth-of-type(3){ .line span{ background: #E0A93F !important; } .afIcoMacro{ color: #E0A93F; } }
+    .lineItem:nth-of-type(4){ .line span{ background: #177A4C !important; } .afIcoMacro{ color: #177A4C; } }
 
     /* La palomita ya la dibuja checkout.scss con ::after; anadir otra con
        ::before pintaba dos por linea. */
