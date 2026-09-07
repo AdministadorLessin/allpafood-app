@@ -374,8 +374,7 @@ const UbicacionesPage = (props) => {
                                         placeholder="Casa · Oficina · Casa de mis papás"
                                         variant="filled"
                                         error={errors.name ? true : false}
-                                        {...register("name")}
-                                        onChange={changeFields}
+                                        {...register("name", { onChange: changeFields })}
                                         value={dataAddPoint.name || ''}
                                     />
                                 </div>
@@ -388,8 +387,7 @@ const UbicacionesPage = (props) => {
                                         placeholder="Dpto. 402 · Oficina B · Casa 15"
                                         variant="filled" 
                                         error={errors.address ? true : false}
-                                        {...register("address")} 
-                                        onChange={changeFields} 
+                                        {...register("address", { onChange: changeFields })} 
                                         value={dataAddPoint.address} 
                                     />
                                 </div>
@@ -401,8 +399,7 @@ const UbicacionesPage = (props) => {
                                         
                                         variant="filled" 
                                         error={errors.description ? true : false}
-                                        {...register("description")} 
-                                        onChange={changeFields} 
+                                        {...register("description", { onChange: changeFields })} 
                                         value={dataAddPoint.description} 
                                     />
                                 </div>

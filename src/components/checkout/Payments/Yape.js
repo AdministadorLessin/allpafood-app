@@ -84,8 +84,7 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
                                         type={'text'}
                                         variant="outlined" 
                                         error={errors.ynumero ? true : false}
-                                        {...register("ynumero")} 
-                                        onChange={changeFields} 
+                                        {...register("ynumero", { onChange: changeFields })} 
                                         //onFocus={handleInputFocus}
                                         value={yapeFormFields.ynumero} 
                                     />
@@ -100,8 +99,7 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
                                         type={'text'}
                                         variant="outlined" 
                                         error={errors.yotp ? true : false}
-                                        {...register("yotp")} 
-                                        onChange={changeFields} 
+                                        {...register("yotp", { onChange: changeFields })} 
                                         //onFocus={handleInputFocus}
                                         value={yapeFormFields.yotp} 
                                     />

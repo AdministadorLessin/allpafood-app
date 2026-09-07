@@ -62,8 +62,11 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
     
     // Los mensajes eran todos "Ingrese un telefono valido por favor.", incluso
     // en los campos de direccion.
+    /* El distrito NO va en el esquema: su campo solo se muestra cuando el mapa
+       no lo detecto, y Yup validaba igual un campo que ni siquiera existe en
+       pantalla —pedia "escribe tu distrito" sin ningun sitio donde escribirlo.
+       Se comprueba a mano al enviar, contra el del mapa o el escrito. */
     const validationSchema = Yup.object().shape({
-        fs3distrito: Yup.string().required('Escribe tu distrito.'),
         fs3dir: Yup.string().required('Indica el número, piso o departamento.'),
         fs3dirdescripcion: Yup.string().required('Una referencia ayuda al repartidor a encontrarte.'),
     });
@@ -290,6 +293,12 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
         const getUserTmp = JSON.parse(window.localStorage.getItem('inf'));
 
+        const distritoFinal = distrito || bodyForm.fs3distrito;
+        if (!distritoFinal) {
+            setErrorGuardar('Marca tu punto en el mapa o escribe tu distrito.');
+            return;
+        }
+
         setLoadingForm(true)
         setErrorGuardar('');   // limpiar el aviso del intento anterior
         updateData(dataForm);
@@ -316,12 +325,12 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
         axios.put(`${API_URL}register/profile`, {
             bornDate: newObjet2.bornDate,
-            district: newObjet2.district,
+            district: distritoFinal,
             address: newObjet2.address,
             descriptionAddress: newObjet2.descriptionAddress,
             // Si el geocodificador no detecto el distrito, se usa el que
             // el cliente escribio. Antes viajaba vacio y el API devolvia 400.
-            districtLocation: distrito || bodyForm.fs3distrito,
+            districtLocation: distritoFinal,
             location: {
                 latitude: defailtCenter.lat,
                 longitude: defailtCenter.lng
@@ -656,8 +665,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                         variant="filled"
                         label={'Distrito'}
                         error={errors.fs3distrito ? true : false}
-                        {...register("fs3distrito")}
-                        onChange={handleChangeFields}
+                        {...register("fs3distrito", { onChange: handleChangeFields })}
                         value={bodyForm.fs3distrito}
                     />
                     {distritoNoDetectado &&
@@ -675,8 +683,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                     variant="filled"
                     label={'Número, piso o departamento'}
                     error={errors.fs3dir ? true : false}
-                    {...register("fs3dir")}
-                    onChange={handleChangeFields}
+                    {...register("fs3dir", { onChange: handleChangeFields })}
                     value={bodyForm.fs3dir}
                 />
             </div>
@@ -689,8 +696,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                     label={'Referencia'}
                     placeholder="Frente al parque, portón verde…"
                     error={errors.fs3dirdescripcion ? true : false}
-                    {...register("fs3dirdescripcion")}
-                    onChange={handleChangeFields}
+                    {...register("fs3dirdescripcion", { onChange: handleChangeFields })}
                     value={bodyForm.fs3dirdescripcion}
                 />
             </div>

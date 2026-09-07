@@ -118,8 +118,7 @@ const LoginPage = (props) => {
             autoComplete="email"
             value={bodyFields ? bodyFields.lfcorreo : ''}
             error={errors.lfcorreo ? true : false}
-            {...register("lfcorreo")} 
-            onChange={handleFieldChange}
+            {...register("lfcorreo", { onChange: handleFieldChange })}
           />
         </div>
         <div className="afCampo">
@@ -132,8 +131,7 @@ const LoginPage = (props) => {
             autoComplete="current-password"
             value={bodyFields ? bodyFields.lfpassword : ''}
             error={errors.lfpassword ? true : false}
-            {...register("lfpassword")} 
-            onChange={handleFieldChange}
+            {...register("lfpassword", { onChange: handleFieldChange })}
           />
         </div>
 

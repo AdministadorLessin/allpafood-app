@@ -111,8 +111,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
                                 label={'Nombres:'}
                                 variant="filled" 
                                 error={errors.fpnombres ? true : false}
-                                {...register("fpnombres")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpnombres", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpnombres} 
                             />
                         </div>
@@ -126,8 +125,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
                                 label={'Apellidos:'}
                                 variant="filled" 
                                 error={errors.fpapellos ? true : false}
-                                {...register("fpapellos")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpapellos", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpapellos} 
                             />
                         </div>
@@ -141,8 +139,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
                                 label={'Fecha de inscripcion:'}
                                 variant="filled" 
                                 error={errors.fpinscripcion ? true : false}
-                                {...register("fpinscripcion")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpinscripcion", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpinscripcion} 
                                 disabled
                             />
@@ -157,8 +154,7 @@ const ProfileChangePerson = ({iconImg,closeModal,data,updatePerson}) => {
                                 label={'Correo:'}
                                 variant="filled" 
                                 error={errors.fpcorreo ? true : false}
-                                {...register("fpcorreo")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpcorreo", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpcorreo} 
                                 disabled
                             />

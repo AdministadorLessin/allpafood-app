@@ -173,8 +173,7 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                             type={'text'}
                             variant="outlined" 
                             error={errors.ccnombres ? true : false}
-                            {...register("ccnombres")} 
-                            onChange={changeFields} 
+                            {...register("ccnombres", { onChange: changeFields })} 
                             //onFocus={handleInputFocus}
                             value={yapeFormFields.ccnombres} 
                         />
@@ -189,8 +188,7 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                             type={'text'}
                             variant="outlined" 
                             error={errors.ccdni ? true : false}
-                            {...register("ccdni")} 
-                            onChange={changeFields} 
+                            {...register("ccdni", { onChange: changeFields })} 
                             //onFocus={handleInputFocus}
                             value={yapeFormFields.ccdni} 
                         />

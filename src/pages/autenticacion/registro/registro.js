@@ -78,6 +78,11 @@ const RegistroPage = (props) => {
     });
 
     
+    /* Ojo con el patron de los campos: el onChange propio va DENTRO de
+       register, no como prop aparte despues del spread. Puesto aparte, pisa el
+       onChange que devuelve register y react-hook-form deja de enterarse de lo
+       que el cliente escribe: la validacion falla siempre, aunque el campo se
+       vea lleno en pantalla. */
     const [errorSendCode, setErrorSendCode] = useState();
     const onSubmitHandler = (data) => {
         
@@ -183,8 +188,7 @@ const RegistroPage = (props) => {
                                         autoComplete="tel-national"
                                         placeholder={'963 987 654'}
                                         error={errors.fValidNumber ? true : false}
-                                        {...register("fValidNumber")} 
-                                        onChange={handleChangeNumber} 
+                                        {...register("fValidNumber", { onChange: handleChangeNumber })}
                                         value={numberVerify} 
                                         variant="outlined"
                                     />

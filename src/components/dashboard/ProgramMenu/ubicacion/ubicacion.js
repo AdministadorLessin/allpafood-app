@@ -302,8 +302,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                                 type={'tel'}
                                 variant="filled" 
                                 error={errors.description ? true : false}
-                                {...register("description")} 
-                                onChange={changeFields} 
+                                {...register("description", { onChange: changeFields })} 
                                 value={dataAddPoint.description}
                             />
                         </div>
@@ -315,8 +314,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                                 
                                 variant="filled" 
                                 error={errors.address ? true : false}
-                                {...register("address")} 
-                                onChange={changeFields} 
+                                {...register("address", { onChange: changeFields })} 
                                 value={dataAddPoint.address} 
                             />
                         </div>

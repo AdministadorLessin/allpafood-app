@@ -173,8 +173,7 @@ const FormDatos = ({telefono}) => {
                             name="fdnombre" 
                             value={bodyFields ? bodyFields.fdnombre : ''}
                             error={errors.fdnombre ? true : false}
-                            {...register("fdnombre")} 
-                            onChange={handleFieldChange}
+                            {...register("fdnombre", { onChange: handleFieldChange })}
                         />
                     </div>
                 </Grid>
@@ -187,8 +186,7 @@ const FormDatos = ({telefono}) => {
                             name="fdapellidos" 
                             value={bodyFields ? bodyFields.fdapellidos : ''}
                             error={errors.fdapellidos ? true : false}
-                            {...register("fdapellidos")}
-                            onChange={handleFieldChange}
+                            {...register("fdapellidos", { onChange: handleFieldChange })}
                         />
                     </div>
                 </Grid>
@@ -201,8 +199,7 @@ const FormDatos = ({telefono}) => {
                             name="fdcorreo" 
                             value={bodyFields ? bodyFields.fdcorreo : ''}
                             error={errors.fdcorreo ? true : false}
-                            {...register("fdcorreo")}
-                            onChange={handleFieldChange}
+                            {...register("fdcorreo", { onChange: handleFieldChange })}
                         />
                     </div>
                 </Grid>
@@ -215,8 +212,7 @@ const FormDatos = ({telefono}) => {
                             name="fdtelefono" 
                             value={bodyFields ? bodyFields.fdtelefono : ''}
                             error={errors.fdtelefono ? true : false}
-                            {...register("fdtelefono")}
-                            onChange={handleFieldChange}
+                            {...register("fdtelefono", { onChange: handleFieldChange })}
                         />
                     </div>
                 </Grid>
@@ -230,8 +226,7 @@ const FormDatos = ({telefono}) => {
                             name="fddni" 
                             value={bodyFields ? bodyFields.fddni : ''}
                             error={errors.fddni ? true : false}
-                            {...register("fddni")}
-                            onChange={handleFieldChange}
+                            {...register("fddni", { onChange: handleFieldChange })}
                         />
                     </div>
                 </Grid>
@@ -245,8 +240,7 @@ const FormDatos = ({telefono}) => {
                             type="password"
                             value={bodyFields ? bodyFields.fdclave : ''}
                             error={errors.fdclave ? true : false}
-                            {...register("fdclave")}
-                            onChange={handleFieldChange}
+                            {...register("fdclave", { onChange: handleFieldChange })}
                         />
                     </div>
                     {/* Las cuatro reglas siempre a la vista y marcandose solas.

@@ -111,8 +111,7 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
                                 label={'DNI:'}
                                 variant="filled" 
                                 error={errors.fpdni ? true : false}
-                                {...register("fpdni")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpdni", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpdni} 
                             />
                         </div>
@@ -126,8 +125,7 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
                                 label={'Whatsapp:'}
                                 variant="filled" 
                                 error={errors.fpwhatsapp ? true : false}
-                                {...register("fpwhatsapp")} 
-                                onChange={handleChangeFields} 
+                                {...register("fpwhatsapp", { onChange: handleChangeFields })} 
                                 value={bodyForm.fpwhatsapp} 
                             />
                         </div>
