@@ -18,7 +18,6 @@ import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
 import MiPlanPage from './pages/dashboard/miplan/miplan';
-import PreviewPanel from './pages/dev/PreviewPanel';
 
 import AuthContextProvider from './context/authContext';
 import RegistroPageProfile from './pages/autenticacion/registro/profile';
@@ -55,9 +54,6 @@ function App() {
                   { 
                     // Rutas Publicas
                   }
-                  {/* SOLO DESARROLLO: revision visual del panel sin sesion.
-                      Borrar esta ruta y src/pages/dev antes de desplegar. */}
-                  <Route path='/preview-ux' element={ <PreviewPanel /> } />
                   <Route path='/ingresar' element={ <LoginPage /> } />
                   <Route path='/registro' element={ <RegistroPage /> } />
                 </Routes>

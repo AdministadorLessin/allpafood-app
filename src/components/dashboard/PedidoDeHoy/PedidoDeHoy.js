@@ -40,9 +40,7 @@ const Marca = ({ hecho, actual }) => (
  * todas por WhatsApp: ¿ya salio?, ¿a que hora llega?, ¿que pedi?. El estado
  * viene de tbl_order y ya se escribia; solo no se mostraba.
  */
-// forzarRetraso solo lo usa /preview-ux, para ver el estado sin esperar
-// a que sean las 1:30 de la tarde.
-const PedidoDeHoy = ({ ordenes, direccion, forzarRetraso, aviso }) => {
+const PedidoDeHoy = ({ ordenes, direccion, aviso }) => {
 
   const hoy = moment().format('YYYY-MM-DD');
   const pedido = (ordenes || []).find((o) => moment(o.date).format('YYYY-MM-DD') === hoy);
@@ -62,7 +60,7 @@ const PedidoDeHoy = ({ ordenes, direccion, forzarRetraso, aviso }) => {
   // horas antes de que se note. Si lo publicaron, se muestra desde ese momento
   // aunque todavia no sean las 1:30.
   const avisoActivo = !!aviso && estado !== 'C';
-  const retrasado = forzarRetraso || avisoActivo
+  const retrasado = avisoActivo
     || (estado !== 'C' && ahoraHoras > REPARTO.horaCierre);
   const porRetrasarse = !retrasado && estado !== 'C'
     && ahoraHoras > REPARTO.horaCierre - REPARTO.margenGracia;

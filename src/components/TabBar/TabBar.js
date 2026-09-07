@@ -37,17 +37,14 @@ const Icono = ({ nombre }) => {
   );
 };
 
-// 'activa' solo lo usa /preview-ux, donde la ruta no coincide con ninguna
-// pestaña y no se veria el estado seleccionado.
-const TabBar = ({ activa }) => (
+const TabBar = () => (
   <nav className="afTabs" aria-label="Navegación principal">
     {TABS.map((t) => (
       <NavLink
         key={t.a}
         to={t.a}
         end={t.a === '/'}
-        className={({ isActive }) =>
-          (activa ? activa === t.a : isActive) ? 'afTab afTab--on' : 'afTab'}
+        className={({ isActive }) => isActive ? 'afTab afTab--on' : 'afTab'}
       >
         {/* Solo la pestaña activa muestra su nombre: se expande en una pildora
             clara y las demas quedan en icono. Da la referencia de donde estas
