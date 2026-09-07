@@ -72,6 +72,30 @@ const newRequestId = () =>
     : `af-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
 
+/* Que es cada adicional y para que sirve.
+
+   Las cinco tarjetas decian solo su nombre y su precio, asi que las cinco se
+   leian igual y ninguna daba una razon para tocarla. El argumento va por tipo
+   y no por id, que es lo estable. */
+const ADICIONAL = {
+    breakfast:     { arg: 'Resuelve la primera comida del día',        tono: 'sol'   },
+    snacks:        { arg: 'Para la media mañana, sin salir a comprar', tono: 'menta' },
+    fruits:        { arg: 'Fruta de estación, ya lavada y cortada',    tono: 'coral' },
+    starters:      { arg: 'Ensalada o sopa antes del plato',           tono: 'menta' },
+    doubleprotein: { arg: 'Porción doble en tus 20 almuerzos',         tono: 'tinta' },
+};
+
+const IcoAd = ({ tipo }) => {
+    const c = { className: 'afAd__ic', viewBox: '0 0 24 24', fill: 'none',
+                stroke: 'currentColor', strokeWidth: 1.7,
+                strokeLinecap: 'round', strokeLinejoin: 'round' };
+    if (tipo === 'breakfast') return <svg {...c}><path d="M4.5 8.5h11v5.2a5.5 5.5 0 0 1-11 0z"/><path d="M15.5 9.8h2a2.6 2.6 0 0 1 0 5.2h-2"/><path d="M7 5.2v-1.6M10.5 5.2v-1.6M14 5.2v-1.6M3.5 20.4h13"/></svg>;
+    if (tipo === 'snacks')    return <svg {...c}><path d="M5.2 9.6h13.6l-1.2 9a2 2 0 0 1-2 1.7H8.4a2 2 0 0 1-2-1.7z"/><path d="M8.8 9.6V7a3.2 3.2 0 0 1 6.4 0v2.6"/></svg>;
+    if (tipo === 'fruits')    return <svg {...c}><path d="M12 8.4c2.6-2.4 7.2-1 7.2 4 0 4.2-3 8-5 8-1 0-1.4-.6-2.2-.6s-1.2.6-2.2.6c-2 0-5-3.8-5-8 0-5 4.6-6.4 7.2-4z"/><path d="M12 8.4V5.6c0-1.2 1-2.2 2.4-2.2"/></svg>;
+    if (tipo === 'starters')  return <svg {...c}><path d="M3.4 11.4h17.2a8.6 8.6 0 0 1-8.6 7.4 8.6 8.6 0 0 1-8.6-7.4z"/><path d="M9 8.2c0-1.4 1.4-1.6 1.4-3M13 8.2c0-1.4 1.4-1.6 1.4-3"/></svg>;
+    return <svg {...c}><path d="M6.8 8.2v7.6M4.2 9.8v4.4M17.2 8.2v7.6M19.8 9.8v4.4M6.8 12h10.4"/></svg>;
+};
+
 const CheckoutPage = (props) => {
 
     let navigate = useNavigate();
@@ -597,30 +621,64 @@ const CheckoutPage = (props) => {
                             <CardPaper
                                 data={
                                     {
-                                        titulo:'Puedes agregar a tu plan:',
+                                        titulo:'Hazlo más completo',
                                         ico:icoMenu,
                                         className:false
                                     }
                                 }
                             >
 
-                                <div className="inlineFlex coAditionalList">
-                                    {aditionalList.length && aditionalList.length > 0 && aditionalList.map((item)=>(
-                                        <div className="coAditionalItem">
-                                            {false &&
-                                                <figure></figure>
-                                            }
-                                            <div className={'price'}>S/. {item. monthlyPrice}</div>
-                                            <div className="txt">
-                                                <h4>{item.name}</h4>
-                                                <small>Por unidad: <b>S/. {item.unitPrice}</b></small>
-                                                <div 
-                                                    className="btnPrimary"
-                                                    onClick={()=>addItemAdToCart(item)}
-                                                >Agregar</div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                {/* Riel horizontal en vez de lista: se desliza con el
+                                    pulgar y cada tarjeta se ve entera. Como cinco
+                                    filas grises apiladas, nadie llegaba al final. */}
+                                <div className="afAdRiel">
+                                    {aditionalList.map((item)=>{
+                                        const puesto = cartAdicionales.some((x)=>x.id === item.id);
+                                        const info = ADICIONAL[item.type] || {};
+                                        const unidades = Math.round(item.monthlyPrice / item.unitPrice);
+                                        const ahorro = item.prevPrice - item.price;
+
+                                        return (
+                                            <motion.div
+                                                key={item.id}
+                                                className={'afAd afAd--' + (info.tono || 'menta') + (puesto ? ' afAd--puesto' : '')}
+                                                whileTap={{ scale: .97 }}
+                                                onClick={()=> puesto ? deleteItemAdToCart(item) : addItemAdToCart(item)}
+                                            >
+                                                <span className="afAd__marco"><IcoAd tipo={item.type} /></span>
+
+                                                <h4 className="afAd__nombre">{item.name}</h4>
+                                                <p className="afAd__arg">{info.arg}</p>
+
+                                                <p className="afAd__unid">{unidades} al mes · S/ {item.unitPrice} c/u</p>
+
+                                                <div className="afAd__precio">
+                                                    <b>S/ {item.monthlyPrice}</b>
+                                                    {ahorro > 0 && <em>S/ {item.prevPrice}</em>}
+                                                </div>
+
+                                                <span className="afAd__btn">
+                                                    {puesto ?
+                                                        <>
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                 strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="m5 12.5 4.5 4.5L19 7.5"/>
+                                                            </svg>
+                                                            Agregado
+                                                        </>
+                                                    :
+                                                        <>
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                 strokeWidth="2.6" strokeLinecap="round">
+                                                                <path d="M12 5.5v13M5.5 12h13"/>
+                                                            </svg>
+                                                            Agregar
+                                                        </>
+                                                    }
+                                                </span>
+                                            </motion.div>
+                                        );
+                                    })}
                                 </div>
                             </CardPaper>
                         </Grid>

@@ -1,0 +1,117 @@
+/* Lo que necesitas al dia.
+
+   Los macros no son cuatro datos sueltos: son el reparto de un mismo dia. Por
+   eso las calorias son el titular y los tres macros el reparto de esa cifra,
+   en una sola barra con el ancho real de su aporte. Antes eran cuatro
+   casillas grises iguales y ninguna decia como se relacionaba con las otras. */
+
+.afNutri{
+
+    &__hero{
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    &__cifra{
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        min-width: 0;
+        b{
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -.045em;
+            color: var(--af-ink);
+            font-variant-numeric: tabular-nums;
+        }
+        span{
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--af-muted);
+        }
+    }
+
+    &__sello{
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex: 0 0 auto;
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--af-accent);
+        background: var(--af-accent-soft);
+        border-radius: var(--af-r-pill);
+        padding: 5px 11px;
+        svg{ width: 11px; height: 11px; }
+    }
+
+    &__barra{
+        display: flex;
+        gap: 3px;
+        height: 12px;
+        margin-bottom: 16px;
+        i{
+            display: block;
+            height: 100%;
+            border-radius: var(--af-r-pill);
+            min-width: 4px;
+        }
+    }
+
+    &__leyenda{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__fila{
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--af-line);
+        &:last-child{ border-bottom: 0; }
+    }
+
+    &__punto{
+        width: 9px;
+        height: 9px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+    }
+    &__et{
+        flex: 1 1 auto;
+        font-size: 13px;
+        color: var(--af-muted);
+    }
+    &__g{
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--af-ink);
+        font-variant-numeric: tabular-nums;
+    }
+    &__pc{
+        width: 40px;
+        text-align: right;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--af-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__pie{
+        margin: 14px 0 0;
+        font-size: 11.5px;
+        line-height: 1.5;
+        color: var(--af-muted);
+    }
+}
+
+@media (max-width: 359px){
+    .afNutri__cifra b{ font-size: 36px; }
+}

@@ -88,18 +88,25 @@ export default function AuthContextProvider({ children }) {
     updateCartProduct(setCartItems, product.id, -1);
   }, [updateCartProduct, setCartItems]);
 
+  /* Los adicionales son un si/no, no una cantidad.
+     Sumar amount era enganoso en las dos direcciones: el total del checkout
+     hace reduce sobre current.price sin mirar amount, y al backend solo le
+     viaja cartAdicionales.map(item => item.type) —una lista de tipos, donde
+     un duplicado no significa nada—. Asi que agregar "Desayunos" tres veces
+     mostraba 3 en el carrito, cobraba 1, y despues obligaba a pulsar quitar
+     tres veces para sacarlo. Agregar dos veces ahora no cambia nada. */
   const addItemAdToCart = useCallback((product) => {
     setCartAdicionales((prev) => {
       const exists = prev.some((item) => item.id === product.id);
-      return exists
-        ? prev.map((item) => (item.id === product.id ? { ...item, amount: item.amount + 1 } : item))
-        : [...prev, { ...product, amount: 1 }];
+      return exists ? prev : [...prev, { ...product, amount: 1 }];
     });
   }, [setCartAdicionales]);
 
+  /* Quitar saca el adicional entero. Antes restaba uno a amount, asi que un
+     item que hubiera llegado a 3 necesitaba tres toques para desaparecer. */
   const deleteItemAdToCart = useCallback((product) => {
-    updateCartProduct(setCartAdicionales, product.id, -1);
-  }, [updateCartProduct, setCartAdicionales]);
+    setCartAdicionales((prev) => prev.filter((item) => item.id !== product.id));
+  }, [setCartAdicionales]);
 
   const emptyCart = useCallback(() => {
     localStorage.removeItem(STORAGE_KEYS.CART_PRODUCTS);

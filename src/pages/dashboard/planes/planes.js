@@ -10,18 +10,8 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
 import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
+import PanelNecesidades from './../../../components/dashboard/PanelNecesidades/PanelNecesidades';
 import { API_URL } from '../../../config';
-
-const Ico = ({ n }) => {
-  const c = { className: 'afNec__ic', viewBox: '0 0 24 24', fill: 'none',
-              stroke: 'currentColor', strokeWidth: 1.7,
-              strokeLinecap: 'round', strokeLinejoin: 'round' };
-  // Llama, mancuerna, espiga y gota: cuatro siluetas que se distinguen a 19px.
-  if (n === 'kcal') return <svg {...c}><path d="M12 20.8a5.4 5.4 0 0 0 5.4-5.4c0-3.5-3-5.6-3-8.6 0 0-2 1.5-2 3.5 0 1.2-1 2-1.8 1.3-1.3-1.1-1.7-2.7-1.7-4.2 0 0-2.3 3-2.3 8a5.4 5.4 0 0 0 5.4 5.4z"/></svg>;
-  if (n === 'prot') return <svg {...c}><path d="M6.8 8.2v7.6M4.2 9.8v4.4M17.2 8.2v7.6M19.8 9.8v4.4M6.8 12h10.4"/></svg>;
-  if (n === 'carb') return <svg {...c}><path d="M12 20.6V8.4"/><path d="M12 8.4c0-2 1.5-3.6 3.4-3.6 0 2-1.5 3.6-3.4 3.6zM12 8.4C12 6.4 10.5 4.8 8.6 4.8c0 2 1.5 3.6 3.4 3.6zM12 14c0-2 1.5-3.6 3.4-3.6 0 2-1.5 3.6-3.4 3.6zM12 14c0-2-1.5-3.6-3.4-3.6 0 2 1.5 3.6 3.4 3.6z"/></svg>;
-  return <svg {...c}><path d="M12 3.6s5.2 5.5 5.2 9.1a5.2 5.2 0 1 1-10.4 0C6.8 9.1 12 3.6 12 3.6z"/></svg>;
-};
 
 const Tick = () => (
   <svg className="afPlanCard__tick" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -106,14 +96,6 @@ const PlanesPage = (props) => {
   },[])
 
   const nombre = dataUser?.profile?.name || dataUser?.name;
-  const macros = dataNeedDay?.macros;
-
-  const necesidades = dataNeedDay ? [
-    { ico:'kcal', valor: Math.round(dataNeedDay.bmr ?? 0), u:'kcal', et:'Calorías' },
-    { ico:'prot', valor: Math.round(macros?.protein ?? 0), u:'g', et:'Proteína' },
-    { ico:'carb', valor: Math.round(macros?.carbs ?? 0),   u:'g', et:'Carbos' },
-    { ico:'gras', valor: Math.round(macros?.fat ?? 0),     u:'g', et:'Grasas' },
-  ] : [];
 
   return (
     <LayoutDasboard claseStyle={false}>
@@ -128,25 +110,16 @@ const PlanesPage = (props) => {
           </h1>
         </Bloque>
 
-        {/* Por que estos planes y no otros. El calculo ya existia pero vivia en
-            una tarjeta aparte con cuatro anillos de colores, sin decir en
+        {/* Por que estos planes y no otros. El calculo ya existia pero vivia
+            en una tarjeta aparte con cuatro anillos de colores, sin decir en
             ningun momento que era la razon de la recomendacion. */}
-        {necesidades.length > 0 &&
+        {dataNeedDay &&
           <Bloque>
             <div className="afCard">
               <div className="afCard__head">
                 <span className="afCard__title">Lo que necesitas al día</span>
-                <span className="afCard__label">Según tus respuestas</span>
               </div>
-              <div className="afNec">
-                {necesidades.map((n)=>(
-                  <div className="afNec__it" key={n.et}>
-                    <Ico n={n.ico} />
-                    <b>{n.valor}<small>{n.u}</small></b>
-                    <span>{n.et}</span>
-                  </div>
-                ))}
-              </div>
+              <PanelNecesidades datos={dataNeedDay} />
             </div>
           </Bloque>
         }

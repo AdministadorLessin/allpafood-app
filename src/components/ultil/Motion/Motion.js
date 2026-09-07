@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as motion from "motion/react-client";
 
 /**
@@ -54,6 +54,40 @@ export const Bloque = ({ children, className }) => (
 export const alToque = sinMovimiento
   ? {}
   : { whileTap: { scale: 0.97 }, transition: { type: 'spring', stiffness: 400, damping: 26 } };
+
+/**
+ * Numero que cuenta hasta su valor al aparecer.
+ *
+ * Una cifra que sube se lee como una medicion; la misma cifra quieta se lee
+ * como una etiqueta. Es la diferencia entre un panel y un formulario.
+ */
+export const Contador = ({ valor, decimales = 0, duracion = 950, retraso = 0 }) => {
+  const objetivo = Number(valor) || 0;
+  const [n, setN] = useState(sinMovimiento ? objetivo : 0);
+
+  useEffect(() => {
+    if (sinMovimiento) { setN(objetivo); return; }
+
+    let cuadro;
+    let inicio = null;
+    const paso = (t) => {
+      if (inicio === null) inicio = t;
+      const transcurrido = t - inicio - retraso;
+      if (transcurrido < 0) { cuadro = requestAnimationFrame(paso); return; }
+      const p = Math.min(transcurrido / duracion, 1);
+      // Arranca rapido y frena al final, como un marcador que se detiene.
+      setN(objetivo * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) cuadro = requestAnimationFrame(paso);
+    };
+    cuadro = requestAnimationFrame(paso);
+    return () => cancelAnimationFrame(cuadro);
+  }, [objetivo, duracion, retraso]);
+
+  return <>{n.toLocaleString('es-PE', {
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
+  })}</>;
+};
 
 /** Barra de progreso que crece desde cero al aparecer. */
 export const BarraAnimada = ({ porcentaje, className }) => (

@@ -828,67 +828,135 @@
         }
     }
 
-    /* --- Adicionales --- */
-    .coAditionalList{
+    /* --- Adicionales: el riel ---
+       Cinco filas grises con un boton de contorno cada una se leian como un
+       formulario. Aqui cada adicional es una tarjeta con su icono, su
+       argumento y su precio, y se elige con un toque en cualquier parte. */
+    .afAdRiel{
+        display: flex;
+        gap: 11px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        /* El riel se sale de la tarjeta a proposito: asi la quinta pieza
+           asoma por el borde y se entiende que hay mas. */
+        margin: 0 -18px;
+        padding: 4px 18px 14px;
+        scrollbar-width: none;
+        &::-webkit-scrollbar{ display: none; }
+    }
+
+    .afAd{
+        position: relative;
+        flex: 0 0 186px;
+        scroll-snap-align: start;
         display: flex;
         flex-direction: column;
-        gap: 9px;
-        width: 100%;
-    }
-    .coAditionalItem{
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        background: rgba(16,31,24,.035);
-        border-radius: 16px;
-        box-shadow: none;
-        padding: 13px 14px;
-        width: 100%;
+        background: var(--af-paper);
+        border: 1.5px solid var(--af-line);
+        border-radius: 20px;
+        padding: 15px 15px 14px;
+        cursor: pointer;
+        transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        box-shadow: var(--af-shadow-s);
 
-        h4{
-            font-size: 14px !important;
-            font-weight: 700;
+        &__marco{
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            background: var(--af-accent-soft);
+            color: var(--af-accent);
+        }
+        &__ic{ width: 21px; height: 21px; }
+
+        &__nombre{
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            letter-spacing: -.02em;
             color: var(--af-ink) !important;
-            margin: 0 !important;
+            margin: 0 0 4px !important;
         }
-        .txt{
-            flex: 1 1 100%;
-            order: 3;
-            p{ font-size: 12px; color: var(--af-muted); margin: 0 0 10px; }
+        &__arg{
+            font-size: 11.5px;
+            line-height: 1.4;
+            color: var(--af-muted);
+            margin: 0 0 10px;
+            min-height: 32px;
         }
-        .price{
-            order: 2;
-            margin-left: auto;
-            padding: 0;
-            border: 0;
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--af-ink);
-            background: none;
+        &__unid{
+            font-size: 11px;
+            color: var(--af-muted);
+            margin: 0 0 8px;
+            padding-top: 9px;
+            border-top: 1px solid var(--af-line);
         }
-        .btnPrimary{
-            display: block;
-            width: 100%;
-            background: transparent;
-            border: 1.5px solid var(--af-ink);
-            color: var(--af-ink);
+        &__precio{
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+            margin-bottom: 12px;
+            b{
+                font-size: 21px;
+                font-weight: 800;
+                letter-spacing: -.035em;
+                color: var(--af-ink);
+                font-variant-numeric: tabular-nums;
+            }
+            em{
+                font-style: normal;
+                font-size: 11.5px;
+                color: var(--af-muted);
+                text-decoration: line-through;
+            }
+        }
+
+        &__btn{
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 40px;
             border-radius: var(--af-r-pill);
-            font-family: inherit;
-            font-size: 13.5px;
+            background: var(--af-ink);
+            color: #F1F6F2;
+            font-size: 13px;
             font-weight: 700;
-            padding: 11px 16px;
-            text-align: center;
-            cursor: pointer;
-            span{ color: inherit; }
+            transition: background .2s ease, color .2s ease;
+            svg{ width: 14px; height: 14px; }
+        }
+
+        /* Cada adicional con su propio marco de color: cinco tarjetas iguales
+           se leen como una lista, cinco distintas se leen como una vitrina. */
+        &--sol   .afAd__marco{ background: #FDF1D8; color: #9A731A; }
+        &--coral .afAd__marco{ background: #FBE7DD; color: #A9542B; }
+        &--tinta .afAd__marco{ background: rgba(16,31,24,.07); color: var(--af-ink); }
+
+        /* Puesto: la tarjeta entera cambia, no solo el boton. */
+        &--puesto{
+            border-color: var(--af-accent);
+            box-shadow: 0 0 0 3px var(--af-accent-soft), var(--af-shadow-s);
+            .afAd__btn{
+                background: var(--af-mint);
+                color: var(--af-mint-ink);
+            }
         }
     }
 
+    /* --- Lo que ya agregaste ---
+       Eran bloques de 121px de alto apilados, con el icono grande y el nombre
+       debajo: ocupaban mas que el plan que se esta comprando. Aqui son
+       pildoras que se leen de un vistazo y se quitan de un toque. */
     .coResumenAdicionales{
         width: 100%;
         margin-top: 14px;
         padding-top: 14px;
         border-top: 1px solid var(--af-line);
+
         h5{
             font-size: 11px !important;
             font-weight: 800;
@@ -900,31 +968,55 @@
     }
     .coResumenAdicionalesItem{
         position: relative;
-        display: flex;
+        display: inline-flex;
+        /* La regla original apila en columna: sin esto el icono quedaba encima
+           del nombre y la pildora media 61px de alto en vez de 38. */
+        flex-direction: row;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        width: auto;
         background: var(--af-accent-soft);
-        border-radius: 14px;
-        padding: 11px 40px 11px 13px;
-        margin-bottom: 8px;
+        border-radius: var(--af-r-pill);
+        padding: 6px 36px 6px 7px;
+        margin: 0 7px 7px 0;
         box-shadow: none;
-        font-size: 13px;
-        color: var(--af-accent);
+        vertical-align: middle;
+
+        figure{
+            width: 26px;
+            height: 26px;
+            flex: 0 0 auto;
+            margin: 0;
+            border-radius: 50%;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            img{ width: 16px; height: 16px; object-fit: contain; }
+        }
+        h6{
+            font-size: 12.5px !important;
+            font-weight: 700;
+            color: var(--af-accent) !important;
+            margin: 0 !important;
+            white-space: nowrap;
+        }
     }
     .coaiClose{
         position: absolute;
         top: 50%;
-        right: 10px;
+        right: 6px;
         transform: translateY(-50%);
-        width: 26px;
-        height: 26px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        background: rgba(23,122,76,.12);
+        background: rgba(23,122,76,.14);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        svg{ font-size: 15px; color: var(--af-accent); }
+        svg{ font-size: 13px !important; color: var(--af-accent); }
     }
 
     /* --- Metodos de pago ---
