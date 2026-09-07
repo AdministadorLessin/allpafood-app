@@ -98,12 +98,19 @@ const RegistroPage = (props) => {
                 // quedaba girando para siempre y el registro moria ahi.
                 setLoadingVal(false);
 
-                if(err.status === 409){
-                    setErrorSendCode(err.response.data);
-                }else if(!err.response){
-                    setErrorSendCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.' } });
-                }else{
-                    setErrorSendCode({ data: { message: 'No pudimos enviar el código. Inténtalo de nuevo en un momento.' } });
+                // Dos fallos encadenados hacian que el cliente NUNCA viera el
+                // motivo real. Uno: axios 1.7 no expone err.status —eso llego
+                // en la 1.8—, asi que la rama del 409 no entraba nunca. Dos:
+                // el cuerpo del 409 es {message}, y se leia como
+                // {data:{message}}, asi que tampoco se habria visto.
+                // Resultado: "no pudimos enviar el codigo" tapando mensajes
+                // utiles como "este numero esta pendiente de verificacion".
+                if (!err.response) {
+                    setErrorSendCode('No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.');
+                } else if (err.response.status === 409 && err.response.data?.message) {
+                    setErrorSendCode(err.response.data.message);
+                } else {
+                    setErrorSendCode('No pudimos enviar el código. Inténtalo de nuevo en un momento.');
                 }
             })
         
@@ -128,10 +135,11 @@ const RegistroPage = (props) => {
                 setLoadingVal(false);
                 // Antes solo contemplaba el 500: si el codigo era incorrecto
                 // (400) no se mostraba absolutamente nada.
-                if(err.response){
-                    setErrorVerifyCode(err.response);
-                }else{
-                    setErrorVerifyCode({ data: { message: 'No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.' } });
+                if (!err.response) {
+                    setErrorVerifyCode('No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.');
+                } else {
+                    setErrorVerifyCode(err.response.data?.message
+                        || 'El código no es válido. Revísalo e inténtalo de nuevo.');
                 }
             })
     }
@@ -191,7 +199,7 @@ const RegistroPage = (props) => {
                                 {errorSendCode &&
                                     <div className="afAuth__error">
                                         <IcoError />
-                                        {errorSendCode?.data?.message || 'No pudimos enviar el código. Inténtalo de nuevo.'}
+                                        {errorSendCode}
                                     </div>
                                 }
 
@@ -232,7 +240,7 @@ const RegistroPage = (props) => {
                             {errorVerifyCode &&
                                 <div className="afAuth__error">
                                     <IcoError />
-                                    {errorVerifyCode?.data?.message || 'El código no es válido. Revísalo e inténtalo de nuevo.'}
+                                    {errorVerifyCode}
                                 </div>
                             }
 
