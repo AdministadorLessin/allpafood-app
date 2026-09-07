@@ -1,298 +1,229 @@
 import React,{useState,useEffect} from "react";
 
-import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import InputLabel from '@mui/material/InputLabel';
-
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-
 import InputAdornment from '@mui/material/InputAdornment';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+
+import { motion, alToque } from './../../ultil/Motion/Motion';
+
+/* Las seis rutinas del calculo, con su descripcion. Antes vivian dentro de un
+   <Select> de MUI: para elegir habia que abrir un desplegable, leer seis
+   etiquetas sueltas —"Sedentario", "Trabajo activo"— y adivinar cual era la
+   propia. Aqui se ven las seis a la vez y cada una dice a que se parece. */
+const RUTINAS = [
+    { v: 'A', t: 'Sedentario',           d: 'Paso el día sentado y casi no camino' },
+    { v: 'B', t: 'Trabajo de oficina',   d: 'Sentado la mayor parte del día, camino algo' },
+    { v: 'C', t: 'Trabajo activo',       d: 'De pie o moviéndome buena parte del día' },
+    { v: 'D', t: 'Entreno fuerte',       d: 'Gimnasio o deporte 5 veces por semana' },
+    { v: 'E', t: 'Atleta profesional',   d: 'Entreno todos los días, a veces dos veces' },
+    { v: 'F', t: 'Atleta de resistencia',d: 'Fondo, ciclismo o triatlón' },
+];
+
+const DIAS  = [0, 1, 2, 3, 4, 5, 6, 7];
+const HORAS = [
+    { v: 0.5, t: '½ h' },
+    { v: 1,   t: '1 h' },
+    { v: 1.5, t: '1½ h' },
+    { v: 2,   t: '2 h' },
+    { v: 3,   t: '3 h o más' },
+];
+
+/** Anos cumplidos a partir de una fecha, para poder volver al paso. */
+const edadDesde = (fecha) => {
+    if (!fecha) return '';
+    const hoy = new Date();
+    const nac = new Date(fecha);
+    if (isNaN(nac.getTime())) return '';
+    let anos = hoy.getFullYear() - nac.getFullYear();
+    const m = hoy.getMonth() - nac.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) anos -= 1;
+    return anos > 0 ? String(anos) : '';
+};
+
+/** La fecha que hay que guardar para que el servidor calcule esa edad. */
+const fechaDesdeEdad = (edad) => {
+    const n = parseInt(edad, 10);
+    if (!n || n < 1) return '';
+    const hoy = new Date();
+    const d = new Date(hoy.getFullYear() - n, hoy.getMonth(), hoy.getDate());
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+};
 
 const FormPerfilStep2 = ({stepForm,setStepForm,data,setData}) => {
 
-    // Sex option
-    const [cfEjercicios,setCfEjercicios] = useState();
-    const [cfFueza,setCfFuerza] = useState();
-    const [validForm,setValidForm] = useState(false);
-
-    const changeCfEjercicio = (resp) =>{
-        setCfEjercicios(resp);
-    }
-
-    const changeCfFuerza = (resp) =>{
-        setCfFuerza(resp);
-    }
-
-    const [rutina, setRutina] = useState('');
-
-    const handleChangeRutina = (event) => {
-        setRutina(event.target.value);
-        setBodyForm({
-            ...bodyForm,
-            [event.target.name]:event.target.value
-        })
-
-    };
-
-    const validationSchema = Yup.object().shape({
-        fsestatura: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fspeso: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fshorasejercicio: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fsrutina: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fsdiasejercicio: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
+    const [campos,setCampos] = useState({
+        edad: '',
+        estatura: '',
+        peso: '',
     });
+    const [rutina,setRutina]         = useState('');
+    const [dias,setDias]             = useState(null);
+    const [horas,setHoras]           = useState(null);
+    const [intensidad,setIntensidad] = useState('');
+    const [fuerza,setFuerza]         = useState(null);
+    const [tocado,setTocado]         = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        mode: "all",
-        shouldUnregister: true,
-        resolver: yupResolver(validationSchema),
-    });
+    const cambiar = (e) => setCampos({ ...campos, [e.target.name]: e.target.value });
 
+    /* La edad se pedia como fecha de nacimiento con un datepicker. El calculo
+       solo usa los anos cumplidos —bmrCalc y fitCalc reciben age, no la
+       fecha—, asi que pedir dia y mes era pedir un dato que nadie usa y que
+       cuesta tres toques mas en un telefono. */
+    const entrena = dias !== null && dias > 0;
 
-    const prevForm = () =>{
-        //updateData(data);
-        setStepForm(stepForm - 1);
-    }
+    const faltan = !campos.edad || !campos.estatura || !campos.peso || !rutina
+        || dias === null
+        || (entrena && (horas === null || !intensidad || fuerza === null));
 
-    const [bodyForm,setBodyForm] = useState({
-        fsestatura:'',
-        fspeso:'',
-        fshorasejercicio:0,
-        fsrutina:'',
-        fsdiasejercicio:0
-    });
+    const siguiente = () => {
+        setTocado(true);
+        if (faltan) return;
 
-    /*
-    1.00 (sedentario) 
-    1.35 (trabajo de escritorio normal)
-    1.45 (entrenamiento 3 veces por semana + trabajo de escritorio normal)
-    1.50 (entrenamiento 3 veces por semana + trabajo activo)
-    1.55 (atleta y culturista (entrenamiento 5 veces por semana) + trabajo de escritorio normal)
-    1.65 (atleta y culturista (entrenamiento 5 veces por semana) + trabajo activo)
-    1.75 (atleta profesional (entrenamiento 5+ veces por semana))
-    1.85 (atleta de resistencia)
-    */
-
-    const handleChangeFields = (e) =>{
-        setBodyForm({
-            ...bodyForm,
-            [e.target.name]:e.target.value
-        })
-    }
-
-    const updateData = (dataUpdate) =>{
-        if(data && data.information){
-            setData(prevState =>({
-                ...prevState,
-                information:{
-                    ...prevState.information,
-                    height:dataUpdate.fsestatura,
-                    weight:dataUpdate.fspeso,
-                    trainingDays:dataUpdate.fsdiasejercicio,
-                    trainingHours:dataUpdate.fshorasejercicio,
-                    trainingLevel:cfEjercicios,
-                    routine:dataUpdate.fsrutina,
-                    strengthTraining:cfFueza
-                }
-            }))
-        }
-    }
-
-    const onSubmitHandler = (datsa) => {
-        setValidForm(false);
-        updateData(datsa);
+        setData(prev => ({
+            ...prev,
+            bornDate: fechaDesdeEdad(campos.edad),
+            information: {
+                ...(prev?.information || {}),
+                height: campos.estatura,
+                weight: campos.peso,
+                trainingDays: dias,
+                trainingHours: entrena ? horas : 0,
+                trainingLevel: entrena ? intensidad : 'L',
+                routine: rutina,
+                strengthTraining: entrena ? fuerza : false,
+            }
+        }));
         setStepForm(stepForm + 1);
     };
 
     useEffect(()=>{
-        if(data){
-            if(data.information){
-                setBodyForm({
-                    fsestatura:data.information.height,
-                    fspeso:data.information.weight,
-                    fshorasejercicio:data.information.trainingHours,
-                    fsrutina:data.information.routine,
-                    fsdiasejercicio:data.information.trainingDays
-                })
-                setCfEjercicios(data.information.trainingLevel);
-                setCfFuerza(data.information.strengthTraining);
-            }
-        }
-    },[])
+        if (!data) return;
+        const i = data.information || {};
+        setCampos({
+            edad: edadDesde(data.bornDate),
+            estatura: i.height ?? '',
+            peso: i.weight ?? '',
+        });
+        setRutina(i.routine ?? '');
+        setDias(i.trainingDays ?? null);
+        setHoras(i.trainingHours ?? null);
+        setIntensidad(i.trainingLevel ?? '');
+        setFuerza(i.strengthTraining ?? null);
+    },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const Aviso = ({ si, texto }) => (si && tocado ?
+        <div className="regErrorField"><p><ErrorOutlineIcon /> {texto}</p></div> : null
+    );
 
     return (
-        
-        <form className={'regStepResp'} onSubmit={handleSubmit(onSubmitHandler)}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} sm={12} md={3}>
-                    <div className="textFieldReg2">
-                        <TextField 
-                            id="fsestatura" 
-                            name="fsestatura"
-                            type={'number'}
-                            variant="filled" 
-                            label={'¿Cuánto mides?'}
-                            error={errors.fsestatura ? true : false}
-                            {...register("fsestatura")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fsestatura} 
-                            InputProps={{
-                                endAdornment: bodyForm.fsestatura ? (
-                                    <InputAdornment 
-                                        position="end"
-                                        className="uMedida"
-                                    >
-                                        cm
-                                    </InputAdornment>
-                                ) : null,
-                            }}
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={3}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fspeso" 
-                            name="fspeso"
-                            type={'number'}
-                            variant="filled" 
-                            label={'¿Cuánto pesas?'}
-                            error={errors.fspeso ? true : false}
-                            {...register("fspeso")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fspeso} 
-                            InputProps={{
-                                endAdornment: bodyForm.fspeso ? (
-                                    <InputAdornment 
-                                        position="end"
-                                        className="uMedida"
-                                    >
-                                        .kg
-                                    </InputAdornment>
-                                ) : null,
-                            }}
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className={errors.fsrutina ? "textFieldReg textFieldRegSelect" : "textFieldReg textFieldRegSelect textFieldRegSelectAct"}>
-                        <FormControl fullWidth>
-                            <InputLabel id="fsrutina">En tu rutina diaria normalmente:</InputLabel>
-                            <Select
-                                id="fsrutina" 
-                                name="fsrutina"
-                                variant="outlined" 
-                                error={errors.fsrutina ? true : false}
-                                {...register("fsrutina")} 
-                                onChange={handleChangeRutina} 
-                                value={bodyForm.fsrutina} 
-                            >
-                                <MenuItem value={'A'}>Sedentario</MenuItem>
-                                <MenuItem value={'B'}>Trabajo de escritorio normal</MenuItem>
-                                <MenuItem value={'C'}>Trabajo activo</MenuItem>
-                                <MenuItem value={'D'}>Atleta y culturista</MenuItem>
-                                <MenuItem value={'E'}>Atleta profesional</MenuItem>
-                                <MenuItem value={'F'}>Atleta de resistencia</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                </Grid>
+        <div className="regStepResp">
 
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fsdiasejercicio" 
-                            name="fsdiasejercicio"
-                            type={'number'}
-                            variant="filled" 
-                            label={'¿Cuántos días a la semana te ejercitas?'}
-                            error={errors.fsdiasejercicio ? true : false}
-                            {...register("fsdiasejercicio")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fsdiasejercicio === 0 ? '' : bodyForm.fsdiasejercicio} 
-                        />
+            <div className="rsrTitle"><span>Tus medidas</span></div>
+            <div className="afTres">
+                <div className="afCampo">
+                    <TextField
+                        name="edad" type="number" inputMode="numeric"
+                        variant="filled" label="Edad"
+                        value={campos.edad} onChange={cambiar}
+                        InputProps={{ endAdornment: campos.edad ?
+                            <InputAdornment position="end" className="uMedida">años</InputAdornment> : null }}
+                    />
+                </div>
+                <div className="afCampo">
+                    <TextField
+                        name="estatura" type="number" inputMode="numeric"
+                        variant="filled" label="Estatura"
+                        value={campos.estatura} onChange={cambiar}
+                        InputProps={{ endAdornment: campos.estatura ?
+                            <InputAdornment position="end" className="uMedida">cm</InputAdornment> : null }}
+                    />
+                </div>
+                <div className="afCampo">
+                    <TextField
+                        name="peso" type="number" inputMode="decimal"
+                        variant="filled" label="Peso"
+                        value={campos.peso} onChange={cambiar}
+                        InputProps={{ endAdornment: campos.peso ?
+                            <InputAdornment position="end" className="uMedida">kg</InputAdornment> : null }}
+                    />
+                </div>
+            </div>
+            <Aviso si={!campos.edad || !campos.estatura || !campos.peso}
+                   texto="Completa tu edad, estatura y peso." />
+
+            <div className="rsrTitle"><span>¿Cómo es tu día normal?</span></div>
+            <div className="afOpc">
+                {RUTINAS.map((r)=>(
+                    <motion.button
+                        type="button" key={r.v}
+                        className={`afOpc__it${rutina === r.v ? ' afOpc__it--sel' : ''}`}
+                        onClick={()=>setRutina(r.v)} {...alToque}
+                    >
+                        <span className="afOpc__txt">
+                            <b>{r.t}</b>
+                            <small>{r.d}</small>
+                        </span>
+                        <span className="afOpc__tick" />
+                    </motion.button>
+                ))}
+            </div>
+            <Aviso si={!rutina} texto="Elige la opción que más se parezca a tu día." />
+
+            <div className="rsrTitle"><span>¿Cuántos días entrenas por semana?</span></div>
+            <div className="afChips afChips--num">
+                {DIAS.map((d)=>(
+                    <button type="button" key={d}
+                        className={`afChip${dias === d ? ' afChip--sel' : ''}`}
+                        onClick={()=>setDias(d)}>{d}</button>
+                ))}
+            </div>
+            <Aviso si={dias === null} texto="Marca cuántos días entrenas. Si no entrenas, elige 0." />
+
+            {/* Todo lo del entrenamiento solo tiene sentido si entrena: antes se
+                le preguntaba la intensidad y las horas a quien acababa de poner
+                que no entrena ningun dia. */}
+            {entrena &&
+                <>
+                    <div className="rsrTitle"><span>¿Cuánto dura cada sesión?</span></div>
+                    <div className="afChips">
+                        {HORAS.map((h)=>(
+                            <button type="button" key={h.v}
+                                className={`afChip${horas === h.v ? ' afChip--sel' : ''}`}
+                                onClick={()=>setHoras(h.v)}>{h.t}</button>
+                        ))}
                     </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fshorasejercicio" 
-                            name="fshorasejercicio"
-                            type={'number'}
-                            label={'¿Cuántas horas al dia te ejercitas?'}
-                            variant="filled" 
-                            error={errors.fshorasejercicio ? true : false}
-                            {...register("fshorasejercicio")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fshorasejercicio === 0 ? '': bodyForm.fshorasejercicio } 
-                        />
+                    <Aviso si={horas === null} texto="Marca cuánto dura tu sesión." />
+
+                    <div className="rsrTitle"><span>¿Qué tan intenso entrenas?</span></div>
+                    <div className="rsrIntensidad">
+                        <span className={intensidad === 'L' ? 'active' : undefined} onClick={()=>setIntensidad('L')}>Leve</span>
+                        <span className={intensidad === 'M' ? 'active' : undefined} onClick={()=>setIntensidad('M')}>Moderada</span>
+                        <span className={intensidad === 'F' ? 'active' : undefined} onClick={()=>setIntensidad('F')}>Fuerte</span>
                     </div>
-                </Grid>
-                {bodyForm.fsdiasejercicio > 0 &&
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldReg">
-                            <p>La intensidad de mi entrenamiento es:</p>
-                            <div className="rsrIntensidad">
-                                <span className={cfEjercicios === 'L' ? 'active':null} onClick={()=>changeCfEjercicio('L')}>Leve</span>
-                                <span className={cfEjercicios === 'M' ? 'active':null} onClick={()=>changeCfEjercicio('M')}>Moderada</span>
-                                <span className={cfEjercicios === 'F' ? 'active':null} onClick={()=>changeCfEjercicio('F')}>Fuerte</span>
-                            </div>
-                        </div>
-                    </Grid>
-                }
-                {bodyForm.fsdiasejercicio > 0 &&
-                    <Grid itemxs={12} sm={12} md={6}>
-                        <div className="textFieldReg">
-                            <p>¿Realizas entrenamiento de fuerza?</p>
-                            <div className="rsrIntensidad">
-                                <span className={cfFueza === true ? 'active':null} onClick={()=>changeCfFuerza(true)} >Si</span>
-                                <span className={cfFueza === false ? 'active':null} onClick={()=>changeCfFuerza(false)}>No</span>
-                            </div>
-                        </div>
-                    </Grid>
-                }
-                <Grid item xs={12}>
-                    <div className="btnBox">
-                        <a href="#" onClick={prevForm} className="btnPrimary btnIcon btnOutline">
-                            <span>
-                                <ArrowBackIosIcon />
-                                Volver
-                            </span>
-                        </a>
-                        <button type={'submit'} className="btnPrimary btnIcon btnIconRight">
-                            <span>
-                                Siguiente
-                                <ArrowForwardIosIcon />
-                            </span>
-                        </button>
+                    <Aviso si={!intensidad} texto="Marca la intensidad." />
+
+                    <div className="rsrTitle"><span>¿Levantas pesas?</span></div>
+                    <div className="rsrIntensidad">
+                        <span className={fuerza === true ? 'active' : undefined} onClick={()=>setFuerza(true)}>Sí</span>
+                        <span className={fuerza === false ? 'active' : undefined} onClick={()=>setFuerza(false)}>No</span>
                     </div>
-                </Grid>
-            </Grid>
-        </form>
+                    <Aviso si={fuerza === null} texto="Marca sí o no." />
+                </>
+            }
+
+            <div className="btnBox">
+                <button type="button" onClick={()=>setStepForm(stepForm - 1)}
+                        className="btnPrimary btnIcon btnOutline">
+                    <span>Volver</span>
+                </button>
+                <motion.button type="button" onClick={siguiente}
+                        className="btnPrimary btnIcon btnIconRight" {...alToque}>
+                    <span>Siguiente</span>
+                </motion.button>
+            </div>
+        </div>
     )
 };
 

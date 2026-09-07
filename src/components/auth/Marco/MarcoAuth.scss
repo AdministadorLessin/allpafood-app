@@ -14,6 +14,11 @@
     min-height: 100vh;
     padding: 22px 16px 60px;
 
+    /* El degradado verde del body es el del panel, donde las tarjetas blancas
+       flotan encima. Aqui casi todo es formulario, y ese verde de fondo
+       envejecia la pantalla en vez de darle aire. */
+    background: #FFFFFF;
+
     &__col{
         width: 100%;
         max-width: 560px;   /* el mismo que .afPanel */
@@ -515,4 +520,206 @@
         }
     }
     .btnBoxLeft{ justify-content: flex-start; }
+
+    /* --- Tres campos cortos en una fila (edad, estatura, peso) --- */
+    .afTres{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        .afCampo{ margin-bottom: 0; }
+        .MuiInputBase-root input{ padding: 22px 10px 8px; }
+        .MuiInputLabel-root{ font-size: 12.5px; left: 0; }
+        .uMedida{ padding-right: 10px; font-size: 11px; }
+    }
+    @media (max-width: 359px){
+        .afTres{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* --- Lista de opciones con descripcion --- */
+    .afOpc{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        &__it{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            font-family: inherit;
+            text-align: left;
+            background: var(--af-paper);
+            border: 1.5px solid var(--af-line);
+            border-radius: 16px;
+            padding: 13px 14px;
+            cursor: pointer;
+            transition: border-color .18s ease, background .18s ease;
+
+            &--sel{
+                border-color: var(--af-ink);
+                background: var(--af-accent-soft);
+            }
+        }
+        &__txt{
+            flex: 1 1 auto;
+            min-width: 0;
+            b{
+                display: block;
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--af-ink);
+                line-height: 1.25;
+            }
+            small{
+                display: block;
+                font-size: 11.5px;
+                color: var(--af-muted);
+                margin-top: 2px;
+                line-height: 1.4;
+            }
+        }
+        &__tick{
+            flex: 0 0 auto;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(16,31,24,.18);
+            position: relative;
+        }
+        &__it--sel &__tick{
+            background: var(--af-accent);
+            border-color: var(--af-accent);
+            &::after{
+                content: '';
+                position: absolute;
+                left: 6.5px; top: 3.5px;
+                width: 4px; height: 8px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    /* --- Fichas: dias, horas --- */
+    .afChips{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+    .afChip{
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--af-ink);
+        background: var(--af-paper);
+        border: 1.5px solid var(--af-line);
+        border-radius: var(--af-r-pill);
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: border-color .18s ease, background .18s ease, color .18s ease;
+
+        &--sel{
+            border-color: var(--af-ink);
+            background: var(--af-accent-soft);
+            color: var(--af-accent);
+            font-weight: 700;
+        }
+    }
+    .afChips--num .afChip{
+        flex: 1 1 auto;
+        min-width: 38px;
+        padding: 10px 4px;
+        text-align: center;
+    }
+
+    .afAyuda{
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--af-muted);
+        margin: -4px 0 10px;
+    }
+    .afCampo--suelto{ margin-top: 10px; margin-bottom: 0; }
+
+    /* --- El mapa del ultimo paso ---
+       Misma estructura que /ubicaciones: el buscador cuelga del contenedor del
+       mapa, no de un MapControl de Google. */
+    .rsrMap{
+        position: relative;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    .rsrMapUbiPageMapApiStyle{
+        width: 100%;
+        height: 340px;
+        border-radius: 20px;
+        border: 1px solid var(--af-line);
+        overflow: hidden;
+    }
+    .rsrMapsearchMapBox{
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: 500px;
+        z-index: 4;
+        input{
+            width: 100%;
+            height: 46px;
+            border-radius: 23px;
+            border: 0;
+            box-shadow: 0 4px 14px -4px rgba(16,31,24,.35);
+            outline: none;
+            padding: 0 18px;
+            color: var(--af-ink);
+            font-size: 15px;
+            font-family: var(--poppins);
+        }
+    }
+    .rsrMapNotCobertura{
+        position: absolute;
+        left: 10px;
+        bottom: 12px;
+        z-index: 4;
+        background: var(--error);
+        border-radius: var(--af-r-pill);
+        p{
+            color: #fff;
+            font-size: 12px;
+            margin: 0;
+            padding: 6px 14px;
+        }
+    }
+
+    /* Direccion detectada por el mapa */
+    .ubiCalle{
+        background: var(--af-accent-soft);
+        border-radius: 14px;
+        padding: 13px 15px;
+        margin-bottom: 16px;
+        &__et{
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--af-accent);
+            margin-bottom: 5px;
+        }
+        strong{
+            display: block;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--af-ink);
+            line-height: 1.3;
+        }
+        em{
+            display: block;
+            font-style: normal;
+            font-size: 12.5px;
+            color: var(--af-muted);
+            text-transform: capitalize;
+            margin-top: 2px;
+        }
+    }
 }

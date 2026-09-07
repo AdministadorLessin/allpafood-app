@@ -64,10 +64,10 @@ const RegistroPage = (props) => {
     const TITULOS = [
         { t1: 'Cuéntanos', fuerte: 'qué buscas',
           bajada: 'Con esto calculamos cuántas calorías necesitas al día y qué plan te queda mejor.' },
-        { t1: 'Ahora,', fuerte: 'cómo te mueves',
-          bajada: 'Tu nivel de actividad cambia bastante el cálculo. Sé honesto: nadie lo va a ver.' },
-        { t1: 'Por último,', fuerte: 'tus medidas',
-          bajada: 'Es el último paso. Después te mostramos los planes que te calzan.' },
+        { t1: 'Ahora,', fuerte: 'tu actividad física',
+          bajada: 'Cuánto te mueves cambia bastante el cálculo de calorías.' },
+        { t1: 'Por último,', fuerte: '¿dónde te entregamos?',
+          bajada: 'Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.' },
     ];
     const titulo = TITULOS[stepProfile] || TITULOS[0];
 

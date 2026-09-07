@@ -16,6 +16,7 @@ import { PANTALLAS_MENU } from './PantallasMenu';
 import MiPlanVista from './MiPlanVista';
 // SOLO DESARROLLO: para revisar la pantalla de exito sin cobrar de verdad.
 import PagoListo from './../../components/checkout/PagoListo/PagoListo';
+import LoaderMacros from './../../components/auth/FormPerfil/LoaderMacros/LoaderMacros';
 
 /**
  * SOLO DESARROLLO. Ruta /preview-ux, sin sesion.
@@ -133,6 +134,7 @@ const PreviewPanel = () => {
       </div>
       {window.location.search.includes('pago') &&
         <PagoListo total={508.90} plan={'Nutrivital Plus'} adicionales={1} />}
+      {window.location.search.includes('macros') && <LoaderMacros />}
     </div>
   );
 };

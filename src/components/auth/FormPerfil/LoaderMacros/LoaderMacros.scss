@@ -1,80 +1,188 @@
-.loaderMacrosCont{
+/* El resultado del calculo, al terminar el perfil.
+
+   Antes eran seis frases escritas a maquina durante mas de ocho segundos
+   —"Estamos calculando sus proteinas", "Estamos calculando sus grasas"— con
+   las cifras apareciendo de a una. El calculo es instantaneo: esa espera era
+   teatro, y llegaba justo despues de que el cliente llenara tres pantallas.
+
+   Ahora hay un momento corto de calculo y despues el numero, con sus tres
+   partes. Cada tarjeta lleva su color y su grafico: la misma idea que un
+   panel de salud, no una lista de campos. */
+
+.afMacros{
     position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100vh;
-    background: rgb(50 112 119 / 43%);
-    backdrop-filter: blur(20px);
-    z-index: 999;
+    inset: 0;
+    z-index: 200;
     display: flex;
     align-items: center;
-    flex-direction: column;
     justify-content: center;
-    transition: ease-in-out all .2s ;
-    .authDetails{
-        pointer-events: none;
-        z-index: 1;
+    padding: 18px;
+    overflow-y: auto;
+    background: rgba(16,31,24,.40);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+
+    &__hoja{
+        width: 100%;
+        max-width: 400px;
+        background: #FFFFFF;
+        border-radius: 28px;
+        padding: 26px 20px 20px;
+        box-shadow: 0 40px 80px -30px rgba(16,31,24,.6);
+        margin: auto;
     }
-}
 
-.loaderMacrosContHide{
-    opacity: 0;
-    transform: translate(0%,0%);
-    transition: ease-in-out all .2s ;
-    pointer-events: none;
-}
-
-.loaderMacrosBox{
-    position: relative;
-    padding: 30px;
-    margin-bottom: 20px;
-    transition: ease-in-out all .3s ;
-    opacity: 1;
-}
-
-.loaderMacrosBoxHide{
-    opacity: 0;
-    transition: ease-in-out all .3s ;
-    transform: translate(0%, -10%);
-}
-
-.loaderMacrosCircle{
-    position: absolute;
-    svg{
-        circle{
-            stroke-width: 1px !important;
-            stroke: white;
+    /* --- Momento de calculo --- */
+    &__calc{
+        text-align: center;
+        padding: 22px 6px 14px;
+        h2{
+            font-size: 21px !important;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            color: var(--af-ink) !important;
+            margin: 0 0 6px !important;
+        }
+        p{
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--af-muted);
+            margin: 0 0 22px;
         }
     }
-}
-
-
-.loadMacrosItem{
-    background: rgba(255,255,255,1);
-    max-width: 90%;
-    width: auto;
-    min-width: 720px;
-    padding: 30px;
-    z-index: 1;
-    position: relative;
-    box-shadow: 5px 10px 30px 0px rgba(0,0,0,.1);
-    border-radius: 20px;
-    transition: all ease-in-out .3s;
-    transform: translate(0%, 0%);
-    h4{
-        font-size: 22px;
-        text-align: center;
-        width: 100%;
+    &__iso{
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 18px;
+        animation: afLatido 1.4s ease-in-out infinite;
+        svg{ width: 100%; height: 100%; }
     }
-    @media screen and (max-width: 750px) {
-        min-width: auto;
+    &__barra{
+        height: 5px;
+        border-radius: var(--af-r-pill);
+        background: rgba(16,31,24,.08);
+        overflow: hidden;
+        i{
+            display: block;
+            height: 100%;
+            width: 40%;
+            border-radius: var(--af-r-pill);
+            background: var(--af-accent);
+            animation: afCorre 1.2s ease-in-out infinite;
+        }
+    }
+
+    /* --- Resultado --- */
+    &__et{
+        margin: 0 0 3px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--af-accent);
+    }
+    &__t{
+        font-size: 23px !important;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--af-ink) !important;
+        margin: 0 0 16px !important;
+    }
+    &__rej{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 9px;
+    }
+    &__nota{
+        font-size: 11.5px;
+        line-height: 1.5;
+        color: var(--af-muted);
+        margin: 16px 0 0;
     }
 }
 
-.loadMacrosItemHide{
-    opacity: 0;
-    transition: all ease-in-out .3s;
-    transform: translate(0%, 10%);
+/* --- Tarjeta de macro --- */
+.afMac{
+    border-radius: 18px;
+    padding: 14px 15px;
+    background: rgba(16,31,24,.04);
+
+    &__et{
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--af-muted);
+        margin-bottom: 6px;
+    }
+    &__fila{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    &__txt{
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+        min-width: 0;
+        b{
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -.04em;
+            color: var(--af-ink);
+            font-variant-numeric: tabular-nums;
+        }
+        span{ font-size: 12px; font-weight: 600; color: var(--af-muted); }
+    }
+    &__vizBox{
+        flex: 0 0 auto;
+        width: 46px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    &__viz{ width: 100%; height: 100%; }
+    &__pie{
+        display: block;
+        font-size: 10.5px;
+        color: var(--af-muted);
+        margin-top: 7px;
+    }
+
+    /* Un tinte por macro, como en un panel de salud. Es lo que separa esto de
+       una lista de campos. */
+    &--verde{ background: #E8F5ED; }
+    &--azul { background: #E6F1FA; }
+    &--ambar{ background: #FCF3E2; }
+
+    /* Sola en media fila dejaba un hueco, y la linea se lee mejor ancha. */
+    &--ancha{
+        grid-column: 1 / -1;
+        .afMac__vizBox{ width: 86px; }
+    }
+
+    &--hero{
+        grid-column: 1 / -1;
+        background: #FDEDE4;
+        padding: 18px 18px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        .afMac__txt b{ font-size: 40px; line-height: 1; }
+        .afMac__txt span{ font-size: 14px; }
+        .afMac__vizBox{ width: 62px; height: 62px; }
+    }
 }
 
+@keyframes afCorre{
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .afMacros__iso{ animation: none; }
+    .afMacros__barra i{ animation: none; width: 100%; }
+}

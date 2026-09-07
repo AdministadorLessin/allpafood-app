@@ -1,32 +1,23 @@
 import React,{ useState, useEffect, useRef } from 'react';
 
 import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
 
-import { styled } from '@mui/material/styles';
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from 'axios';
 
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 // El pin del mapa traia el logo antiguo (un arbol).
 import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
-import FormHelperText from '@mui/material/FormHelperText';
 
 import {useAuthContext} from '../../../context/authContext';
 
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 
 import { fitCalc } from 'fitcalc';
 
 import { 
     APIProvider,
-    ControlPosition,
-    MapControl,
     AdvancedMarker,
     Map,
     useMap,
@@ -37,67 +28,6 @@ import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { API_URL } from '../../../config';
 
-const IOSSwitch = styled((props) => (
-  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-))(({ theme }) => ({
-  width: 42,
-  height: 26,
-  padding: 0,
-  '& .MuiSwitch-switchBase': {
-    padding: 0,
-    margin: 2,
-    transitionDuration: '300ms',
-    '&.Mui-checked': {
-      transform: 'translateX(16px)',
-      color: '#fff',
-      '& + .MuiSwitch-track': {
-        backgroundColor: '#65C466',
-        opacity: 1,
-        border: 0,
-        ...theme.applyStyles('dark', {
-          backgroundColor: '#2ECA45',
-        }),
-      },
-      '&.Mui-disabled + .MuiSwitch-track': {
-        opacity: 0.5,
-      },
-    },
-    '&.Mui-focusVisible .MuiSwitch-thumb': {
-      color: '#33cf4d',
-      border: '6px solid #fff',
-    },
-    '&.Mui-disabled .MuiSwitch-thumb': {
-      color: theme.palette.grey[100],
-      ...theme.applyStyles('dark', {
-        color: theme.palette.grey[600],
-      }),
-    },
-    '&.Mui-disabled + .MuiSwitch-track': {
-      opacity: 0.7,
-      ...theme.applyStyles('dark', {
-        opacity: 0.3,
-      }),
-    },
-  },
-  '& .MuiSwitch-thumb': {
-    boxSizing: 'border-box',
-    width: 22,
-    height: 22,
-  },
-  '& .MuiSwitch-track': {
-    borderRadius: 26 / 2,
-    backgroundColor: '#E9E9EA',
-    opacity: 1,
-    transition: theme.transitions.create(['background-color'], {
-      duration: 500,
-    }),
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#39393D',
-    }),
-  },
-}));
-
-
 const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
     const [selectedPlace, setSelectedPlace] = useState(null);
@@ -106,14 +36,21 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
     const { token, coverCities, handleUpdateToken } = useAuthContext();
 
+    /* Este paso pasa a ser SOLO la direccion de entrega.
+       Antes mezclaba fecha de nacimiento, distrito, restricciones
+       alimenticias y un interruptor de azucar entre el numero de departamento
+       y la referencia, y el mapa iba al final —despues de pedir el numero de
+       piso, que es imposible de saber antes de marcar el punto—. La edad y
+       las preferencias viven ahora donde corresponde: con las medidas y con
+       el objetivo. */
     const [bodyForm,setBodyForm] = useState({
-        fs3fecnac:'',
         fs3distrito:'',
-        fs3restricciones:'',
         fs3dir:'',
-        fs3dirdescripcion:'',
-        fs3azucar: true
+        fs3dirdescripcion:''
     });
+
+    // Calle que devuelve el mapa para el punto marcado, como en /ubicaciones.
+    const [calleDelMapa,setCalleDelMapa] = useState(null);
 
     const handleChangeFields = (e) => {
         const { name, value, type, checked } = e.target;
@@ -123,22 +60,12 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         });
     };
     
+    // Los mensajes eran todos "Ingrese un telefono valido por favor.", incluso
+    // en los campos de direccion.
     const validationSchema = Yup.object().shape({
-        fs3fecnac: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fs3distrito: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        //fs3restricciones: Yup.string()
-                        //.required('Ingrese un telefono valido por favor.')
-                        //.min(1,'Ingrese un telefono valido por favor.'),
-        fs3dir: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
-        fs3dirdescripcion: Yup.string()
-                        .required('Ingrese un telefono valido por favor.')
-                        .min(1,'Ingrese un telefono valido por favor.'),
+        fs3distrito: Yup.string().required('Escribe tu distrito.'),
+        fs3dir: Yup.string().required('Indica el número, piso o departamento.'),
+        fs3dirdescripcion: Yup.string().required('Una referencia ayuda al repartidor a encontrarte.'),
     });
 
     const {
@@ -155,18 +82,12 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         if (data && data.information) {
             setData(prevState => ({
                 ...prevState,
-                bornDate: bodyForm.fs3fecnac,
                 district: bodyForm.fs3distrito,
                 address: bodyForm.fs3dir,
                 descriptionAddress: bodyForm.fs3dirdescripcion,
                 location: {
                     latitude: defailtCenter.lat,
                     longitude: defailtCenter.lng
-                },
-                information: {
-                    ...prevState.information,
-                    alimentsRestrictions: bodyForm.fs3restricciones,
-                    sugar: bodyForm.fs3azucar // <-- Agregado
                 }
             }));
         }
@@ -373,28 +294,28 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
         setErrorGuardar('');   // limpiar el aviso del intento anterior
         updateData(dataForm);
 
+        // La direccion que se guarda es la calle del mapa mas el detalle que
+        // escribio el cliente. Antes viajaba solo el detalle.
+        const detalle = (bodyForm.fs3dir || '').trim();
+        const direccionCompleta = calleDelMapa
+            ? (detalle ? `${calleDelMapa}, ${detalle}` : calleDelMapa)
+            : detalle;
+
         const newObjet = data;
         const newObjet2 = {
             ...newObjet,
-            bornDate:bodyForm.fs3fecnac,
             district:bodyForm.fs3distrito,
-            // Estaban invertidos: se guardaba la referencia como direccion y la
-            // direccion como referencia. Es el dato que usa el motorizado.
-            address:bodyForm.fs3dir,
+            address:direccionCompleta,
             descriptionAddress:bodyForm.fs3dirdescripcion,
             location:{
                 latitude: defailtCenter.lat,
                 longitude: defailtCenter.lng
-            },
-            information:{
-                ...newObjet.information,
-                alimentsRestrictions:bodyForm.fs3restricciones
             }
         }
         
 
         axios.put(`${API_URL}register/profile`, {
-            bornDate: formatDate(newObjet2.bornDate),
+            bornDate: newObjet2.bornDate,
             district: newObjet2.district,
             address: newObjet2.address,
             descriptionAddress: newObjet2.descriptionAddress,
@@ -415,8 +336,8 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                 trainingLevel: newObjet2.information.trainingLevel,
                 routine: newObjet2.information.routine,
                 strengthTraining: newObjet2.information.strengthTraining,
-                alimentsRestrictions: newObjet2.information.alimentsRestrictions,
-                sugar: bodyForm.fs3azucar // <-- Se envía el valor boolean aquí
+                alimentsRestrictions: newObjet2.information.alimentsRestrictions ?? '',
+                sugar: newObjet2.information.sugar ?? true
             }
         },
         {
@@ -614,7 +535,20 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
                 setDistritoNoDetectado(false);
 
-                console.log('Distrito FINAL:', district);
+                /* La calle. El geocodificador ya devolvia 'route' y
+                   'street_number' y se tiraban: por eso en la base quedaban
+                   direcciones como "402" —solo el numero de departamento—,
+                   sin ninguna via que el motorizado pudiera buscar. Es el
+                   mismo arreglo que ya se hizo en /ubicaciones. */
+                const conCalle = results.find(r =>
+                    r.address_components.some(c => c.types.includes('route')));
+                let calle = null;
+                if (conCalle) {
+                    const via = conCalle.address_components.find(c => c.types.includes('route'));
+                    const num = conCalle.address_components.find(c => c.types.includes('street_number'));
+                    calle = num ? `${via.long_name} ${num.long_name}` : via.long_name;
+                }
+                setCalleDelMapa(calle);
 
                 setDistrito(district);
 
@@ -636,207 +570,157 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
 
     useEffect(()=>{
-        if(data && data.information && data.information.alimentsRestrictions ){
-            setBodyForm({
-                fs3fecnac:data.bornDate,
-                fs3distrito:data.district,
-                fs3restricciones:data.information.alimentsRestrictions,
-                fs3dir:data.address,
-                fs3dirdescripcion:data.descriptionAddress,
-                fs3azucar: data.information.sugar ?? true // <-- Recupera o usa default
-            });
-        }
-    },[])
+        if(!data) return;
+        setBodyForm({
+            fs3distrito: data.district ?? '',
+            fs3dir: data.address ?? '',
+            fs3dirdescripcion: data.descriptionAddress ?? ''
+        });
+    },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         
         <form className={loadingForm ? 'regStepResp disableForms':'regStepResp'} onSubmit={handleSubmit(onSubmitHandler)}>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2 textFieldReg3">
-                        <TextField
-                            id="fs3fecnac" 
-                            name="fs3fecnac"
-                            type={'date'}
-                            label={'Fecha de nacimiento:'}
-                            variant="filled" 
-                            error={errors.fs3fecnac ? true : false}
-                            {...register("fs3fecnac")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fs3fecnac} 
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fs3distrito" 
-                            name="fs3distrito"
-                            type={'text'}
-                            label={'Distrito:'}
-                            variant="filled" 
-                            error={errors.fs3distrito ? true : false}
-                            {...register("fs3distrito")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fs3distrito} 
-                        />
-                        {/* El geocodificador de Google devuelve "Lima" en muchas
-                            avenidas principales. Cuando eso pasa hay que pedir el
-                            distrito, no fallar en silencio. */}
-                        {distritoNoDetectado && !bodyForm.fs3distrito &&
-                            <div className="regErrorField">
-                                <p> <ErrorOutlineIcon /> No pudimos detectar tu distrito. Escríbelo aquí por favor.</p>
-                            </div>
-                        }
-                        {errors.fs3distrito &&
-                            <div className="regErrorField">
-                                <p> <ErrorOutlineIcon /> Ingresa tu distrito por favor.</p>
-                            </div>
-                        }
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={10}>
-                    <div className="textFieldReg2 textFieldRegNota">
-                        <FormHelperText>*Coloca ingredientes que no puedes consumir por alergia o orden medica.</FormHelperText>
-                        <TextField
-                            id="fs3restricciones"
-                            name="fs3restricciones"
-                            type={'text'}
-                            label={'Restricciones alimenticias:'}
-                            variant="filled" 
-                            //error={errors.fs3restricciones ? true : false}
-                            {...register("fs3restricciones")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fs3restricciones} 
-                        />
-                        
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={2}>
-                    <div className="textFieldReg2 textFieldRegSwitch">
-                        <FormHelperText>¿Desea azucar?</FormHelperText>
-                        <FormControlLabel
-                            control={
-                                <IOSSwitch 
-                                    sx={{ m: 1 }} 
-                                    name="fs3azucar"
-                                    checked={bodyForm.fs3azucar}
-                                    onChange={handleChangeFields}
-                                />
-                            }
-                            label="Azúcar"
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fs3dir" 
-                            name="fs3dir"
-                            label={'N° Dep. / Oficina / Piso:'}
-                            type={'text'}
-                            variant="filled" 
-                            error={errors.fs3dir ? true : false}
-                            {...register("fs3dir")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fs3dir} 
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                    <div className="textFieldReg2">
-                        <TextField
-                            id="fs3dirdescripcion" 
-                            name="fs3dirdescripcion"
-                            type={'text'}
-                            label={'Referencia:'}
-                            variant="filled" 
-                            error={errors.fs3dirdescripcion ? true : false}
-                            {...register("fs3dirdescripcion")} 
-                            onChange={handleChangeFields} 
-                            value={bodyForm.fs3dirdescripcion} 
-                        />
-                    </div>
-                </Grid>
-                <Grid item xs={12}>
-                    <div className="rsrMap">
-                        <APIProvider apiKey={'AIzaSyA2RQfrTKIQNzphsuq06Czy5u-BH2XBFsI'}>
-                            <Map
-                                mapId={"8f1d9e42cf8834cfb88cbcd3"}
-                                className={'rsrMapUbiPageMapApiStyle'}
-                                defaultZoom={11}
-                                defaultCenter={defailtCenter}
-                                gestureHandling={"greedy"}
-                                disableDefaultUI={true}
-                            >
-                                <AdvancedMarker 
-                                    draggable={true} 
-                                    ref={markerRef} 
-                                    position={defailtCenter}
-                                    onDragEnd={(e) => {
-                                        handleLocationChange(e.latLng);
-                                    }}
-                                >
-                                    <img 
-                                        width={40} 
-                                        height={49.68} 
-                                        src={icoMarkerPin} 
-                                        alt="Ubicación"
-                                    />
-                                </AdvancedMarker>
-                                <Polygon
-                                    paths={cover}
-                                    strokeColor="#5AD178"
-                                    strokeOpacity={0.8}
-                                    fillColor = {"#5AD178"}
-                                    strokeWeight={3} 
-                                    fillOpacity={0.2}
-                                />
 
-                            </Map>
-                            <MapControl position={ControlPosition.TOP_LEFT} width={'100%'}>
-                                <div className="rsrMapsearchMapBox" >
-                                    <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
-                                </div>
-                            </MapControl>
-                            <MapHandler 
-                                place={selectedPlace} 
-                                marker={marker}
-                                onLocationChange={handleLocationChange}
-                            />
+            {/* El mapa va primero. Pedir el numero de piso antes de marcar el
+                punto es pedirlo a ciegas, y es la razon por la que en la base
+                habia direcciones que eran solo un numero. */}
+            <div className="rsrMap">
+                <APIProvider apiKey={'AIzaSyA2RQfrTKIQNzphsuq06Czy5u-BH2XBFsI'}>
+                    <Map
+                        mapId={"8f1d9e42cf8834cfb88cbcd3"}
+                        className={'rsrMapUbiPageMapApiStyle'}
+                        defaultZoom={11}
+                        defaultCenter={defailtCenter}
+                        gestureHandling={"greedy"}
+                        disableDefaultUI={true}
+                    >
+                        <AdvancedMarker
+                            draggable={true}
+                            ref={markerRef}
+                            position={defailtCenter}
+                            onDragEnd={(e) => { handleLocationChange(e.latLng); }}
+                        >
+                            {/* Gota con el isotipo dentro, como en /ubicaciones:
+                                el logo suelto no senala ningun punto. */}
+                            <span className="ubiPin">
+                                <img src={icoMarkerPin} alt="" />
+                            </span>
+                        </AdvancedMarker>
+                        <Polygon
+                            paths={cover}
+                            strokeColor="#5AD178"
+                            strokeOpacity={0.8}
+                            fillColor={"#5AD178"}
+                            strokeWeight={3}
+                            fillOpacity={0.2}
+                        />
+                    </Map>
 
-                        </APIProvider>
-                        {!statusUbi &&
-                            <div className="rsrMapNotCobertura">
-                                <p>Lo sentimos estas fuera de nuestra cobertura</p>
-                            </div>
-                        }
+                    {/* Fuera del MapControl: Google envuelve cada control en un
+                        div que se ajusta al contenido, asi que la caja no tenia
+                        contra que medir un ancho y se salia del mapa. */}
+                    <div className="rsrMapsearchMapBox">
+                        <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
                     </div>
-                </Grid>
-                <Grid item xs={12}>
-                    <div className="btnBox">
-                        <a onClick={prevForm} className="btnPrimary btnIcon btnOutline">
-                            <span>
-                                <ArrowBackIosIcon />
-                                Volver
-                            </span>
-                        </a>
-                        <button type={'submit'} className="btnPrimary btnIcon btnIconRight">
-                            <span>
-                                Finalizar
-                                <ArrowForwardIosIcon />
-                            </span>
-                        </button>
+
+                    <MapHandler
+                        place={selectedPlace}
+                        marker={marker}
+                        onLocationChange={handleLocationChange}
+                    />
+                </APIProvider>
+
+                {!statusUbi &&
+                    <div className="rsrMapNotCobertura">
+                        <p>Todavía no llegamos a esa zona. Prueba con otro punto.</p>
                     </div>
-                    {/* Si el guardado falla, el cliente tiene que enterarse.
-                        Antes el formulario quedaba gris sin explicacion. */}
-                    {errorGuardar &&
-                        <div className="regErrorField">
-                            <p> <ErrorOutlineIcon /> {errorGuardar}</p>
-                        </div>
+                }
+            </div>
+
+            {dataAddPoint.location.latitude !== 0 &&
+                <div className="ubiCalle">
+                    <span className="ubiCalle__et">Dirección del punto que marcaste</span>
+                    <strong>{calleDelMapa || 'Sin nombre de calle en este punto'}</strong>
+                    {distrito && <em>{distrito}</em>}
+                </div>
+            }
+
+            {/* Solo se pide a mano cuando el mapa no lo detecto. Google devuelve
+                "Lima" en muchas avenidas principales. */}
+            {(distritoNoDetectado || !distrito) &&
+                <div className="afCampo">
+                    <TextField
+                        id="fs3distrito"
+                        name="fs3distrito"
+                        variant="filled"
+                        label={'Distrito'}
+                        error={errors.fs3distrito ? true : false}
+                        {...register("fs3distrito")}
+                        onChange={handleChangeFields}
+                        value={bodyForm.fs3distrito}
+                    />
+                    {distritoNoDetectado &&
+                        <span className="afCampo__ayuda">
+                            No pudimos detectar tu distrito desde el mapa. Escríbelo aquí.
+                        </span>
                     }
-                </Grid>
-            </Grid>
+                </div>
+            }
+
+            <div className="afCampo">
+                <TextField
+                    id="fs3dir"
+                    name="fs3dir"
+                    variant="filled"
+                    label={'Número, piso o departamento'}
+                    error={errors.fs3dir ? true : false}
+                    {...register("fs3dir")}
+                    onChange={handleChangeFields}
+                    value={bodyForm.fs3dir}
+                />
+            </div>
+
+            <div className="afCampo">
+                <TextField
+                    id="fs3dirdescripcion"
+                    name="fs3dirdescripcion"
+                    variant="filled"
+                    label={'Referencia'}
+                    placeholder="Frente al parque, portón verde…"
+                    error={errors.fs3dirdescripcion ? true : false}
+                    {...register("fs3dirdescripcion")}
+                    onChange={handleChangeFields}
+                    value={bodyForm.fs3dirdescripcion}
+                />
+            </div>
+
+            {(errors.fs3distrito || errors.fs3dir || errors.fs3dirdescripcion) &&
+                <div className="regErrorField">
+                    <p><ErrorOutlineIcon /> {
+                        errors.fs3distrito?.message
+                        || errors.fs3dir?.message
+                        || errors.fs3dirdescripcion?.message
+                    }</p>
+                </div>
+            }
+
+            <div className="btnBox">
+                <button type="button" onClick={prevForm} className="btnPrimary btnIcon btnOutline">
+                    <span>Volver</span>
+                </button>
+                <button type={'submit'} className="btnPrimary btnIcon btnIconRight">
+                    <span>{loadingForm ? 'Guardando…' : 'Terminar'}</span>
+                </button>
+            </div>
+
+            {/* Si el guardado falla, el cliente tiene que enterarse.
+                Antes el formulario quedaba gris sin explicacion. */}
+            {errorGuardar &&
+                <div className="regErrorField">
+                    <p> <ErrorOutlineIcon /> {errorGuardar}</p>
+                </div>
+            }
 
         </form>
     )
