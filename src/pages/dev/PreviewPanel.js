@@ -14,6 +14,8 @@ import PedidoDeHoy from './../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
 import { ESCENARIOS_PANEL, objetivo, AHORA, FACTURAS_EJEMPLO } from './datosEjemplo';
 import { PANTALLAS_MENU } from './PantallasMenu';
 import MiPlanVista from './MiPlanVista';
+// SOLO DESARROLLO: para revisar la pantalla de exito sin cobrar de verdad.
+import PagoListo from './../../components/checkout/PagoListo/PagoListo';
 
 /**
  * SOLO DESARROLLO. Ruta /preview-ux, sin sesion.
@@ -129,6 +131,8 @@ const PreviewPanel = () => {
           </div>
         ))}
       </div>
+      {window.location.search.includes('pago') &&
+        <PagoListo total={508.90} plan={'Nutrivital Plus'} adicionales={1} />}
     </div>
   );
 };

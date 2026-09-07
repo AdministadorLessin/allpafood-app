@@ -27,6 +27,7 @@ import axios from 'axios';
 
 import { AnimatePresence } from "motion/react"
 import * as motion from "motion/react-client"
+import { Contador } from './../../../components/ultil/Motion/Motion';
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -50,7 +51,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import {useAuthContext} from '../../../context/authContext';
 
 import { useNavigate } from "react-router-dom";
-import LoaderPayment from './../../../components/auth/FormPerfil/LoaderMacros/LoaderPayment';
+import PagoListo from './../../../components/checkout/PagoListo/PagoListo';
 import CheckoutPaymentYape from './../../../components/checkout/Payments/Yape';
 import CheckoutPaymentCard from './../../../components/checkout/Payments/CreditCard';
 
@@ -484,7 +485,7 @@ const CheckoutPage = (props) => {
                             <CardPaper
                                 data={
                                     {
-                                        titulo:'Resumen de compra:',
+                                        titulo:'Lo que llevas',
                                         ico:icoMenu,
                                         className:false
                                     }
@@ -512,7 +513,7 @@ const CheckoutPage = (props) => {
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><img src={icoCalorias} alt="" /> Calorías</p>
-                                                                            <p>{carloriasRed+item.properties[0]?.value}/{(metricasCal.bmr).toFixed(2)}</p>
+                                                                            <p>{Math.round(carloriasRed+item.properties[0]?.value)}/{Math.round(metricasCal.bmr)}</p>
                                                                         </div>
                                                                         <div className="line">
                                                                             
@@ -523,7 +524,7 @@ const CheckoutPage = (props) => {
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><img src={icoCarbo} alt="" /> Carbohidratos</p>
-                                                                            <p>{carboRed+item.properties[1]?.value}/{metricasCal.macros.carbs}</p>
+                                                                            <p>{Math.round(carboRed+item.properties[1]?.value)}/{Math.round(metricasCal.macros.carbs)}</p>
                                                                         </div>
                                                                         <div className="line">
                                                                             <span style={{width:''+(((carboRed+item.properties[1]?.value)/metricasCal.macros.carbs)*100).toFixed(0)+'%'}}></span>
@@ -532,7 +533,7 @@ const CheckoutPage = (props) => {
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><img src={icoGrasas} alt="" /> Grasas</p>
-                                                                            <p>{grasasRed+item.properties[2]?.value}/{metricasCal.macros.fat}</p>
+                                                                            <p>{Math.round(grasasRed+item.properties[2]?.value)}/{Math.round(metricasCal.macros.fat)}</p>
                                                                         </div>
                                                                         <div className="line">
                                                                             <span style={{width:''+(((grasasRed+item.properties[2]?.value)/metricasCal.macros.fat)*100).toFixed(0)+'%'}}></span>
@@ -541,7 +542,7 @@ const CheckoutPage = (props) => {
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><img src={icoProte} alt="" /> Proteinas</p>
-                                                                            <p>{proteinasRed+item.properties[3]?.value}/{metricasCal.macros.protein}</p>
+                                                                            <p>{Math.round(proteinasRed+item.properties[3]?.value)}/{Math.round(metricasCal.macros.protein)}</p>
                                                                         </div>
                                                                         <div className="line">
                                                                             <span style={{width:''+(((proteinasRed+item.properties[3]?.value)/metricasCal.macros.protein)*100).toFixed(0)+'%'}}></span>
@@ -562,8 +563,8 @@ const CheckoutPage = (props) => {
                                                         </div>
 
                                                         <div className="price">
-                                                            <p>Antes: <strong>S/.{item.previousPrice}</strong></p>
-                                                            <h6>S/. {item.price}</h6>
+                                                            <p>Antes: <strong>S/ {Number(item.previousPrice).toFixed(2)}</strong></p>
+                                                            <h6>S/ {Number(item.price).toFixed(2)}</h6>
                                                             
                                                         </div>
                                                     </div>
@@ -686,7 +687,7 @@ const CheckoutPage = (props) => {
                             <CardPaper
                                 data={
                                     {
-                                        titulo:'Métodos de pago:',
+                                        titulo:'¿Cómo prefieres pagar?',
                                         ico:iconPayment,
                                         className:'cCheckoutMetodos'
                                     }
@@ -785,29 +786,42 @@ const CheckoutPage = (props) => {
                             <CardPaper
                                 data={
                                     {
-                                        titulo:'Total:',
+                                        titulo:'Tu pago',
                                         ico: iconTotal,
                                         className:false
                                     }
                                 }
                             >
+                                {/* El total deja de ser la ultima fila de una tabla y
+                                    pasa a ser el titular de la tarjeta: es la cifra
+                                    por la que el cliente esta en esta pantalla. Las
+                                    demas lineas son su desglose. */}
+                                <div className="afTotal">
+                                    <span className="afTotal__et">Total a pagar</span>
+                                    <p className="afTotal__n">
+                                        <em>S/</em>
+                                        <Contador valor={totalPayment + totalPaymentAd} decimales={2} />
+                                    </p>
+                                    {((subTotalPayment + subTotalPaymentAd) - (totalPayment + totalPaymentAd)) > 0 &&
+                                        <span className="afTotal__ahorro">
+                                            Ahorras S/ {((subTotalPayment + subTotalPaymentAd) - (totalPayment + totalPaymentAd)).toFixed(2)}
+                                        </span>
+                                    }
+                                </div>
+
                                 <div className="coTotalPayment">
                                     <ul>
                                         <li>
-                                            <span>Delivery</span>
-                                            <span>Gratis</span>
-                                        </li>
-                                        <li>
-                                            <span>Sub Total</span>
-                                            <span>S/.{subTotalPayment + subTotalPaymentAd}</span>
+                                            <span>Precio de lista</span>
+                                            <span>S/ {(subTotalPayment + subTotalPaymentAd).toFixed(2)}</span>
                                         </li>
                                         <li className={'relevand'}>
                                             <span>Descuento</span>
-                                            <span>S/.{((subTotalPayment + subTotalPaymentAd) -(totalPayment + totalPaymentAd)).toFixed(2)}</span>
+                                            <span>&minus; S/ {((subTotalPayment + subTotalPaymentAd) -(totalPayment + totalPaymentAd)).toFixed(2)}</span>
                                         </li>
                                         <li>
-                                            <span>Total</span>
-                                            <span>S/.{(totalPayment + totalPaymentAd)}</span>
+                                            <span>Delivery</span>
+                                            <span>Gratis</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -840,7 +854,11 @@ const CheckoutPage = (props) => {
             </Grid>
             
             {showLoaderPayment && (
-                <LoaderPayment />
+                <PagoListo
+                    total={totalPayment + totalPaymentAd}
+                    plan={cartItems[0]?.description}
+                    adicionales={cartAdicionales.length}
+                />
             )}
         </LayoutDasboard>
     )

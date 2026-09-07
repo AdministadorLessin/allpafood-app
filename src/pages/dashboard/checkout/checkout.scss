@@ -782,10 +782,16 @@
                 display: block;
                 height: 100%;
                 border-radius: var(--af-r-pill);
-                background: var(--af-accent) !important;
+                transition: width .6s cubic-bezier(.4,0,.2,1);
             }
         }
     }
+    /* Un color por macro, no cuatro barras verdes iguales. El orden del
+       marcado es calorias, carbohidratos, grasas, proteinas. */
+    .lineItem:nth-of-type(1) .line span{ background: #E0A93F !important; }
+    .lineItem:nth-of-type(2) .line span{ background: #6FD79B !important; }
+    .lineItem:nth-of-type(3) .line span{ background: #7FB6E8 !important; }
+    .lineItem:nth-of-type(4) .line span{ background: var(--af-accent) !important; }
 
     /* La palomita ya la dibuja checkout.scss con ::after; anadir otra con
        ::before pintaba dos por linea. */
@@ -1088,6 +1094,7 @@
     }
     .ccPaymentItemAct{
         border-color: var(--af-ink);
+        background: linear-gradient(120deg, rgba(60,251,159,.10), rgba(120,214,255,.10));
         .circle{
             border-color: var(--af-accent);
             &::after{
@@ -1104,7 +1111,55 @@
         padding: 4px 15px 16px;
     }
 
-    /* --- Total --- */
+    /* --- Total ---
+       La malla de color solo aqui y en la pantalla de exito. Es donde el
+       cliente decide, asi que es lo unico que se permite salir un poco de la
+       linea grafica: el resto de la app sigue en blanco y tinta. */
+    .afTotal{
+        border-radius: 18px;
+        padding: 18px 18px 16px;
+        margin-bottom: 16px;
+        background-color: var(--af-accent-soft);
+        background-image:
+            radial-gradient(ellipse 75% 80% at 8% 0%, rgba(60,251,159,.55), transparent 62%),
+            radial-gradient(ellipse 65% 75% at 92% 12%, rgba(120,214,255,.40), transparent 66%),
+            radial-gradient(ellipse 90% 60% at 60% 100%, rgba(255,214,120,.34), transparent 68%);
+        background-repeat: no-repeat;
+
+        &__et{
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--af-accent);
+            margin-bottom: 6px;
+        }
+        &__n{
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 0;
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -.045em;
+            color: var(--af-ink);
+            font-variant-numeric: tabular-nums;
+            em{ font-style: normal; font-size: 20px; font-weight: 700; }
+        }
+        &__ahorro{
+            display: inline-block;
+            margin-top: 11px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--af-accent);
+            background: rgba(255,255,255,.7);
+            border-radius: var(--af-r-pill);
+            padding: 5px 12px;
+        }
+    }
+
     .coTotalPayment{
         width: 100%;
         background: none;

@@ -1,0 +1,127 @@
+/* La pantalla que ve el cliente cuando su pago entra.
+
+   Sustituye a una maquina de escribir de siete segundos que terminaba en un
+   redirect forzado. Aqui hay dos momentos: activando —que respeta el tiempo
+   que el servidor necesita para aplicar los beneficios— y listo, que ademas
+   dice cual es el siguiente paso. */
+
+.afPago{
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(16,31,24,.42);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+
+    &__hoja{
+        width: 100%;
+        max-width: 380px;
+        background: #FBFDF9;
+        border-radius: 28px;
+        padding: 34px 24px 24px;
+        text-align: center;
+        box-shadow: 0 40px 80px -30px rgba(16,31,24,.6);
+
+        /* La malla de color arriba. Es lo unico que se sale de la linea
+           grafica, y se sale a proposito: esta es la unica pantalla de toda
+           la app que celebra algo. */
+        background-image:
+            radial-gradient(ellipse 70% 55% at 18% 0%, rgba(60,251,159,.42), transparent 62%),
+            radial-gradient(ellipse 60% 50% at 88% 6%, rgba(120,214,255,.34), transparent 64%),
+            radial-gradient(ellipse 80% 40% at 55% -6%, rgba(255,214,120,.30), transparent 66%);
+        background-repeat: no-repeat;
+    }
+
+    &__iso{
+        width: 62px;
+        height: 62px;
+        margin: 6px auto 20px;
+        animation: afLatido 1.5s ease-in-out infinite;
+        svg{ width: 100%; height: 100%; }
+    }
+
+    &__check{
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: var(--af-ink);
+        color: var(--af-mint);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg{ width: 36px; height: 36px; }
+    }
+
+    &__t{
+        font-size: 23px !important;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--af-ink) !important;
+        margin: 0 0 7px !important;
+        text-wrap: balance;
+    }
+    &__d{
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--af-muted);
+        margin: 0 0 18px;
+        b{ color: var(--af-ink); font-weight: 700; }
+    }
+
+    &__monto{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid var(--af-line);
+        border-radius: 16px;
+        padding: 13px 16px;
+        margin-bottom: 18px;
+        span{ font-size: 12.5px; color: var(--af-muted); }
+        b{
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            color: var(--af-ink);
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    &__sig{
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: var(--af-accent);
+        background: var(--af-accent-soft);
+        border-radius: 14px;
+        padding: 11px 13px;
+        margin: 0 0 4px;
+    }
+
+    &__luego{
+        display: block;
+        width: 100%;
+        background: none;
+        border: 0;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--af-muted);
+        padding: 6px 0 2px;
+        cursor: pointer;
+    }
+}
+
+@keyframes afLatido{
+    0%, 100% { transform: scale(1);    opacity: .9; }
+    50%      { transform: scale(1.09); opacity: 1;  }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .afPago__iso{ animation: none; }
+}
