@@ -649,6 +649,43 @@
     max-width: 560px;
     margin: 0 auto;
 
+    /* El JSX reparte el checkout en dos columnas con MUI: md={8} para el
+       resumen y md={4} para el pago. MUI dispara ese md mirando el ancho de
+       la VENTANA (900px), no el del contenedor.
+       Con el tope de 560 fijo, en un escritorio de 1600px MUI partia igual:
+       la columna del resumen quedaba en 271px para un contenido que necesita
+       403, y el texto salia cortado —"20 almuer", "Guia nutricio", "S/ 295"
+       sin el ultimo digito—. El precio a medio leer en la pantalla de pago es
+       de las peores cosas que puede ver un cliente.
+       Este umbral tiene que ser EXACTAMENTE el md de MUI: con cualquier otro
+       queda una franja de anchos donde MUI ya dividio y la caja no ha crecido,
+       que es el mismo fallo en pequeno. */
+    @media (min-width: 900px){
+        max-width: 1080px;
+
+        /* El resumen se apila, tambien en escritorio.
+           La tarjeta se rediseno como una pila vertical —plan y macros, luego
+           lo que incluye, y el precio abajo separado por una linea—, y sus
+           hijos llevan width:100% y ese borde superior en el precio. Pero el
+           flex-direction:column solo entraba por mediaTablet (992px): mas
+           arriba seguian siendo una FILA. Tres hijos que piden el 100% cada
+           uno dentro de una fila se reparten a la fuerza, y la lista de lo que
+           incluye —la unica que puede envolver texto— absorbia todo el
+           apreton: 94px partiendo "+ 20 snacks saludables" en tres lineas. */
+        .coResumenItemBox{
+            flex-direction: column;
+            justify-content: flex-start;
+            /* Mismo juego de estilos que ya aplica mediaTablet mas abajo. Se
+               repite en vez de sacarlo del @media para no tocar el bloque
+               original en mitad de un despliegue: el sitio correcto para
+               unificarlo es la proxima limpieza de esta hoja. */
+            .contain{
+                width: 100%;
+                margin: 20px 0;
+            }
+        }
+    }
+
     &__titular{
         font-size: var(--af-t-xxl) !important;
         font-weight: 800;

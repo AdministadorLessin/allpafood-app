@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid';
 import './Password.scss';
 
 import axios from 'axios';
+import { mensajeError } from '../../../ultil/mensajeError';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -79,17 +80,15 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
             }).catch((errr)=>{
                 //console.log('--->',errr);
                 setLoadingForm(false);
-                if(errr.status === 409){
-                    setRespErr({
-                        status:true,
-                        data:errr.response.data.message
-                    });
-                }else{
-                    setRespErr({
-                        status:false,
-                        data:null
-                    });
-                }
+                // Dos fallos encadenados: axios 1.7 no expone errr.status —eso
+                // llego en la 1.8—, asi que esta rama no entraba NUNCA y el
+                // else borraba el error; y el mensaje del servidor viene
+                // envuelto, asi que aunque entrara mostraba "Conflict".
+                // Cambiar la clave fallaba en silencio.
+                setRespErr({
+                    status: true,
+                    data: mensajeError(errr, 'No pudimos cambiar tu contraseña. Inténtalo de nuevo.')
+                });
                 
             })
 

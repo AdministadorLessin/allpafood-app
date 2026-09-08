@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from 'axios';
+import { mensajeError } from '../../../components/ultil/mensajeError';
 
 import {useAuthContext} from '../../../context/authContext';
 
@@ -103,20 +104,14 @@ const RegistroPage = (props) => {
                 // quedaba girando para siempre y el registro moria ahi.
                 setLoadingVal(false);
 
-                // Dos fallos encadenados hacian que el cliente NUNCA viera el
+                // Tres fallos encadenados hacian que el cliente NUNCA viera el
                 // motivo real. Uno: axios 1.7 no expone err.status —eso llego
                 // en la 1.8—, asi que la rama del 409 no entraba nunca. Dos:
-                // el cuerpo del 409 es {message}, y se leia como
-                // {data:{message}}, asi que tampoco se habria visto.
-                // Resultado: "no pudimos enviar el codigo" tapando mensajes
-                // utiles como "este numero esta pendiente de verificacion".
-                if (!err.response) {
-                    setErrorSendCode('No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.');
-                } else if (err.response.status === 409 && err.response.data?.message) {
-                    setErrorSendCode(err.response.data.message);
-                } else {
-                    setErrorSendCode('No pudimos enviar el código. Inténtalo de nuevo en un momento.');
-                }
+                // el loader no se liberaba fuera del 409. Tres: este endpoint
+                // devuelve el mensaje envuelto en {data:{message}}, y leerlo
+                // como {message} sacaba en pantalla la etiqueta "Conflict".
+                setErrorSendCode(mensajeError(
+                    err, 'No pudimos enviar el código. Inténtalo de nuevo en un momento.'));
             })
         
     };
@@ -140,12 +135,8 @@ const RegistroPage = (props) => {
                 setLoadingVal(false);
                 // Antes solo contemplaba el 500: si el codigo era incorrecto
                 // (400) no se mostraba absolutamente nada.
-                if (!err.response) {
-                    setErrorVerifyCode('No pudimos conectarnos. Revisa tu internet e inténtalo de nuevo.');
-                } else {
-                    setErrorVerifyCode(err.response.data?.message
-                        || 'El código no es válido. Revísalo e inténtalo de nuevo.');
-                }
+                setErrorVerifyCode(mensajeError(
+                    err, 'El código no es válido. Revísalo e inténtalo de nuevo.'));
             })
     }
 

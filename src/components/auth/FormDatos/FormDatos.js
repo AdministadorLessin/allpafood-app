@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from 'axios';
+import { mensajeError } from '../../ultil/mensajeError';
 
 
 import {useAuthContext} from '../../../context/authContext';
@@ -144,7 +145,7 @@ const FormDatos = ({telefono}) => {
             console.log('error al enviar la data', error);
             setFormRegLoad(false);
             if (error.response && error.response.status === 409) {
-                setErrorData(error.response.data.message);
+                setErrorData(mensajeError(error, 'No pudimos guardar tus datos. Inténtalo de nuevo.'));
             }
         });
     };
