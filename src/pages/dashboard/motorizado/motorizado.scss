@@ -1,57 +1,252 @@
+/* La pantalla del motorizado.
 
-.mainLayoutBoxMotorizado{
-    padding: 0px;
-    height: 100vh;
-}
+   Se usa en la calle, con una mano, con casco y sin tiempo. Por eso: primero
+   cuanto falta, despues cada parada como una tarjeta que se cierra de un
+   toque, y el mapa escondido hasta que se pida —abrirlo consume datos y tapa
+   la lista, que es lo que de verdad se usa.
 
-.motorizadoList{
-    position: absolute;
-    right: 5%;
-    top: 5%;
-    max-width: 400px;
-    width: 90%;
-    .paperItem{
-        background: rgba(255,255,255,.9);
+   No lleva la barra de pestanas del cliente: aqui no hay a donde navegar. */
+
+.afMoto{
+    display: block;
+    min-height: 100vh;
+    padding: 20px 16px 50px;
+    background: #FFFFFF;
+
+    &__col{ width: 100%; max-width: 560px; margin: 0 auto; }
+
+    &__top{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 16px;
     }
-}
+    &__hola{
+        font-size: var(--af-t-xl);
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--af-ink);
+    }
+    &__fecha{
+        font-size: var(--af-t-xs);
+        font-weight: 600;
+        color: var(--af-muted);
+        &::first-letter{ text-transform: uppercase; }
+    }
 
-.motDeliveryItem{
-    background: white;
-    padding: 20px;
-    border-radius: 25px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 10px;
-    box-shadow: 0px 0px 30px 0px rgba(0,0,0,.1);
-    figure{
-        width: 45px;
+    /* Lo primero que se ve: cuanto falta. */
+    &__marcador{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        background: var(--af-ink);
+        border-radius: var(--af-r-card);
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+    &__cifra{
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        b{
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -.045em;
+            color: #F4F9F5;
+        }
+        span{ font-size: 13px; color: rgba(244,249,245,.66); }
+    }
+    &__aro{
+        flex: 0 0 auto;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
+        border: 3px solid rgba(255,255,255,.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        span{
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--af-mint);
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    &__error{
+        background: var(--error-back);
+        color: var(--error-txt);
+        border-radius: 13px;
+        padding: 11px 13px;
+        font-size: 12.5px;
+        margin: 0 0 14px;
+    }
+
+    &__vacio{
+        text-align: center;
+        background: rgba(16,31,24,.04);
+        border-radius: var(--af-r-card);
+        padding: 34px 20px;
+        b{ display: block; font-size: 15px; color: var(--af-ink); margin-bottom: 5px; }
+        p{ font-size: 13px; color: var(--af-muted); margin: 0; line-height: 1.5; }
+    }
+    &__vacioIc{ width: 30px; height: 30px; color: var(--af-accent); margin-bottom: 10px; }
+
+    &__verMapa{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--af-ink);
+        background: var(--af-paper);
+        border: 1.5px solid var(--af-line);
+        border-radius: var(--af-r-pill);
+        padding: 13px 16px;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+    &__verMapaIc{ width: 16px; height: 16px; }
+
+    &__mapa{
+        height: 320px;
+        border-radius: 20px;
         overflow: hidden;
-        img{
+        border: 1px solid var(--af-line);
+        margin-bottom: 16px;
+    }
+
+    /* Cada parada numerada sobre el mapa, para poder cruzarla con la lista. */
+    &__pin{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50% 50% 50% 4px;
+        transform: rotate(-45deg);
+        background: var(--af-ink);
+        color: #fff;
+        font-size: 12.5px;
+        font-weight: 800;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 10px -3px rgba(16,31,24,.5);
+        > *{ transform: rotate(45deg); }
+        &--listo{ background: var(--af-accent); }
+    }
+}
+
+/* --- Una parada --- */
+.afParada{
+    background: var(--af-paper);
+    border: 1.5px solid var(--af-line);
+    border-radius: var(--af-r-card);
+    padding: 15px 16px;
+    margin-bottom: 11px;
+
+    &__cab{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 11px;
+    }
+    &__n{
+        flex: 0 0 auto;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--af-ink);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+    }
+    &__nIc{ width: 15px; height: 15px; }
+    &__quien{
+        min-width: 0;
+        b{
             display: block;
-            width: 100%;
-            height: auto;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--af-ink);
+            line-height: 1.25;
         }
+        small{ font-size: 11.5px; color: var(--af-muted); }
     }
-    .txt{
-        width: calc( 100% - 75px );
-        padding: 0px 0px 0px 10px;
-        h4{
-            font-size: 16px;
-        }
-        p{
-            color: var(--dark-gris);
-            font-size: 12px;
-        }
+
+    &__dir{
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--af-ink);
+        margin: 0 0 4px;
     }
-    .checkBox{
-        width: 30px;
-        .circl{
-            width: 100%;
-            height: 30px;
-            border: 3px solid var(--green);
-            border-radius: 50%;
-        }
+    &__dirIc{ width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; color: var(--af-accent); }
+    &__ref{
+        font-size: 12.5px;
+        color: var(--af-muted);
+        margin: 0 0 12px;
+        padding-left: 23px;
+        line-height: 1.45;
+    }
+
+    &__acciones{
+        display: flex;
+        gap: 8px;
+        margin-bottom: 11px;
+    }
+    &__btn{
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 42px;
+        border-radius: var(--af-r-pill);
+        border: 1.5px solid var(--af-line);
+        background: transparent;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--af-ink);
+        text-decoration: none;
+    }
+    &__btnIc{ width: 15px; height: 15px; }
+
+    /* Grande a proposito: se toca en movimiento y con guantes. */
+    &__hecho{
+        display: block;
+        width: 100%;
+        min-height: 50px;
+        border: 0;
+        border-radius: var(--af-r-pill);
+        background: var(--af-mint);
+        color: var(--af-mint-ink);
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    &--listo{
+        border-color: var(--af-accent);
+        background: var(--af-accent-soft);
+        .afParada__n{ background: var(--af-accent); }
+    }
+    &__ok{
+        margin: 0;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--af-accent);
     }
 }
