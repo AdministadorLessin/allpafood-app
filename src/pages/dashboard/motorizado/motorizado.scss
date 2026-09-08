@@ -358,3 +358,54 @@
     color: #8A4A1E;
     line-height: 1.4;
 }
+
+/* --- La espera de 8 minutos --- */
+.afParada__llegue{
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    min-height: 46px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--af-ink);
+    background: transparent;
+    border: 1.5px solid var(--af-ink);
+    border-radius: var(--af-r-pill);
+    cursor: pointer;
+}
+.afParada__espera{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    background: rgba(16,31,24,.05);
+}
+.afParada__reloj{
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--af-ink);
+    font-variant-numeric: tabular-nums;
+}
+.afParada__esperaT{ font-size: 12.5px; color: var(--af-muted); }
+.afParada__esperaOk{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--af-accent);
+}
+
+.afParada__motivo small{
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--af-muted);
+    margin-top: 3px;
+}
+.afParada__motivo--bloq{
+    opacity: .5;
+    cursor: not-allowed;
+}

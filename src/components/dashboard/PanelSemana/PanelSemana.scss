@@ -100,3 +100,20 @@
 @media (prefers-reduced-motion: reduce){
     .afDia--elegir{ animation: none; }
 }
+
+/* Un dia que salio y no se pudo dejar. Va en ambar: no es un error del
+   sistema ni un exito, es algo que el cliente debe saber. */
+.afDia--noEntregado{
+    background: #FDF1E4;
+    .afDia__s{ color: #8A4A1E; }
+}
+.afSemana__aviso{
+    font-size: 12px;
+    line-height: 1.5;
+    color: #8A4A1E;
+    background: #FDF1E4;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 12px 0 0;
+    b{ font-weight: 700; text-transform: capitalize; }
+}

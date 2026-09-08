@@ -176,7 +176,12 @@ export function semanaDelCliente(ordenes, ahora) {
     const orden = conOrden.get(clave);
     let estado;
 
-    if (cursor.isBefore(hoy)) estado = orden ? 'entregado' : 'pasado';
+    /* 'F' es una entrega que salio y no se pudo dejar. El cliente tiene que
+       verla: cuando el fallo es suyo —no estaba, no contesto— el envio se le
+       descuenta igual, y enterarse de eso sin explicacion es exactamente lo
+       que termina en un reclamo. */
+    if (orden && orden.status === 'F') estado = 'noEntregado';
+    else if (cursor.isBefore(hoy)) estado = orden ? 'entregado' : 'pasado';
     else if (cursor.isSame(hoy)) estado = orden ? 'enRuta' : 'pasado';
     else if (orden) estado = 'listo';
     else if (cursor.isBefore(primeroElegible)) estado = 'cerrado';
@@ -195,6 +200,7 @@ export function semanaDelCliente(ordenes, ahora) {
 }
 
 export const TEXTO_ESTADO = {
+  noEntregado: 'No entregado',
   entregado: 'Entregado',
   enRuta: 'En ruta',
   listo: 'Listo',

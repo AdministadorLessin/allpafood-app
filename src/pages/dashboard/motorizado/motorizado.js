@@ -13,16 +13,25 @@ import { API_URL } from '../../../config';
 /* Numero de la oficina, por si el cliente no responde. */
 const OFICINA = '51999999999';
 
+/* Minutos que se espera al cliente antes de poder dar la entrega por fallida.
+   Es politica de Allpa, y la app la sostiene: sin la hora de llegada, "espere
+   y no salio nadie" es la palabra del motorizado contra la del cliente. */
+const ESPERA_MIN = 8;
+
 /* Por que no se pudo entregar. Se eligen de una lista y no se escriben: en la
    calle, con una mano, nadie redacta. Y ademas asi se pueden contar despues:
    si "nadie contesto" es la mitad de los fallos, eso se arregla avisando
-   antes, no cambiando de motorizado. */
+   antes, no cambiando de motorizado.
+
+   'espera' marca los motivos que solo valen despues de los 8 minutos.
+   Quien decide si el envio se devuelve es el servidor, no esta lista. */
 const MOTIVOS = [
-  'Nadie contestó',
-  'No encontré la dirección',
-  'El cliente no estaba',
-  'El cliente rechazó el pedido',
-  'No me dejaron entrar',
+  { cod:'NO_ANSWER',   txt:'Nadie contestó',                espera:true  },
+  { cod:'NOT_THERE',   txt:'El cliente no estaba',          espera:true  },
+  { cod:'REJECTED',    txt:'El cliente rechazó el pedido',  espera:false },
+  { cod:'NO_ACCESS',   txt:'No me dejaron entrar',          espera:false },
+  { cod:'BAD_ADDRESS', txt:'La dirección está mal',         espera:false },
+  { cod:'OUR_ISSUE',   txt:'Problema mío, no pude llegar',  espera:false },
 ];
 
 const Ico = ({ d, c }) => (
@@ -54,6 +63,14 @@ const DashboardMotorizado = () => {
   const [guardando, setGuardando] = useState(null);
   const [verMapa, setVerMapa] = useState(false);
   const [fallando, setFallando] = useState(null);
+  // { [orderId]: horaDeLlegada } y un tic para redibujar la cuenta atras.
+  const [llegadas, setLlegadas] = useState({});
+  const [, setTic] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setTic((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const hoy = moment().format('YYYY-MM-DD');
 
@@ -86,18 +103,33 @@ const DashboardMotorizado = () => {
       .finally(() => setGuardando(null));
   };
 
+  /* El motorizado llego al punto: arranca la espera. La hora se guarda tambien
+     en el servidor, que es lo que sirve si despues hay un reclamo. */
+  const marcarLlegada = (orderId) => {
+    setLlegadas((l) => ({ ...l, [orderId]: Date.now() }));
+    axios.post(`${API_URL}delivery/motorized/arrive-order`, { orderId }, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {});
+  };
+
+  const segundosRestantes = (orderId) => {
+    const desde = llegadas[orderId];
+    if (!desde) return null;
+    return Math.max(0, Math.ceil((desde + ESPERA_MIN * 60000 - Date.now()) / 1000));
+  };
+
   /* No se pudo entregar. Antes esto no existia: el motorizado llamaba a la
      oficina y quedaba de palabra, sin rastro. */
   const marcarFallida = (orderId, motivo) => {
     setGuardando(orderId);
     setError('');
-    axios.post(`${API_URL}delivery/motorized/fail-order`, { orderId, reason: motivo }, {
+    axios.post(`${API_URL}delivery/motorized/fail-order`, { orderId, reason: motivo.cod }, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(() => {
         setEntregas((lista) => lista.map((e) =>
           e.orderEntity.id === orderId
-            ? { ...e, orderEntity: { ...e.orderEntity, status: 'FAILED', deliveryNote: motivo } }
+            ? { ...e, orderEntity: { ...e.orderEntity, status: 'FAILED', deliveryNote: motivo.txt } }
             : e));
         setFallando(null);
       })
@@ -273,6 +305,33 @@ const DashboardMotorizado = () => {
                       onClick={() => marcarEntregado(o.id)} {...alToque}>
                       {guardando === o.id ? 'Guardando…' : 'Entregado'}
                     </motion.button>
+
+                    {/* La espera de 8 minutos, cronometrada. Marcar la llegada
+                        deja la hora registrada: si despues el cliente reclama
+                        que nadie toco, hay con que responder. */}
+                    {llegadas[o.id] === undefined ?
+                      <button type="button" className="afParada__llegue"
+                        onClick={() => marcarLlegada(o.id)}>
+                        Llegué — empezar los {ESPERA_MIN} min
+                      </button>
+                    :
+                      <div className="afParada__espera">
+                        {segundosRestantes(o.id) > 0 ?
+                          <>
+                            <span className="afParada__reloj">
+                              {String(Math.floor(segundosRestantes(o.id) / 60)).padStart(2,'0')}
+                              :{String(segundosRestantes(o.id) % 60).padStart(2,'0')}
+                            </span>
+                            <span className="afParada__esperaT">Esperando al cliente</span>
+                          </>
+                        :
+                          <span className="afParada__esperaOk">
+                            Esperaste los {ESPERA_MIN} minutos
+                          </span>
+                        }
+                      </div>
+                    }
+
                     <button type="button" className="afParada__nope"
                       onClick={() => setFallando(o.id)}>
                       No pude entregar
@@ -284,13 +343,27 @@ const DashboardMotorizado = () => {
                 {fallando === o.id &&
                   <div className="afParada__motivos">
                     <p className="afParada__motivosT">¿Qué pasó?</p>
-                    {MOTIVOS.map((m) => (
-                      <button type="button" key={m} className="afParada__motivo"
-                        disabled={guardando === o.id}
-                        onClick={() => marcarFallida(o.id, m)}>
-                        {m}
-                      </button>
-                    ))}
+                    {MOTIVOS.map((m) => {
+                      // Los motivos de espera solo se habilitan cumplidos los
+                      // 8 minutos: es la politica, y asi no depende de que el
+                      // motorizado se acuerde.
+                      const falta = m.espera && segundosRestantes(o.id) !== 0;
+                      return (
+                        <button type="button" key={m.cod}
+                          className={`afParada__motivo${falta ? ' afParada__motivo--bloq' : ''}`}
+                          disabled={falta || guardando === o.id}
+                          onClick={() => marcarFallida(o.id, m)}>
+                          {m.txt}
+                          {falta &&
+                            <small>
+                              {llegadas[o.id] === undefined
+                                ? `Marca "Llegué" y espera ${ESPERA_MIN} min`
+                                : `Faltan ${Math.ceil(segundosRestantes(o.id) / 60)} min de espera`}
+                            </small>
+                          }
+                        </button>
+                      );
+                    })}
                     <button type="button" className="afParada__cancelar"
                       onClick={() => setFallando(null)}>
                       Volver

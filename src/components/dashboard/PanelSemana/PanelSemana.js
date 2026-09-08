@@ -57,6 +57,17 @@ const PanelSemana = ({ ordenes, cargando, ahora }) => {
           </motion.button>
         ))}
       </div>
+
+      {/* Si un dia no se pudo entregar, se dice por que. El envio se descuenta
+          igual cuando el cliente no aparece, y enterarse sin explicacion es lo
+          que termina en un reclamo por WhatsApp. */}
+      {dias.filter((d) => d.estado === 'noEntregado').map((d) => (
+        <p className="afSemana__aviso" key={d.fecha.format('YYYY-MM-DD')}>
+          <b>{d.fecha.format('dddd D')}:</b> no pudimos entregarte
+          {d.orden?.deliveryNote ? ` — ${d.orden.deliveryNote}` : ''}.
+          Si crees que fue un error nuestro, escríbenos.
+        </p>
+      ))}
     </div>
   );
 };
