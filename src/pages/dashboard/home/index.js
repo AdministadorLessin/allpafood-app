@@ -40,6 +40,11 @@ const DashboadHome = (props) => {
   const { token, planInfo ,handleUpdateToken, setLoadResp, removeLocalstorage } = useAuthContext();
   let navigate = useNavigate();
 
+  // Un motorizado no es cliente: su pantalla es la ruta del dia.
+  useEffect(()=>{
+    if(planInfo?.role === 'DELIVERY') navigate('/motorizado', { replace: true });
+  },[planInfo]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [menuList,setMenuList] = useState();
   const todayDate = new Date();
   const [metricsDay,setMetricsDay] = useState({

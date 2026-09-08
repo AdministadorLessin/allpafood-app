@@ -76,8 +76,11 @@ const LoginPage = (props) => {
 
             userDate.log = bodyFields.lfcorreo;
             handleUpdateToken(resp.data.data.token,userDate);
-            
-            navigate('/')
+
+            /* Cada rol a su casa. Un motorizado no tiene plan, asi que al
+               mandarlo a '/' el panel del cliente no encontraba ninguno y lo
+               rebotaba a comprar uno: parecia que su cuenta no servia. */
+            navigate(userDate.role === 'DELIVERY' ? '/motorizado' : '/')
           }
           
         }).catch((error) =>{
