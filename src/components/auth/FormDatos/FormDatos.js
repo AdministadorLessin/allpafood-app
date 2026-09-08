@@ -14,6 +14,7 @@ import {useAuthContext} from '../../../context/authContext';
 
 import { useNavigate } from "react-router-dom";
 import ErrorForm from './../../ultil/ErrorForm/ErrorForm';
+import { Link } from 'react-router-dom';
 import { motion, alToque } from './../../ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 
@@ -256,9 +257,18 @@ const FormDatos = ({telefono}) => {
                     </ul>
                 </Grid>
 
+                {/* Si el choque es por el correo, lo que esa persona necesita
+                    no es otro intento: ya tiene cuenta y hay que llevarla a
+                    iniciar sesion. Es el caso mas comun y el que hoy termina
+                    en WhatsApp. */}
                 {errorData &&
                     <Grid item xs={12} sm={12} md={12}>
                         <ErrorForm text={errorData} />
+                        {/^ya existe una cuenta/i.test(errorData) &&
+                            <p className="afAuth__pie">
+                                <Link to="/ingresar">Ir a iniciar sesión</Link>
+                            </p>
+                        }
                     </Grid>
                 }
 
