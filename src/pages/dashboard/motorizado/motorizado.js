@@ -13,6 +13,18 @@ import { API_URL } from '../../../config';
 /* Numero de la oficina, por si el cliente no responde. */
 const OFICINA = '51999999999';
 
+/* Por que no se pudo entregar. Se eligen de una lista y no se escriben: en la
+   calle, con una mano, nadie redacta. Y ademas asi se pueden contar despues:
+   si "nadie contesto" es la mitad de los fallos, eso se arregla avisando
+   antes, no cambiando de motorizado. */
+const MOTIVOS = [
+  'Nadie contestó',
+  'No encontré la dirección',
+  'El cliente no estaba',
+  'El cliente rechazó el pedido',
+  'No me dejaron entrar',
+];
+
 const Ico = ({ d, c }) => (
   <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor"
        strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -41,6 +53,7 @@ const DashboardMotorizado = () => {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(null);
   const [verMapa, setVerMapa] = useState(false);
+  const [fallando, setFallando] = useState(null);
 
   const hoy = moment().format('YYYY-MM-DD');
 
@@ -73,10 +86,33 @@ const DashboardMotorizado = () => {
       .finally(() => setGuardando(null));
   };
 
+  /* No se pudo entregar. Antes esto no existia: el motorizado llamaba a la
+     oficina y quedaba de palabra, sin rastro. */
+  const marcarFallida = (orderId, motivo) => {
+    setGuardando(orderId);
+    setError('');
+    axios.post(`${API_URL}delivery/motorized/fail-order`, { orderId, reason: motivo }, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        setEntregas((lista) => lista.map((e) =>
+          e.orderEntity.id === orderId
+            ? { ...e, orderEntity: { ...e.orderEntity, status: 'FAILED', deliveryNote: motivo } }
+            : e));
+        setFallando(null);
+      })
+      .catch(() => setError('No se pudo guardar. Inténtalo otra vez.'))
+      .finally(() => setGuardando(null));
+  };
+
   const pendientes = useMemo(
-    () => (entregas || []).filter((e) => e.orderEntity.status !== 'COMPLETED'),
+    () => (entregas || []).filter((e) => !['COMPLETED','FAILED'].includes(e.orderEntity.status)),
     [entregas]);
-  const hechas = (entregas || []).length - pendientes.length;
+  const total = (entregas || []).length;
+  const cerradas = total - pendientes.length;
+  const fallidas = (entregas || []).filter((e) => e.orderEntity.status === 'FAILED').length;
+  // La siguiente parada: es lo unico que importa mientras se maneja.
+  const siguiente = pendientes[0]?.orderEntity?.id;
 
   const puntos = (entregas || [])
     .map((e) => e.orderEntity.deliveryPoint?.geoLocation)
@@ -116,13 +152,28 @@ const DashboardMotorizado = () => {
               <b>{pendientes.length}</b>
               <span>{pendientes.length === 1 ? 'entrega por hacer' : 'entregas por hacer'}</span>
             </div>
-            {entregas.length > 0 &&
+            {total > 0 &&
               <div className="afMoto__aro">
-                <span>{hechas}/{entregas.length}</span>
+                <span>{cerradas}/{total}</span>
               </div>
             }
           </div>
         </Bloque>
+
+        {/* Una barra que se llena: en la calle se mira de reojo, y decir
+            "vas por la 3 de 5" es mas util que cualquier numero suelto. */}
+        {total > 0 &&
+          <Bloque>
+            <div className="afMoto__barra">
+              <i style={{ width: `${(cerradas / total) * 100}%` }} />
+            </div>
+            {fallidas > 0 &&
+              <p className="afMoto__fallidas">
+                {fallidas} sin entregar · la oficina ya lo ve
+              </p>
+            }
+          </Bloque>
+        }
 
         {error && <Bloque><p className="afMoto__error">{error}</p></Bloque>}
 
@@ -171,15 +222,22 @@ const DashboardMotorizado = () => {
           const p = e.userProfile || {};
           const dp = o.deliveryPoint || {};
           const listo = o.status === 'COMPLETED';
+          const fallida = o.status === 'FAILED';
+          const esSiguiente = o.id === siguiente;
           const g = dp.geoLocation;
           const tel = (p.phoneNumber || '').replace(/\D/g, '');
 
           return (
             <Bloque key={o.id}>
-              <div className={`afParada${listo ? ' afParada--listo' : ''}`}>
+              <div className={`afParada${listo ? ' afParada--listo' : ''}${fallida ? ' afParada--fallida' : ''}${esSiguiente ? ' afParada--siguiente' : ''}`}>
+
+                {esSiguiente && <span className="afParada__toca">Tu siguiente parada</span>}
 
                 <div className="afParada__cab">
-                  <span className="afParada__n">{listo ? <Ico d={CHECK} c="afParada__nIc" /> : i + 1}</span>
+                  <span className="afParada__n">
+                    {listo ? <Ico d={CHECK} c="afParada__nIc" />
+                      : fallida ? '!' : i + 1}
+                  </span>
                   <div className="afParada__quien">
                     <b>{[p.name, p.lastname].filter(Boolean).join(' ') || 'Cliente'}</b>
                     {dp.district && <small>{dp.district}</small>}
@@ -208,14 +266,44 @@ const DashboardMotorizado = () => {
                   </a>
                 </div>
 
-                {!listo &&
-                  <motion.button type="button" className="afParada__hecho"
-                    disabled={guardando === o.id}
-                    onClick={() => marcarEntregado(o.id)} {...alToque}>
-                    {guardando === o.id ? 'Guardando…' : 'Marcar entregado'}
-                  </motion.button>
+                {!listo && !fallida && fallando !== o.id &&
+                  <>
+                    <motion.button type="button" className="afParada__hecho"
+                      disabled={guardando === o.id}
+                      onClick={() => marcarEntregado(o.id)} {...alToque}>
+                      {guardando === o.id ? 'Guardando…' : 'Entregado'}
+                    </motion.button>
+                    <button type="button" className="afParada__nope"
+                      onClick={() => setFallando(o.id)}>
+                      No pude entregar
+                    </button>
+                  </>
                 }
+
+                {/* El motivo se elige, no se escribe: en la calle nadie redacta. */}
+                {fallando === o.id &&
+                  <div className="afParada__motivos">
+                    <p className="afParada__motivosT">¿Qué pasó?</p>
+                    {MOTIVOS.map((m) => (
+                      <button type="button" key={m} className="afParada__motivo"
+                        disabled={guardando === o.id}
+                        onClick={() => marcarFallida(o.id, m)}>
+                        {m}
+                      </button>
+                    ))}
+                    <button type="button" className="afParada__cancelar"
+                      onClick={() => setFallando(null)}>
+                      Volver
+                    </button>
+                  </div>
+                }
+
                 {listo && <p className="afParada__ok">Entregado</p>}
+                {fallida &&
+                  <p className="afParada__nook">
+                    No entregado{o.deliveryNote ? ` · ${o.deliveryNote}` : ''}
+                  </p>
+                }
               </div>
             </Bloque>
           );

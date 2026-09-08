@@ -250,3 +250,111 @@
         color: var(--af-accent);
     }
 }
+
+/* --- Avance de la ruta --- */
+.afMoto__barra{
+    height: 8px;
+    border-radius: var(--af-r-pill);
+    background: rgba(16,31,24,.08);
+    overflow: hidden;
+    margin-bottom: 10px;
+    i{
+        display: block;
+        height: 100%;
+        border-radius: var(--af-r-pill);
+        background: var(--af-accent);
+        transition: width .5s cubic-bezier(.4,0,.2,1);
+    }
+}
+.afMoto__fallidas{
+    font-size: 12px;
+    font-weight: 600;
+    color: #8A4A1E;
+    margin: 0 0 12px;
+}
+
+/* --- La siguiente parada ---
+   Mientras se maneja, lo unico que importa es la de al lado. Se destaca en
+   tinta para poder encontrarla sin leer toda la lista. */
+.afParada--siguiente{
+    border-color: var(--af-ink);
+    box-shadow: 0 2px 6px rgba(16,31,24,.06), 0 14px 30px -16px rgba(16,31,24,.28);
+}
+.afParada__toca{
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--af-mint);
+    background: var(--af-ink);
+    border-radius: var(--af-r-pill);
+    padding: 4px 11px;
+    margin-bottom: 11px;
+}
+
+/* --- No pude entregar --- */
+.afParada__nope{
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--af-muted);
+    padding: 10px 0 2px;
+    cursor: pointer;
+}
+
+.afParada__motivos{ margin-top: 4px; }
+.afParada__motivosT{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--af-ink);
+    margin: 0 0 9px;
+}
+.afParada__motivo{
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--af-ink);
+    background: var(--af-paper);
+    border: 1.5px solid var(--af-line);
+    border-radius: 14px;
+    /* Alto generoso: se toca con guantes, de pie y con prisa. */
+    min-height: 48px;
+    padding: 12px 15px;
+    margin-bottom: 7px;
+    cursor: pointer;
+}
+.afParada__cancelar{
+    display: block;
+    width: 100%;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--af-muted);
+    padding: 8px 0 2px;
+    cursor: pointer;
+}
+
+.afParada--fallida{
+    border-color: #E0A93F;
+    background: #FDF6EA;
+    .afParada__n{ background: #C58A2E; }
+}
+.afParada__nook{
+    margin: 0;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #8A4A1E;
+    line-height: 1.4;
+}
