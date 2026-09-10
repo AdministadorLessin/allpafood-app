@@ -1,0 +1,160 @@
+/* ==========================================================================
+   Allpa+ — los convenios que vienen con el plan.
+
+   Se apoya en los mismos tokens del panel para que no parezca una pantalla
+   pegada de otro sitio. La unica libertad que se toma es el color del valor
+   del beneficio: es lo que el cliente viene a buscar y tiene que saltar.
+   ========================================================================== */
+
+.afPlus{
+    &__titular{
+        font-size: var(--af-t-xxl);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -.035em;
+        color: var(--af-ink);
+        margin: 4px 0 10px;
+        text-wrap: balance;
+        .t1{ display: block; color: var(--af-muted); font-weight: 700; }
+    }
+    &__bajada{
+        font-size: var(--af-t-sm);
+        color: var(--af-muted);
+        margin: 0 0 22px;
+        max-width: 46ch;
+    }
+    &__error,
+    &__cargando{
+        font-size: var(--af-t-sm);
+        color: var(--af-muted);
+        padding: 18px 0;
+    }
+
+    /* Cabecera de categoria */
+    &__cat{
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 22px 0 10px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: var(--af-ink);
+        b{
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0;
+            color: var(--af-muted);
+            background: var(--af-paper);
+            border-radius: var(--af-r-pill);
+            padding: 2px 9px;
+        }
+    }
+    &__catIco{
+        width: 26px; height: 26px; flex: 0 0 auto;
+        border-radius: 9px;
+        background: var(--af-accent-soft);
+        color: var(--af-accent);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 15px; height: 15px; }
+    }
+
+    /* Como se usa */
+    &__como{
+        margin-top: 26px;
+        background: var(--af-paper);
+        border-radius: var(--af-r-card);
+        padding: 18px 18px 16px;
+    }
+    &__comoTit{
+        margin: 0 0 10px;
+        font-size: 12px; font-weight: 800;
+        letter-spacing: .09em; text-transform: uppercase;
+        color: var(--af-ink);
+    }
+    &__pasos{
+        margin: 0; padding-left: 18px;
+        li{
+            font-size: var(--af-t-sm);
+            color: var(--af-ink);
+            margin-bottom: 6px;
+            b{ font-weight: 700; }
+        }
+    }
+    &__letraChica{
+        margin: 12px 0 0;
+        font-size: var(--af-t-xs);
+        color: var(--af-muted);
+        line-height: 1.45;
+    }
+}
+
+/* --------------------------------------------------------------- convenio */
+.afConvenio{
+    background: var(--af-card, #fff);
+    border: 1px solid var(--af-line);
+    border-radius: var(--af-r-card);
+    padding: 14px 15px;
+    margin-bottom: 9px;
+
+    &__top{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    &__marca{
+        font-size: var(--af-t-md);
+        font-weight: 800;
+        color: var(--af-ink);
+        line-height: 1.25;
+    }
+    /* Lo que el cliente viene a buscar: el 15%, el "Gratis". */
+    &__valor{
+        flex: 0 0 auto;
+        font-size: var(--af-t-md);
+        font-weight: 800;
+        color: var(--af-accent);
+        white-space: nowrap;
+    }
+    &__que{
+        margin: 4px 0 0;
+        font-size: var(--af-t-sm);
+        color: var(--af-muted);
+        line-height: 1.4;
+    }
+    &__detalle{
+        margin: 2px 0 0;
+        font-size: var(--af-t-xs);
+        color: var(--af-muted);
+    }
+    &__nota{
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+        background: var(--af-paper);
+        border-radius: var(--af-r-pill);
+        padding: 3px 9px;
+    }
+    &__btn{
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+        font-family: inherit;
+        font-size: var(--af-t-sm);
+        font-weight: 700;
+        color: var(--af-ink);
+        background: var(--af-paper);
+        border: 0;
+        border-radius: var(--af-r-pill);
+        padding: 9px 14px;
+        cursor: pointer;
+        &:active{ transform: scale(.985); }
+    }
+}

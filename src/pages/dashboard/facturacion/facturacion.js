@@ -51,6 +51,11 @@ const FacturacionPage = (props) => {
     }
   ];
   const [rows,setRows] = useState([]);
+  // Las facturas tal cual llegan: la tabla solo muestra cuatro campos, pero el
+  // comprobante necesita el detalle por lineas, el metodo de pago y la
+  // referencia del cobro.
+  const [facturas,setFacturas] = useState([]);
+  const [factura,setFactura] = useState(null);
 
   const { token, handleUpdateToken } = useAuthContext();
 
@@ -69,6 +74,7 @@ const FacturacionPage = (props) => {
           })
         })
       }
+      setFacturas(resp.data.data || []);
       setRows(rowsTmp);
     }).catch((error)=>{
       console.log(error);
@@ -95,8 +101,31 @@ const FacturacionPage = (props) => {
   }
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (row) => {
+    // handleOpen recibia la fila y la ignoraba, asi que el modal se abria
+    // vacio: solo un titulo que decia "Detalle" y nada debajo.
+    setFactura(facturas.find((f) => String(f.id) === String(row?.id)) || null);
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
+
+  const nombreCliente = (() => {
+    try {
+      const inf = JSON.parse(window.localStorage.getItem('inf'));
+      const p = inf?.profile;
+      return [p?.name, p?.lastname].filter(Boolean).join(' ') || '';
+    } catch { return ''; }
+  })();
+
+  /* El API devuelve la descripcion del enum, no la letra: COMPLETED, no "C".
+     Se contemplan las dos por si algun endpoint viejo manda la letra. */
+  const ESTADOS = {
+    C: 'Pagado', COMPLETED: 'Pagado',
+    P: 'Pendiente', PENDING: 'Pendiente',
+    X: 'Anulado', CANCELLED: 'Anulado',
+    I: 'En proceso', 'IN PROGRESS': 'En proceso',
+  };
+  const soles = (n) => 'S/ ' + Number(n || 0).toFixed(2);
 
   useEffect(()=>{
       getFacturas();
@@ -174,9 +203,61 @@ const FacturacionPage = (props) => {
         <div className="inlineFlex factModal">
           <TitleCard
             icon={<FormatListBulletedIcon />}
-            title={'Detalle'}
+            title={'Comprobante'}
           />
 
+          {!factura && <p className="afComp__vacio">No pudimos cargar esta factura.</p>}
+
+          {factura &&
+            <div className="afComp" id="afComprobante">
+              <div className="afComp__cab">
+                <div>
+                  <p className="afComp__marca">Allpa Food</p>
+                  <p className="afComp__sub">Comprobante interno de pago</p>
+                </div>
+                <div className="afComp__num">
+                  <span>N°</span>
+                  <b>{factura.id}</b>
+                </div>
+              </div>
+
+              <div className="afComp__datos">
+                {nombreCliente &&
+                  <p><span>Cliente</span><b>{nombreCliente}</b></p>}
+                <p><span>Fecha</span><b>{factura.emissionDate}</b></p>
+                <p><span>Estado</span><b>{ESTADOS[factura.status] || factura.status}</b></p>
+                {factura.paymentMethod &&
+                  <p><span>Medio de pago</span><b>{factura.paymentMethod}</b></p>}
+                {factura.paymentReference &&
+                  <p><span>Referencia</span><b>{factura.paymentReference}</b></p>}
+              </div>
+
+              <div className="afComp__lineas">
+                {(factura.details || []).map((d, i) => (
+                  <p key={i} className={Number(d.value) < 0 ? 'afComp__linea afComp__linea--menos' : 'afComp__linea'}>
+                    <span>{d.name}</span>
+                    <b>{soles(d.value)}</b>
+                  </p>
+                ))}
+              </div>
+
+              <p className="afComp__total">
+                <span>Total</span>
+                <b>{soles(factura.totalPrice)}</b>
+              </p>
+
+              <p className="afComp__pie">
+                Documento interno de Allpa Food. No constituye comprobante
+                electrónico ante SUNAT.
+              </p>
+            </div>
+          }
+
+          {factura &&
+            <button type="button" className="afComp__btn" onClick={() => window.print()}>
+              Imprimir o guardar en PDF
+            </button>
+          }
         </div>
       </Modal>
     </LayoutDasboard>

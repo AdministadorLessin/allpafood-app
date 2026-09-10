@@ -8,6 +8,7 @@ import DashboadHome from './pages/dashboard/home/index.js';
 import DashboardMotorizado from './pages/dashboard/motorizado/motorizado';
 import PerfilPage from './pages/dashboard/perfil/perfil.js';
 import FacturacionPage from './pages/dashboard/facturacion/facturacion';
+import BeneficiosPage from './pages/dashboard/beneficios/beneficios';
 import BlogPage from './pages/dashboard/blog/blog';
 import DetallePage from './pages/dashboard/blog/detalle';
 import PreguntasFrecuentesPage from './pages/dashboard/preguntas-frecuentes/preguntas-frecuentes';
@@ -37,6 +38,7 @@ function App() {
                     <Route path='/motorizado' element={<DashboardMotorizado />} />
                     <Route path='/perfil' element={<PerfilPage />} />
                     <Route path='/facturacion' element={ <FacturacionPage /> } />
+                    <Route path='/beneficios' element={ <BeneficiosPage /> } />
                     <Route path='/salud-y-bienestar' element={ <BlogPage /> } />
                     <Route path='/salud-y-bienestar/detalle' element={ <DetallePage /> } />
                     <Route path='/preguntas-frecuentes' element={ <PreguntasFrecuentesPage /> } />

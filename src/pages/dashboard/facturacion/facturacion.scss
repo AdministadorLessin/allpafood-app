@@ -28,6 +28,16 @@
     right: 0px;
     outline: none;
 
+    /* El panel lleva la clase inlineFlex, que reparte a los hijos en FILA.
+       Con el titulo solo daba igual; al meter el comprobante debajo, el
+       titulo se iba al costado y el boton quedaba aplastado en un circulo.
+       Aqui se apilan, y el panel se desplaza si el comprobante es largo. */
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+    overflow-y: auto;
+
     @include mediaTablet{
         width: 450px;
     }
@@ -35,4 +45,93 @@
         width: 95%;
         padding: 15px 10px 15px 10px;
     }
+}
+/* ==========================================================================
+   Comprobante interno.
+
+   El modal de "Ver detalle" solo tenia un titulo y nada debajo: se abria
+   vacio. Aqui va el comprobante, con el detalle por lineas que el API ya
+   devolvia y que nadie llegaba a mostrar.
+
+   Se imprime con el dialogo del navegador —que en Mac y en el celular
+   incluye "Guardar como PDF"— en vez de sumar una libreria de PDF por un
+   documento de una pagina.
+   ========================================================================== */
+.afComp{
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--af-line, #E4E7E4);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    margin-top: 6px;
+
+    &__cab{
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 14px; padding-bottom: 12px;
+        border-bottom: 1px solid var(--af-line, #E4E7E4);
+    }
+    &__marca{ margin: 0; font-size: 17px; font-weight: 800; color: var(--af-ink, #142018); }
+    &__sub{ margin: 2px 0 0; font-size: 12px; color: var(--af-muted, #6B7168); }
+    &__num{
+        text-align: right; flex: 0 0 auto;
+        span{ display: block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--af-muted, #6B7168); }
+        b{ font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    }
+
+    &__datos{
+        padding: 12px 0;
+        border-bottom: 1px solid var(--af-line, #E4E7E4);
+        p{
+            display: flex; justify-content: space-between; gap: 12px;
+            margin: 0 0 5px; font-size: 13.5px;
+            span{ color: var(--af-muted, #6B7168); }
+            b{ font-weight: 700; text-align: right; text-transform: capitalize; }
+        }
+    }
+
+    &__lineas{ padding: 12px 0 8px; }
+    &__linea{
+        display: flex; justify-content: space-between; gap: 12px;
+        margin: 0 0 6px; font-size: 13.5px;
+        span{ color: var(--af-ink, #142018); }
+        b{ font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        /* Los descuentos y las lineas en cero se apagan: son parte del
+           calculo pero no de lo que el cliente pago. */
+        &--menos b{ color: var(--af-accent, #0B6B52); }
+    }
+
+    &__total{
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 12px; margin: 0; padding-top: 12px;
+        border-top: 2px solid var(--af-ink, #142018);
+        span{ font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+        b{ font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    }
+
+    &__pie{
+        margin: 14px 0 0; font-size: 11px; line-height: 1.45;
+        color: var(--af-muted, #6B7168);
+    }
+
+    &__vacio{ font-size: 14px; color: var(--af-muted, #6B7168); padding: 14px 0; }
+
+    &__btn{
+        width: 100%; margin-top: 14px;
+        font-family: inherit; font-size: 14px; font-weight: 700;
+        color: #fff; background: var(--af-ink, #142018);
+        border: 0; border-radius: 999px; padding: 11px 16px; cursor: pointer;
+    }
+}
+
+/* Al imprimir se manda SOLO el comprobante. Sin esto saldrian tambien el menu
+   lateral, la tabla de facturas y el saludo, y el cliente tendria que recortar
+   tres paginas para quedarse con una. */
+@media print{
+    body * { visibility: hidden !important; }
+    #afComprobante, #afComprobante * { visibility: visible !important; }
+    #afComprobante{
+        position: absolute; left: 0; top: 0;
+        width: 100%; border: 0; padding: 0; margin: 0;
+    }
+    .afComp__btn{ display: none !important; }
 }
