@@ -297,6 +297,8 @@ input[type=number] {
     &__img{
         width: 56px; height: 56px; border-radius: 14px; flex: 0 0 auto;
         background: linear-gradient(140deg,#CFE9D8,#9FD1B4);
+        background-size: cover;
+        background-position: center;
         &--1{ background: linear-gradient(140deg,#EFE3C4,#D8C08A); }
         &--2{ background: linear-gradient(140deg,#E4D5CE,#C4A79C); }
     }
@@ -347,3 +349,30 @@ input[type=number] {
 }
 
 .afBanner__ic{ width: 12px; height: 12px; vertical-align: -1px; margin-right: 4px; }
+
+
+/* ==========================================================================
+   Plato sin foto.
+
+   Un hueco en blanco no se lee como "falta la foto", se lee como que la app
+   esta rota —y aparece justo en la pantalla que tiene que convencer al
+   cliente—. Con el degradado y un cubierto tenue se lee como una tarjeta a la
+   que todavia no le pusieron imagen, que es la verdad.
+
+   El icono va en ::after y no como <img> para que no cargue un archivo mas por
+   cada plato de la lista.
+   ========================================================================== */
+.afSinFoto{
+    position: relative;
+    &::after{
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 46%;
+        opacity: .38;
+        /* Tenedor y cuchara, trazo simple. */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23163A2A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 2v7a2 2 0 0 0 2 2v11'/%3E%3Cpath d='M7 2v6'/%3E%3Cpath d='M11 2v6'/%3E%3Cpath d='M17 2c-1.4 0-2.5 2-2.5 4.5S15.6 11 17 11s2.5-2 2.5-4.5S18.4 2 17 2z'/%3E%3Cpath d='M17 11v11'/%3E%3C/svg%3E");
+    }
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import FotoPlato from '../../ultil/FotoPlato';
 import axios from 'axios';
 import moment from 'moment';
 import Skeleton from '@mui/material/Skeleton';
@@ -459,8 +460,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
                   <motion.button type="button"
                     className={`afPlato${menusSel[comida] === p.id ? ' afPlato--sel' : ''}`}
                     onClick={() => marcarPlato(comida, p.id)} {...alToque}>
-                    <span className="afPlato__img"
-                      style={p.menu.imageUrl ? { backgroundImage: `url(${p.menu.imageUrl})` } : undefined} />
+                    <FotoPlato menu={p.menu} />
                     <span className="afPlato__txt">
                       <b>{p.menu.name}</b>
                       <small>
