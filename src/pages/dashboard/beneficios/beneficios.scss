@@ -1,41 +1,23 @@
 /* ==========================================================================
    Allpa+ — los convenios que vienen con el plan.
 
-   Se apoya en los mismos tokens del panel para que no parezca una pantalla
-   pegada de otro sitio. La unica libertad que se toma es el color del valor
-   del beneficio: es lo que el cliente viene a buscar y tiene que saltar.
+   Cada categoria trae su degradado. No es decoracion: en una lista de diez
+   marcas es lo que permite distinguir un gimnasio de una floreria sin leer
+   el titulo, igual que en la web publica.
    ========================================================================== */
 
 .afPlus{
-    &__titular{
-        font-size: var(--af-t-xxl);
-        font-weight: 800;
-        line-height: 1.05;
-        letter-spacing: -.035em;
-        color: var(--af-ink);
-        margin: 4px 0 10px;
-        text-wrap: balance;
-        .t1{ display: block; color: var(--af-muted); font-weight: 700; }
-    }
-    &__bajada{
+    &__aviso{
         font-size: var(--af-t-sm);
         color: var(--af-muted);
-        margin: 0 0 22px;
-        max-width: 46ch;
-    }
-    &__error,
-    &__cargando{
-        font-size: var(--af-t-sm);
-        color: var(--af-muted);
-        padding: 18px 0;
+        padding: 22px 0;
     }
 
-    /* Cabecera de categoria */
     &__cat{
         display: flex;
         align-items: center;
-        gap: 9px;
-        margin: 22px 0 10px;
+        gap: 10px;
+        margin: 24px 0 10px;
         font-size: 12px;
         font-weight: 800;
         letter-spacing: .09em;
@@ -43,9 +25,7 @@
         color: var(--af-ink);
         b{
             margin-left: auto;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0;
+            font-size: 11px; font-weight: 700; letter-spacing: 0;
             color: var(--af-muted);
             background: var(--af-paper);
             border-radius: var(--af-r-pill);
@@ -53,108 +33,238 @@
         }
     }
     &__catIco{
-        width: 26px; height: 26px; flex: 0 0 auto;
+        width: 28px; height: 28px; flex: 0 0 auto;
         border-radius: 9px;
-        background: var(--af-accent-soft);
-        color: var(--af-accent);
+        color: var(--af-ink);
         display: flex; align-items: center; justify-content: center;
         svg{ width: 15px; height: 15px; }
     }
+}
 
-    /* Como se usa */
-    &__como{
-        margin-top: 26px;
-        background: var(--af-paper);
-        border-radius: var(--af-r-card);
-        padding: 18px 18px 16px;
-    }
-    &__comoTit{
+/* ------------------------------------------------------------------- hero */
+.afPlusHero{
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--af-r-card);
+    padding: 22px 20px 20px;
+    margin-bottom: 6px;
+    background:
+        radial-gradient(120% 140% at 88% 6%, #C9F5DE 0%, rgba(201,245,222,0) 58%),
+        linear-gradient(150deg, #F2FBF5 0%, #E7F5EC 100%);
+
+    &__et{
+        display: inline-block;
         margin: 0 0 10px;
-        font-size: 12px; font-weight: 800;
-        letter-spacing: .09em; text-transform: uppercase;
+        font-size: 10.5px; font-weight: 800;
+        letter-spacing: .16em; text-transform: uppercase;
+        color: var(--af-accent);
+        background: rgba(255,255,255,.75);
+        border-radius: var(--af-r-pill);
+        padding: 4px 11px;
+    }
+    &__tit{
+        margin: 0 0 8px;
+        font-size: var(--af-t-xxl);
+        font-weight: 800;
+        line-height: 1.06;
+        letter-spacing: -.035em;
         color: var(--af-ink);
+        text-wrap: balance;
+        em{ font-style: normal; color: var(--af-accent); display: block; }
     }
-    &__pasos{
-        margin: 0; padding-left: 18px;
-        li{
-            font-size: var(--af-t-sm);
-            color: var(--af-ink);
-            margin-bottom: 6px;
-            b{ font-weight: 700; }
-        }
+    &__baja{
+        margin: 0;
+        font-size: var(--af-t-sm);
+        color: var(--af-muted);
+        max-width: 40ch;
     }
-    &__letraChica{
-        margin: 12px 0 0;
+    &__cifras{
+        display: flex; align-items: center; gap: 14px;
+        margin-top: 16px;
         font-size: var(--af-t-xs);
         color: var(--af-muted);
-        line-height: 1.45;
+        b{
+            font-size: var(--af-t-lg); font-weight: 800;
+            color: var(--af-ink); margin-right: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        i{ width: 1px; height: 22px; background: rgba(20,32,24,.14); }
     }
 }
 
 /* --------------------------------------------------------------- convenio */
-.afConvenio{
+.afConv{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
     background: var(--af-card, #fff);
     border: 1px solid var(--af-line);
     border-radius: var(--af-r-card);
-    padding: 14px 15px;
-    margin-bottom: 9px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-family: inherit;
+
+    &__ico{
+        width: 44px; height: 44px; flex: 0 0 auto;
+        border-radius: 13px;
+        color: var(--af-ink);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 21px; height: 21px; }
+    }
+    &__txt{
+        flex: 1 1 auto; min-width: 0;
+        b{
+            display: block;
+            font-size: var(--af-t-md); font-weight: 800;
+            color: var(--af-ink); line-height: 1.25;
+        }
+        small{
+            display: block;
+            font-size: var(--af-t-xs); color: var(--af-muted);
+            line-height: 1.35; margin-top: 2px;
+            /* Dos lineas como maximo: con tres, las tarjetas de la lista
+               dejan de tener la misma altura y se pierde el ritmo. */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    }
+    &__valor{
+        flex: 0 0 auto; text-align: right;
+        b{
+            display: block;
+            font-size: var(--af-t-md); font-weight: 800;
+            color: var(--af-accent); white-space: nowrap;
+        }
+        small{
+            display: block;
+            font-size: 10px; color: var(--af-muted);
+            max-width: 84px; line-height: 1.25;
+        }
+    }
+}
+
+/* ------------------------------------------------------------------ ficha */
+.afFicha{
+    position: fixed; inset: 0; z-index: 1300;
+    background: rgba(12,20,16,.5);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+
+    @media (min-width: 640px){
+        align-items: center;
+        padding: 24px;
+    }
+
+    &__caja{
+        position: relative;
+        width: 100%; max-width: 420px;
+        max-height: 92vh; overflow-y: auto;
+        background: var(--af-card, #fff);
+        border-radius: 22px 22px 0 0;
+        @media (min-width: 640px){ border-radius: 22px; }
+    }
+    &__x{
+        position: absolute; top: 10px; right: 12px; z-index: 2;
+        width: 30px; height: 30px; border-radius: 50%;
+        border: 0; cursor: pointer;
+        background: rgba(255,255,255,.8);
+        color: var(--af-ink);
+        font-size: 20px; line-height: 1;
+    }
 
     &__top{
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 10px;
+        padding: 26px 20px 20px;
+        text-align: center;
+        border-radius: 22px 22px 0 0;
+        @media (min-width: 640px){ border-radius: 22px 22px 0 0; }
     }
-    &__marca{
-        font-size: var(--af-t-md);
-        font-weight: 800;
+    &__ico{
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 46px; height: 46px; border-radius: 14px;
+        background: rgba(255,255,255,.6);
         color: var(--af-ink);
-        line-height: 1.25;
+        margin-bottom: 10px;
+        svg{ width: 22px; height: 22px; }
     }
-    /* Lo que el cliente viene a buscar: el 15%, el "Gratis". */
     &__valor{
-        flex: 0 0 auto;
-        font-size: var(--af-t-md);
-        font-weight: 800;
-        color: var(--af-accent);
-        white-space: nowrap;
-    }
-    &__que{
-        margin: 4px 0 0;
-        font-size: var(--af-t-sm);
-        color: var(--af-muted);
-        line-height: 1.4;
+        margin: 0; font-size: 34px; font-weight: 800;
+        letter-spacing: -.03em; color: var(--af-ink); line-height: 1;
     }
     &__detalle{
-        margin: 2px 0 0;
-        font-size: var(--af-t-xs);
+        margin: 4px 0 0; font-size: var(--af-t-xs);
+        color: rgba(20,32,24,.62);
+    }
+
+    /* El relleno de abajo deja pasar la barra flotante de navegacion, que va
+       fija a 14px del borde: sin esto el boton de la marca queda detras de
+       ella y no se puede tocar. En pantalla ancha la ficha va centrada y la
+       barra no estorba, asi que vuelve a su medida normal. */
+    &__cuerpo{
+        padding: 18px 20px 96px;
+        @media (min-width: 640px){ padding-bottom: 22px; }
+    }
+    &__marca{
+        margin: 0; font-size: var(--af-t-lg);
+        font-weight: 800; color: var(--af-ink);
+    }
+    &__que{
+        margin: 4px 0 16px; font-size: var(--af-t-sm);
+        color: var(--af-muted); line-height: 1.45;
+    }
+    &__lbl{
+        margin: 0 0 6px; font-size: 10.5px; font-weight: 800;
+        letter-spacing: .12em; text-transform: uppercase;
         color: var(--af-muted);
     }
+    &__codigo{
+        display: flex; align-items: center; gap: 10px;
+        background: var(--af-paper);
+        border: 1px dashed var(--af-line);
+        border-radius: 12px;
+        padding: 10px 10px 10px 14px;
+        span{
+            flex: 1 1 auto;
+            font-size: var(--af-t-md); font-weight: 800;
+            letter-spacing: .06em; color: var(--af-ink);
+            word-break: break-all;
+        }
+        button{
+            flex: 0 0 auto;
+            font-family: inherit; font-size: 12.5px; font-weight: 700;
+            color: #fff; background: var(--af-ink);
+            border: 0; border-radius: var(--af-r-pill);
+            padding: 7px 14px; cursor: pointer;
+        }
+    }
+    &__sinCodigo{
+        margin: 0; font-size: var(--af-t-sm); color: var(--af-muted);
+        background: var(--af-paper); border-radius: 12px;
+        padding: 12px 14px; line-height: 1.45;
+    }
+    &__como{
+        margin: 12px 0 0; font-size: var(--af-t-xs);
+        color: var(--af-muted); line-height: 1.45;
+    }
     &__nota{
-        display: inline-block;
-        margin-top: 8px;
-        font-size: 10.5px;
-        font-weight: 700;
-        letter-spacing: .05em;
-        text-transform: uppercase;
+        display: inline-block; margin-top: 10px;
+        font-size: 10px; font-weight: 700;
+        letter-spacing: .05em; text-transform: uppercase;
         color: var(--af-muted);
         background: var(--af-paper);
         border-radius: var(--af-r-pill);
         padding: 3px 9px;
     }
     &__btn{
-        display: block;
-        width: 100%;
-        margin-top: 12px;
-        font-family: inherit;
-        font-size: var(--af-t-sm);
-        font-weight: 700;
-        color: var(--af-ink);
-        background: var(--af-paper);
-        border: 0;
-        border-radius: var(--af-r-pill);
-        padding: 9px 14px;
-        cursor: pointer;
-        &:active{ transform: scale(.985); }
+        display: block; width: 100%; margin-top: 16px;
+        text-align: center; text-decoration: none;
+        font-family: inherit; font-size: var(--af-t-sm); font-weight: 700;
+        color: #fff; background: var(--af-ink);
+        border: 0; border-radius: var(--af-r-pill);
+        padding: 12px 16px; cursor: pointer;
     }
 }

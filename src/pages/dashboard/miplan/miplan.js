@@ -207,6 +207,26 @@ const MiPlanPage = () => {
               </div>
             </Bloque>
 
+            {/* Allpa+ vive aqui y no en el menu lateral: es un beneficio DEL
+                plan, y este es el sitio donde el cliente viene a ver que le
+                dio su plata. En el menu era una entrada mas entre siete. */}
+            <Bloque>
+              <motion.button type="button" className="afPlusBoton"
+                onClick={() => navigate('/beneficios')} {...alToque}>
+                <span className="afPlusBoton__ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6L12 16.8 6.6 19.6l1.2-6L3.3 9.4l6.1-.8L12 3z" />
+                  </svg>
+                </span>
+                <span className="afPlusBoton__txt">
+                  <b>Allpa+ · Tus beneficios</b>
+                  <small>Descuentos en salud, fitness, hogar y formación</small>
+                </span>
+                <span className="afPlusBoton__ir">›</span>
+              </motion.button>
+            </Bloque>
+
             {/* Los 20 envios, uno por uno. Un numero se olvida; ver la fila
                 completa de lo que compro es lo que hace tangible el mes. */}
             {total > 0 && total <= 40 &&

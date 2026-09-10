@@ -182,3 +182,52 @@
     &__t{ margin: 0 0 6px; font-size: 17px; font-weight: 700; color: var(--af-ink); }
     &__d{ margin: 0 0 20px; font-size: 13.5px; color: var(--af-muted); line-height: 1.5; }
 }
+
+/* Puerta a Allpa+.
+   Va en Mi plan y no en el menu lateral: es un beneficio DEL plan, y esta es
+   la pantalla donde el cliente viene a ver que le dio su plata. Lleva el
+   mismo degradado que la seccion, para que se lea como parte de lo que
+   compro y no como una promocion pegada. */
+.afPlusBoton{
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid rgba(20,32,24,.06);
+    border-radius: var(--af-r-card);
+    padding: 14px 15px;
+    margin-bottom: 10px;
+    background:
+        radial-gradient(120% 160% at 92% 8%, #C9F5DE 0%, rgba(201,245,222,0) 62%),
+        linear-gradient(150deg, #F2FBF5 0%, #E7F5EC 100%);
+
+    &__ico{
+        width: 42px; height: 42px; flex: 0 0 auto;
+        border-radius: 13px;
+        background: rgba(255,255,255,.72);
+        color: var(--af-accent);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 21px; height: 21px; }
+    }
+    &__txt{
+        flex: 1 1 auto; min-width: 0;
+        b{
+            display: block;
+            font-size: var(--af-t-md); font-weight: 800;
+            color: var(--af-ink); line-height: 1.25;
+        }
+        small{
+            display: block;
+            font-size: var(--af-t-xs); color: var(--af-muted);
+            line-height: 1.35; margin-top: 2px;
+        }
+    }
+    &__ir{
+        flex: 0 0 auto;
+        font-size: 22px; line-height: 1;
+        color: var(--af-muted);
+    }
+}

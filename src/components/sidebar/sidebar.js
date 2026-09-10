@@ -66,17 +66,6 @@ const Sidebar = ({setOpenReprogramar,openReprogramar}) => {
                         </a>
                     </li>
                     <li>
-                        {/* Allpa+ va arriba de Salud y bienestar a proposito: es
-                            lo que diferencia al plan de la competencia y lo que
-                            el cliente no sabia que tenia. */}
-                        <NavLink activeClassName={'active'} onClick={closeMenu} to="/beneficios">
-                            <div className="iconSvg">
-                                <img src={icoSalud} alt="" />
-                            </div>
-                            <span>Allpa+ Beneficios</span>
-                        </NavLink>
-                    </li>
-                    <li>
                         <NavLink activeClassName={'active'}  onClick={closeMenu} to="/salud-y-bienestar">
                             <div className="iconSvg">
                                 <img src={icoSalud} alt="" />
