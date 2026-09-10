@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import FotoPlato from '../../ultil/FotoPlato';
 import axios from 'axios';
+import { REPARTO } from '../PedidoDeHoy/PedidoDeHoy';
 import moment from 'moment';
 import Skeleton from '@mui/material/Skeleton';
 
@@ -202,7 +203,11 @@ const MenuFlow = ({ plan, alTerminar }) => {
         <Bloque>
           <h1 className="afPanel__titular">{moment(diaAbierto.date).format('dddd D')}</h1>
         </Bloque>
-        <Bloque><p className="afMenu__ayuda">Almuerzo · llega entre 11:00 y 1:30 p.m.</p></Bloque>
+        <Bloque>
+          <p className="afMenu__ayuda">
+            Almuerzo · llega entre las {REPARTO.desde} y la {REPARTO.hasta}
+          </p>
+        </Bloque>
 
         <Bloque>
           <div className="afCard">
@@ -431,7 +436,15 @@ const MenuFlow = ({ plan, alTerminar }) => {
         <Bloque>
           <h1 className="afPanel__titular">{moment(diaActivo).format('dddd D')}</h1>
         </Bloque>
-        <Bloque><p className="afMenu__ayuda">Llega entre 14:00 y 16:00</p></Bloque>
+        {/* El horario sale de REPARTO, no escrito a mano. Aqui decia "entre
+            14:00 y 16:00", un rango inventado que contradecia al resto de la
+            app —el panel y los avisos ya usaban la constante— y prometia al
+            cliente una hora que la operacion no cumple. */}
+        <Bloque>
+          <p className="afMenu__ayuda">
+            Llega entre las {REPARTO.desde} y la {REPARTO.hasta}
+          </p>
+        </Bloque>
 
         {/* Un bloque por comida del plan. Con un solo principal se ve igual que
             antes; con dos aparecen "Tu almuerzo" y "Tu cena". */}
