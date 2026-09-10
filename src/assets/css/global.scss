@@ -372,8 +372,8 @@ input[type=number] {
         background-position: center;
         background-size: 46%;
         opacity: .38;
-        /* Tenedor y cuchara, trazo simple. */
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23163A2A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 2v7a2 2 0 0 0 2 2v11'/%3E%3Cpath d='M7 2v6'/%3E%3Cpath d='M11 2v6'/%3E%3Cpath d='M17 2c-1.4 0-2.5 2-2.5 4.5S15.6 11 17 11s2.5-2 2.5-4.5S18.4 2 17 2z'/%3E%3Cpath d='M17 11v11'/%3E%3C/svg%3E");
+        /* El dibujo lo pone FotoPlato segun sea comida, bebida o snack. */
+        background-image: var(--af-icono);
     }
 }
 

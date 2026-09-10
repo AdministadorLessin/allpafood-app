@@ -460,7 +460,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
                   <motion.button type="button"
                     className={`afPlato${menusSel[comida] === p.id ? ' afPlato--sel' : ''}`}
                     onClick={() => marcarPlato(comida, p.id)} {...alToque}>
-                    <FotoPlato menu={p.menu} />
+                    <FotoPlato menu={p.menu} tipo={comida} />
                     <span className="afPlato__txt">
                       <b>{p.menu.name}</b>
                       <small>
@@ -493,7 +493,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
               {fijos.map((x) => (
                 <Bloque key={'fijo-' + x.id}>
                   <div className="afPlato afPlato--fijo">
-                    <FotoPlato menu={x.menu} />
+                    <FotoPlato menu={x.menu} tipo={x.type} />
                     <span className="afPlato__txt">
                       <b>{x.menu.name}</b>
                       <small>{prop(x.menu, 'calorias')} kcal · viene con tu plan</small>
