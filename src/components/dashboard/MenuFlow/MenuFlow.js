@@ -476,6 +476,35 @@ const MenuFlow = ({ plan, alTerminar }) => {
           );
         })}
 
+        {/* Lo que viene fijo con el plan.
+            Antes solo se leia "tu snack y tu bebida vienen con el plan", sin
+            decir cuales, y encima en la pantalla anterior —donde todavia no
+            hay un dia elegido, asi que no se podia saber—. Como la bebida y
+            el snack ya estan programados por dia, mostrarlos es gratis y
+            "Refresco de Jamaica" da mas ganas que una frase generica. */}
+        {(() => {
+          const fijos = ['drinks', 'snacks']
+            .flatMap((t) => platosDe(dia, t))
+            .filter((x) => !comidas.includes(x.type));
+          if (!fijos.length) return null;
+          return (
+            <>
+              <Bloque><p className="afMenu__label">Incluido este día</p></Bloque>
+              {fijos.map((x) => (
+                <Bloque key={'fijo-' + x.id}>
+                  <div className="afPlato afPlato--fijo">
+                    <FotoPlato menu={x.menu} />
+                    <span className="afPlato__txt">
+                      <b>{x.menu.name}</b>
+                      <small>{prop(x.menu, 'calorias')} kcal · viene con tu plan</small>
+                    </span>
+                  </div>
+                </Bloque>
+              ))}
+            </>
+          );
+        })()}
+
         {puntos.length > 0 &&
           <>
             <Bloque><p className="afMenu__label">Entregar este día en</p></Bloque>
