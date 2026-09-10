@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Bienvenida + avatar, la primera vez que se entra al panel.
+
+   Mismo lenguaje que el resto del rediseño: hoja con degradado arriba,
+   cascada de motion, bottom-sheet en movil y tarjeta centrada en pantallas
+   anchas. Nada nuevo que aprender si ya se vio Allpa+.
+   ========================================================================== */
+.afBien{
+    position: fixed; inset: 0; z-index: 1400;
+    background: rgba(22,33,27,.55);
+    display: flex; align-items: flex-end; justify-content: center;
+
+    @media (min-width: 640px){
+        align-items: center;
+        padding: 24px;
+    }
+
+    &__caja{
+        width: 100%; max-width: 440px;
+        max-height: 92vh; overflow-y: auto;
+        background: var(--af-paper);
+        border-radius: 24px 24px 0 0;
+        @media (min-width: 640px){ border-radius: 24px; }
+    }
+
+    &__top{
+        text-align: center;
+        padding: 30px 24px 22px;
+        background:
+            radial-gradient(120% 160% at 85% 4%, rgba(60,251,159,.28) 0%, rgba(60,251,159,0) 60%),
+            linear-gradient(150deg, #F0FBF4 0%, #E2F3E9 100%);
+        border-radius: 24px 24px 0 0;
+    }
+    &__iso{
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 48px; height: 48px; border-radius: 16px;
+        background: rgba(255,255,255,.7);
+        color: var(--af-accent);
+        margin-bottom: 12px;
+        svg{ width: 24px; height: 24px; }
+    }
+    &__tit{
+        margin: 0 0 6px;
+        font-size: var(--af-t-xl);
+        font-weight: 800;
+        letter-spacing: var(--af-track-titular);
+        color: var(--af-ink);
+        text-wrap: balance;
+    }
+    &__baja{
+        margin: 0; font-size: var(--af-t-s);
+        color: var(--af-muted); line-height: 1.4;
+    }
+
+    &__cuerpo{ padding: 20px 20px 26px; }
+
+    &__grid{
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    &__av{
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        padding: 0;
+        border: 2px solid transparent;
+        cursor: pointer;
+        overflow: hidden;
+        background: var(--af-accent-soft);
+        img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+        &--sel{
+            border-color: var(--af-accent);
+            box-shadow: 0 0 0 3px var(--af-accent-soft);
+        }
+    }
+    &__check{
+        position: absolute; right: -2px; bottom: -2px;
+        width: 18px; height: 18px; border-radius: 50%;
+        background: var(--af-accent); color: #fff;
+        font-size: 11px; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid var(--af-paper);
+    }
+
+    &__error{
+        margin: 0 0 12px; font-size: var(--af-t-xs);
+        color: #B3261E; text-align: center;
+    }
+
+    &__btn{
+        display: block; width: 100%;
+        font-family: inherit; font-size: var(--af-t-m); font-weight: 700;
+        color: var(--af-mint-ink); background: var(--af-mint);
+        border: 0; border-radius: var(--af-r-pill);
+        padding: 13px 16px; cursor: pointer;
+        &:disabled{ opacity: .5; cursor: not-allowed; }
+    }
+    &__luego{
+        display: block; width: 100%; margin-top: 10px;
+        font-family: inherit; font-size: var(--af-t-s); font-weight: 600;
+        color: var(--af-muted); background: none;
+        border: 0; padding: 8px; cursor: pointer;
+        text-decoration: underline;
+    }
+}

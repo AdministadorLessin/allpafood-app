@@ -110,7 +110,12 @@
         background: var(--af-accent-soft);
         flex: 0 0 auto;
         overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
         img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+    &__inicial{
+        font-size: 13px; font-weight: 800;
+        color: var(--af-accent);
     }
 }
 .afPanel__topDer{

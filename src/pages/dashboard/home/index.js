@@ -16,6 +16,7 @@ import PedidoDeHoy from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy
 import Campana from './../../../components/dashboard/Campana/Campana';
 import icoObjetivo from '../../../assets/img/ico_objetivo.svg';
 import icoFecha from '../../../assets/img/icon_fecha.svg';
+import Bienvenida, { bienvenidaYaVista } from '../../../components/dashboard/Bienvenida/Bienvenida';
 
 // Charts
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
@@ -44,6 +45,10 @@ const DashboadHome = (props) => {
   useEffect(()=>{
     if(planInfo?.role === 'DELIVERY') navigate('/motorizado', { replace: true });
   },[planInfo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // No se muestra hasta saber DE VERDAD si el perfil tiene avatar: mostrarla
+  // un instante y taparla en cuanto llega el perfil se ve como un parpadeo.
+  const [mostrarBienvenida, setMostrarBienvenida] = useState(false);
 
   const [menuList,setMenuList] = useState();
   const todayDate = new Date();
@@ -110,6 +115,11 @@ const DashboadHome = (props) => {
 
   const [plan,setPlan] = useState();
   const [helloCard,setHelloCard] = useState();
+
+  useEffect(() => {
+    if (!helloCard || bienvenidaYaVista(token)) return;
+    if (!helloCard.profile?.image) setMostrarBienvenida(true);
+  }, [helloCard, token]);
   // Marca que /dashboard/plan ya respondio. Sin esto el efecto de redireccion
   // corre al montar con el planActive viejo de localStorage y saca al cliente
   // antes de que llegue el dato fresco.
@@ -283,8 +293,16 @@ const DashboadHome = (props) => {
         <Bloque className={`afPanel__top${pegado ? ' afPanel__top--pegado' : ''}`}>
           <span className="afChipUser">
             <span className="afChipUser__ava">
-              {helloCard && helloCard.profile && helloCard.profile.image !== undefined &&
-                <img src={`assets/img/avatars/avatar_${helloCard.profile.image}.jpg`} alt="" />}
+              {/* Antes la condicion era "!== undefined": un perfil sin avatar
+                  tiene image_url en NULL, y null !== undefined es verdadero,
+                  asi que intentaba cargar "avatar_null.jpg" y salia el icono
+                  de imagen rota junto al nombre. Con inicial de respaldo en
+                  vez de un hueco roto. */}
+              {helloCard && helloCard.profile && helloCard.profile.image
+                ? <img src={`assets/img/avatars/avatar_${helloCard.profile.image}.jpg`} alt="" />
+                : <span className="afChipUser__inicial">
+                    {(helloCard?.profile?.name || '?').charAt(0).toUpperCase()}
+                  </span>}
             </span>
             {helloCard && helloCard.profile && helloCard.profile.name
               ? <>Hola, <b>{helloCard.profile.name.split(' ')[0]}</b></>
@@ -342,6 +360,23 @@ const DashboadHome = (props) => {
             el boton del banner o tocando un dia de la tira. */}
 
       </Cascada>
+
+      {mostrarBienvenida &&
+        <Bienvenida
+          nombre={helloCard?.profile?.name?.split(' ')[0]}
+          onListo={(avatarElegido) => {
+            setMostrarBienvenida(false);
+            // Sin esto el circulo de la cabecera seguia con la inicial hasta
+            // recargar: helloCard es un estado propio de esta pantalla,
+            // separado del que Bienvenida actualiza en el contexto.
+            if (avatarElegido !== undefined && avatarElegido !== null) {
+              setHelloCard((h) => h?.profile
+                ? { ...h, profile: { ...h.profile, image: String(avatarElegido) } }
+                : h);
+            }
+          }}
+        />
+      }
     </LayoutDasboard>
   )
 };
