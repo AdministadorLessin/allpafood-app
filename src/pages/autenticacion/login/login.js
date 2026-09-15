@@ -152,7 +152,7 @@ const LoginPage = (props) => {
           {/* Este enlace no llevaba a ninguna parte (href="#") y el cliente que
               olvidaba su clave terminaba escribiendo por WhatsApp. Mientras no
               exista la pantalla de recuperacion, al menos dice la verdad. */}
-          <a href="https://wa.me/51999999999?text=Olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20Allpa%20Food"
+          <a href="https://wa.me/51955797697?text=Olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20Allpa%20Food"
              target="_blank" rel="noreferrer">
             Olvidé mi contraseña
           </a>

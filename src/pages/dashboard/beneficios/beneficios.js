@@ -47,7 +47,7 @@ const CATEGORIAS = {
   },
 };
 
-const WHATSAPP = '51999999999';
+const WHATSAPP = '51955797697';
 const estilo = (c) => CATEGORIAS[c] || CATEGORIAS._;
 
 const Glifo = ({ d, className }) => (

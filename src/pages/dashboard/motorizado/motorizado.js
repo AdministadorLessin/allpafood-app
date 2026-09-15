@@ -11,7 +11,7 @@ import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Mo
 import { API_URL } from '../../../config';
 
 /* Numero de la oficina, por si el cliente no responde. */
-const OFICINA = '51999999999';
+const OFICINA = '51955797697';
 
 /* Minutos que se espera al cliente antes de poder dar la entrega por fallida.
    Es politica de Allpa, y la app la sostiene: sin la hora de llegada, "espere

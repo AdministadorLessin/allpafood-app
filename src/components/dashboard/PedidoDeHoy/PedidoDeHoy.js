@@ -15,7 +15,7 @@ export const REPARTO = {
 
 /* Numero de atencion. El enlace lleva el pedido escrito para que quien
    responde no tenga que preguntar "¿cual es tu nombre?". */
-const WHATSAPP = '51999999999';
+const WHATSAPP = '51955797697';
 
 // El pie de "En camino" depende de la hora vigente: con un aviso publicado, la
 // hora original ya no es cierta y dejarla ahi contradice al titular.
