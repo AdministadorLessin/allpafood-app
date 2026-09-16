@@ -206,7 +206,7 @@ const validationSchema = Yup.object().shape({
       {/* No existia ninguna puerta de ingreso a registro: quien llegaba aqui
           sin cuenta se quedaba encerrado en esta pantalla. */}
       <p className="afAuth__pie">
-        ¿Es tu primera vez? <Link to="/registro">Crea tu cuenta</Link>
+        ¿Es tu primera vez? <Link to="/empezar">Ver mi plan</Link>
       </p>
     </MarcoAuth>
   )

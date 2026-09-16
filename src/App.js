@@ -15,6 +15,7 @@ import PreguntasFrecuentesPage from './pages/dashboard/preguntas-frecuentes/preg
 import UbicacionesPage from './pages/dashboard/ubicaciones/ubicaciones';
 import LoginPage from './pages/autenticacion/login/login';
 import RegistroPage from './pages/autenticacion/registro/registro';
+import EmpezarPage from './pages/autenticacion/empezar/empezar';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
@@ -58,6 +59,10 @@ function App() {
                   }
                   <Route path='/ingresar' element={ <LoginPage /> } />
                   <Route path='/registro' element={ <RegistroPage /> } />
+                  {/* Cobertura, tres preguntas y el plan con su precio, antes
+                      de pedir un solo dato de cuenta. Va fuera del area
+                      protegida: quien todavia no existe tiene que poder verla. */}
+                  <Route path='/empezar' element={ <EmpezarPage /> } />
                 </Routes>
             </BrowserRouter>
           

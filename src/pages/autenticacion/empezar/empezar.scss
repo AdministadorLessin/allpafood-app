@@ -1,0 +1,48 @@
+/* Pantallas previas al registro. Reusan el marco, el boton y los titulares de
+   autenticacion; lo propio de aqui son las fichas de distrito y la ficha del
+   plan recomendado. */
+
+.empDistritos, .empOps{
+    display:flex; flex-wrap:wrap; gap:8px;
+}
+.empChip{
+    font-family:inherit; font-size:14px;
+    border:1px solid rgba(17,38,28,.18); background:#fff; color:#11261C;
+    border-radius:999px; padding:9px 14px; cursor:pointer;
+    &--sel{ background:#35F09A; border-color:#35F09A; font-weight:600; }
+    &--otro{ border-style:dashed; }
+}
+.empPregunta{
+    font-size:15px; font-weight:600; margin-top:4px;
+}
+.empLectura{
+    background:rgba(53,240,154,.13); border-radius:12px;
+    padding:12px 14px; font-size:14px; line-height:1.4;
+}
+.empMedidas{ display:flex; gap:10px; flex-wrap:wrap; }
+.empCampo{
+    flex:1 1 90px; display:flex; flex-direction:column; gap:4px;
+    font-size:12.5px; color:rgba(17,38,28,.6);
+    input{
+        font-family:inherit; font-size:16px; color:#11261C;
+        border:1px solid rgba(17,38,28,.18); border-radius:12px;
+        padding:11px 12px; width:100%; background:#fff;
+        &:focus{ outline:2px solid #35F09A; outline-offset:1px; }
+    }
+}
+.empNota{ font-size:13px; color:rgba(17,38,28,.6); margin:0; }
+.empEtq{
+    font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:#0A6B41; font-weight:600; margin:0;
+}
+.empPrecio{ display:flex; align-items:baseline; gap:8px; font-variant-numeric:tabular-nums; }
+.empPrecio__g{ font-size:38px; font-weight:800; line-height:1; }
+.empPrecio__t{ font-size:14px; color:rgba(17,38,28,.6); }
+.empPlatos{
+    display:flex; flex-direction:column; gap:5px; font-size:14px;
+    &__t{
+        font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+        color:rgba(17,38,28,.5); font-weight:600;
+    }
+}
+.empBtnLink{ display:block; text-align:center; text-decoration:none; }
