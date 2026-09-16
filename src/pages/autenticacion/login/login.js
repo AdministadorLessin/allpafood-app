@@ -9,6 +9,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import Recuperar from './Recuperar';
 
 import axios from 'axios';
 import {useAuthContext} from '../../../context/authContext';
@@ -55,8 +56,8 @@ const validationSchema = Yup.object().shape({
        no quieren dar su correo, y otros que dieron uno equivocado al migrar:
        para ellos el celular es el unico dato que si es suyo. */
     lfcorreo: Yup.string()
-      .required('Escribe tu correo o tu celular.')
-      .test('correo-o-celular', 'Escribe un correo válido o un celular de 9 dígitos.',
+      .required('Escribe tu celular.')
+      .test('celular', 'Escribe tu celular de 9 dígitos.',
         (valor) => {
           const v = (valor || '').trim();
           if (v.includes('@')) return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
@@ -90,6 +91,9 @@ const validationSchema = Yup.object().shape({
   // Sin esto el boton no daba ninguna senal entre el toque y la respuesta, y
   // el cliente lo pulsaba tres veces creyendo que no habia pasado nada.
   const [enviando,setEnviando] = useState(false);
+  // 'entrar' o 'recuperar'. Misma ruta: quien olvido su clave no deberia
+  // perder de vista donde estaba.
+  const [modo,setModo] = useState('entrar');
 
   const sendData = () =>{
     setEnviando(true);
@@ -138,15 +142,22 @@ const validationSchema = Yup.object().shape({
         Aquí ves tus almuerzos de la semana, tu plan y tus entregas.
       </p>
 
+      {modo === 'recuperar' ? (
+        <Recuperar
+          volver={() => setModo('entrar')}
+          telefonoInicial={bodyFields ? bodyFields.lfcorreo : ''}
+        />
+      ) : (
       <form onSubmit={handleSubmit(onSubmitHandler)}
             className={enviando ? 'afAuth__ocupado' : undefined}>
         <div className="afCampo">
           <TextField 
-            label="Correo o celular" 
+            label="Celular" 
             variant="filled"
             id="lfcorreo" 
             name="lfcorreo" 
             type="text"
+            inputMode="numeric"
             autoComplete="username"
             value={bodyFields ? bodyFields.lfcorreo : ''}
             error={errors.lfcorreo ? true : false}
@@ -178,13 +189,11 @@ const validationSchema = Yup.object().shape({
           <FormGroup>
             <FormControlLabel control={<Checkbox size="small" />} label="Recordarme 30 días" />
           </FormGroup>
-          {/* Este enlace no llevaba a ninguna parte (href="#") y el cliente que
-              olvidaba su clave terminaba escribiendo por WhatsApp. Mientras no
-              exista la pantalla de recuperacion, al menos dice la verdad. */}
-          <a href="https://wa.me/51955797697?text=Olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20Allpa%20Food"
-             target="_blank" rel="noreferrer">
+          {/* Antes esto abria un chat de WhatsApp y alguien tenia que cambiar
+              la clave a mano en la base. Ahora el cliente lo resuelve solo. */}
+          <button type="button" className="afEnlace" onClick={() => setModo('recuperar')}>
             Olvidé mi contraseña
-          </a>
+          </button>
         </div>
 
         <motion.button type="submit" className="afBtn afBtn--mint"
@@ -192,6 +201,7 @@ const validationSchema = Yup.object().shape({
           {enviando ? 'Entrando…' : 'Ingresar'}
         </motion.button>
       </form>
+      )}
 
       {/* No existia ninguna puerta de ingreso a registro: quien llegaba aqui
           sin cuenta se quedaba encerrado en esta pantalla. */}
