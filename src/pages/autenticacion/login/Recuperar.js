@@ -7,8 +7,19 @@ import { motion } from 'framer-motion';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-/** Deja el celular como esta guardado en la base, con el 51 adelante. */
-const soloDigitos = (valor) => (valor || '').replace(/\D/g, '');
+/**
+ * Los nueve digitos del celular, lo escriba como lo escriba.
+ *
+ * Antes esto exigia exactamente nueve: quien escribia su numero con el 51
+ * adelante —que es como lo tiene guardado en el telefono— recibia un error en
+ * la pantalla y la peticion nunca salia. Desde el servidor se veia como si
+ * nadie hubiera pedido nada. El campo del login si acepta las dos formas.
+ */
+const soloDigitos = (valor) => {
+  const digitos = (valor || '').replace(/\D/g, '');
+  if (digitos.length === 11 && digitos.startsWith('51')) return digitos.slice(2);
+  return digitos;
+};
 
 /**
  * Recuperar la contrasena desde el propio celular.
@@ -35,8 +46,8 @@ export default function Recuperar({ volver, telefonoInicial = '' }) {
 
   const pedirCodigo = () => {
     const numero = soloDigitos(telefono);
-    if (numero.length !== 9) {
-      setError('Escribe tu celular de 9 dígitos.');
+    if (numero.length !== 9 || !numero.startsWith('9')) {
+      setError('Escribe tu celular, con o sin el 51 adelante.');
       return;
     }
     setEnviando(true);
@@ -96,6 +107,7 @@ export default function Recuperar({ volver, telefonoInicial = '' }) {
             type="tel"
             inputMode="numeric"
             autoComplete="tel"
+            helperText="Con o sin el 51 adelante"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
           />
