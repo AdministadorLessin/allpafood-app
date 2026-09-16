@@ -67,7 +67,10 @@ const PerfilPage = (props) => {
         lastname:resultTmp.lastname,
         gender:resultTmp.gender,
         registeDate:resultTmp.registeDate,
-        email:planInfoT.log,
+        /* planInfoT.log es lo que la persona escribio para entrar, y ahora
+           puede ser su celular. Mostrarlo aca pondria un numero en el campo
+           Correo, como si ese fuera su correo. Se muestra solo cuando lo es. */
+        email: (planInfoT.log || '').includes('@') ? planInfoT.log : '',
         image:resultTmp.image
       })
       setImgProfile(planInfoT.profile.image);

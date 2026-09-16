@@ -32,9 +32,38 @@ const LoginPage = (props) => {
     lfpassword:''
   });
       
-  const validationSchema = Yup.object().shape({
+  /**
+ * Deja el usuario como esta guardado en la base.
+ *
+ * Los telefonos se guardan con el 51 adelante, y nadie escribe su celular
+ * asi: la busqueda es por igualdad exacta, de modo que "987654321" no
+ * encontraba a nadie. El correo se deja tal cual, que la base no distingue
+ * mayusculas.
+ */
+const normalizarUsuario = (valor) => {
+  const v = (valor || '').trim();
+  if (v.includes('@')) return v;
+  const digitos = v.replace(/\D/g, '');
+  if (digitos.length === 9 && digitos.startsWith('9')) return `51${digitos}`;
+  return digitos || v;
+};
 
-    lfcorreo: Yup.string().required('ingrese un correo valido').email().matches(/^(?!.*@[^,]*,)/),
+const validationSchema = Yup.object().shape({
+
+    /* Correo O celular. El servidor autentica por cualquiera de los dos desde
+       siempre; era esta validacion la que obligaba al correo. Hay clientes que
+       no quieren dar su correo, y otros que dieron uno equivocado al migrar:
+       para ellos el celular es el unico dato que si es suyo. */
+    lfcorreo: Yup.string()
+      .required('Escribe tu correo o tu celular.')
+      .test('correo-o-celular', 'Escribe un correo válido o un celular de 9 dígitos.',
+        (valor) => {
+          const v = (valor || '').trim();
+          if (v.includes('@')) return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+          const digitos = v.replace(/\D/g, '');
+          return (digitos.length === 9 && digitos.startsWith('9'))
+              || (digitos.length === 11 && digitos.startsWith('519'));
+        }),
     lfpassword: Yup.string()
     .required('Ingrese un telefono valido por favor.')
     .min(3,'Ingrese un telefono valido por favor.')
@@ -67,14 +96,14 @@ const LoginPage = (props) => {
     setErrorAxios(false);
     axios.post(`${API_URL}auth/login`,
         {
-          username:bodyFields.lfcorreo,
+          username: normalizarUsuario(bodyFields.lfcorreo),
           password:bodyFields.lfpassword
         }).then((resp)=>{
           if(resp.status === 200){
 
             let userDate = resp.data.data;
 
-            userDate.log = bodyFields.lfcorreo;
+            userDate.log = normalizarUsuario(bodyFields.lfcorreo);
             handleUpdateToken(resp.data.data.token,userDate);
 
             /* Cada rol a su casa. Un motorizado no tiene plan, asi que al
@@ -113,12 +142,12 @@ const LoginPage = (props) => {
             className={enviando ? 'afAuth__ocupado' : undefined}>
         <div className="afCampo">
           <TextField 
-            label="Correo" 
+            label="Correo o celular" 
             variant="filled"
             id="lfcorreo" 
             name="lfcorreo" 
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
             value={bodyFields ? bodyFields.lfcorreo : ''}
             error={errors.lfcorreo ? true : false}
             {...register("lfcorreo", { onChange: handleFieldChange })}
@@ -141,7 +170,7 @@ const LoginPage = (props) => {
         {errorAxios &&
           <div className="afAuth__error">
             <IcoError />
-            El correo o la contraseña no coinciden. Revísalos e inténtalo otra vez.
+            Los datos no coinciden. Revisa tu correo o celular y tu contraseña.
           </div>
         }
 
