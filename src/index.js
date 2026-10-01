@@ -1,5 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// La tipografia viaja dentro de la app. Antes se pedia a Google Fonts y, en el
+// app nativo, esa descarga no llegaba: todo salia en una letra con serifa.
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/500.css';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/700.css';
+import '@fontsource/poppins/800.css';
+import '@fontsource/poppins/900.css';
 import './index.css';
 import moment from 'moment';
 import 'moment/locale/es';

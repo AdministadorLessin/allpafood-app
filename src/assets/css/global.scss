@@ -15,7 +15,7 @@
     --light-green:#cfffe6;
     --gold:#C9A11E;
     
-    --poppins: "Poppins", serif;
+    --poppins: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     /* Declarada pero sin un solo uso en el proyecto. Se conserva por si algun
        estilo antiguo la referencia, pero la tipografia del sistema es Poppins. */
     --days: "Days One", sans-serif;
