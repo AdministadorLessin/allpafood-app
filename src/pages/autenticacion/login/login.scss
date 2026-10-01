@@ -32,10 +32,14 @@
 /* Un boton que se lee como enlace. Antes esto era un <a> a WhatsApp; la
    recuperacion ahora ocurre dentro de la app, pero el lugar y el aspecto
    siguen siendo los mismos para quien ya conocia la pantalla. */
+/* Iba subrayado y heredaba la letra del cuerpo: quedaba mas grande que
+   "Tu sesion dura 30 dias", que esta al lado, y se leia como un enlace web
+   suelto. Ahora tiene la misma medida y el verde de "Ver mi plan". */
 .afEnlace{
-    background:none; border:0; padding:0;
-    font-family:inherit; font-size:inherit; color:inherit;
-    text-decoration:underline; cursor:pointer;
+    background:none; border:0; padding:6px 0;
+    font-family:inherit; font-size:12.5px; font-weight:700;
+    color:var(--af-accent);
+    text-decoration:none; cursor:pointer; white-space:nowrap;
 }
 
 .afRecuperar{

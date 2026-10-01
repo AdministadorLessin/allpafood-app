@@ -475,3 +475,45 @@ input[type=number] {
     cursor: pointer;
     padding: 0;
 }
+
+/* ==========================================================================
+   Dentro del app instalado (la clase la pone src/nativo.js).
+
+   Lo que delata a una web metida en un app: se puede seleccionar el texto
+   con el dedo, cada toque deja un destello azul, la pantalla rebota al
+   llegar al borde, y lo de abajo flota a media pantalla. En el navegador
+   nada de esto aplica.
+   ========================================================================== */
+.es-nativo{
+    body{
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        overscroll-behavior: none;
+    }
+    input, textarea, [contenteditable="true"]{
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
+    /* Ingreso y registro: el contenido arriba y el "¿Es tu primera vez?"
+       pegado abajo, donde llega el pulgar, en vez de flotar a media pantalla
+       con un vacio blanco debajo. */
+    .afAuth{
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 28px;
+    }
+    .afAuth__col{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .afAuth__pie{
+        margin-top: auto;
+        padding-top: 24px;
+    }
+}
