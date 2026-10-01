@@ -1,0 +1,14 @@
+{
+  "appId": "com.allpafood.app",
+  "appName": "Allpa Food",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https",
+    "hostname": "app.allpafood.com"
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}
