@@ -159,3 +159,24 @@
 @media (prefers-reduced-motion: reduce){
     .afPaso__marca--actual{ animation: none; }
 }
+
+/* Pedido no entregado o cancelado: el motivo y una salida directa. */
+.afHoyPedido__nota{
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--af-muted);
+}
+.afHoyPedido__ayuda{
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--af-accent);
+    text-decoration: none;
+}
+
+/* Entregado: una sola linea, sin pasos ni botones. */
+.afHoyPedido--listo{
+    padding-top: 14px; padding-bottom: 14px;
+    .afHoyPedido__promesa{ margin: 0; font-size: 15px; }
+}

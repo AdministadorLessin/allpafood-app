@@ -103,11 +103,16 @@ const Sidebar = ({setOpenReprogramar,openReprogramar}) => {
             <div className="sideProfile">
                 <NavLink onClick={closeMenu} to="/perfil">
                     <figure>
+                        {/* El interrogante tiene que ir tambien en information:
+                            quien entra por la carga masiva tiene perfil con su
+                            nombre pero sin cuestionario, asi que information
+                            llega en null y leer .gender directamente tumbaba el
+                            panel entero con pantalla en blanco. */}
                         {planInfoT && planInfoT.profile?.image ?
                             <img src={'assets/img/avatars/avatar_'+planInfoT.profile?.image+'.jpg' } />
-                        : planInfoT && !planInfoT.profile?.image && planInfoT.profile?.information.gender === "M" ?
+                        : planInfoT && !planInfoT.profile?.image && planInfoT.profile?.information?.gender === "M" ?
                             <img src={'assets/img/avatars/avatar_5.jpg' } />
-                        : planInfoT && !planInfoT.profile?.image && planInfoT.profile?.information.gender === "F" ?
+                        : planInfoT && !planInfoT.profile?.image && planInfoT.profile?.information?.gender === "F" ?
                             <img src={'assets/img/avatars/avatar_6.jpg' } />
                         :
                             <span className="imgLoad"></span>

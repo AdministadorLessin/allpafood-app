@@ -734,3 +734,45 @@
 
 
 
+
+/* La direccion que resolvio el mapa, editable antes de guardar.
+   Por el registro pasan todos los clientes nuevos: la direccion que quede
+   aqui es la que el motorizado va a leer durante meses. */
+.ubiCalle{
+    margin: 14px 0 4px;
+
+    &__et{
+        display: block;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+        color: var(--af-muted, #61706A);
+        margin-bottom: 5px;
+    }
+
+    &__campo{
+        width: 100%;
+        border: 1px solid var(--af-line, #E3E9DF);
+        border-radius: 10px;
+        padding: 11px 13px;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--af-ink, #16211B);
+        background: #FFFFFF;
+
+        &:focus{
+            outline: 2px solid rgba(23,122,76,.25);
+            border-color: var(--af-accent, #177A4C);
+        }
+    }
+
+    &__nota{
+        display: block;
+        margin-top: 5px;
+        font-size: 11.5px;
+        line-height: 1.35;
+        color: var(--af-muted, #61706A);
+    }
+}

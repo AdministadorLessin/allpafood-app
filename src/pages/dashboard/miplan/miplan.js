@@ -182,7 +182,7 @@ const MiPlanPage = () => {
 
   return (
     <LayoutDasboard claseStyle={false}>
-      <Cascada className="afPanel">
+      <Cascada className="afPanel afPanel--plan">
 
         <Bloque><h1 className="afPanel__titular">Mi plan</h1></Bloque>
 
@@ -203,7 +203,7 @@ const MiPlanPage = () => {
                   }
                 </div>
                 <Anillo restantes={restantes} total={total}
-                        unidad={total === 1 ? 'almuerzo' : 'almuerzos'} />
+                        unidad={total === 1 ? 'envío' : 'envíos'} />
               </div>
             </Bloque>
 
@@ -234,7 +234,7 @@ const MiPlanPage = () => {
                 <div className="afCard">
                   <div className="afCard__head">
                     <span className="afCard__title">Tus {total} envíos</span>
-                    <span className="afCard__label">{usados} usados</span>
+                    <span className="afCard__label">{usados} ya pedidos</span>
                   </div>
 
                   <div className="afTira">

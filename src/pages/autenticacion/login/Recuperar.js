@@ -2,10 +2,15 @@ import { useState } from 'react';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import { motion } from 'framer-motion';
+/* La direccion del API sale del mismo sitio que en el resto de la app.
+   Esta pantalla la leia directo de REACT_APP_API_URL, que en produccion no
+   existe: el pedido del codigo salia a "undefinedauth/password/forgot", nunca
+   llegaba al servidor, y ningun cliente pudo recuperar su clave jamas. */
+import { API_URL } from '../../../config';
+import { useVerClave } from '../../../components/ultil/VerClave';
 
 
 
-const API_URL = process.env.REACT_APP_API_URL;
 
 /**
  * Los nueve digitos del celular, lo escriba como lo escriba.
@@ -30,6 +35,7 @@ const soloDigitos = (valor) => {
  * tenga que volver a escribirlo.
  */
 export default function Recuperar({ volver, telefonoInicial = '' }) {
+  const verClave = useVerClave();
 
   const [paso, setPaso] = useState(1);
   const [telefono, setTelefono] = useState(soloDigitos(telefonoInicial).slice(-9));
@@ -131,7 +137,8 @@ export default function Recuperar({ volver, telefonoInicial = '' }) {
             <TextField
               label="Nueva contraseña"
               variant="filled"
-              type="password"
+              type={verClave.type}
+              InputProps={verClave.InputProps}
               autoComplete="new-password"
               value={clave}
               onChange={(e) => setClave(e.target.value)}

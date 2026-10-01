@@ -33,6 +33,12 @@
     background: transparent;
     position: relative;
     padding: 30px 30px 30px 140px;
+    /* En escritorio el contenido arranca despues de la columna de navegacion
+       y respira a los lados; antes quedaba una tira estrecha al centro con
+       medio monitor vacio. */
+    @media screen and (min-width: 993px){
+        padding: 26px 28px 40px 292px;
+    }
     /* Ese relleno de 120px reservaba sitio para la barra blanca superior, que
        ya no existe: el panel empieza arriba del todo. */
     @include mediaTablet{

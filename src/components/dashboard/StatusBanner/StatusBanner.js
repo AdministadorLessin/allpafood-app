@@ -4,6 +4,7 @@ import Skeleton from '@mui/material/Skeleton';
 
 import './StatusBanner.scss';
 import { estadoDelPanel } from './estadoPlan';
+import { useAuthContext } from './../../../context/authContext';
 
 /**
  * Lo primero que ve el cliente al entrar: que tiene que hacer y el boton para
@@ -13,6 +14,8 @@ import { estadoDelPanel } from './estadoPlan';
  * Toda la logica vive en estadoDelPanel: este componente solo pinta.
  */
 const StatusBanner = ({ plan, ordenes, creditos, cargando, ahora }) => {
+
+  const { esCorporativo, empresa } = useAuthContext();
 
   if (cargando) {
     return (
@@ -26,6 +29,15 @@ const StatusBanner = ({ plan, ordenes, creditos, cargando, ahora }) => {
   }
 
   const estado = estadoDelPanel({ plan, ordenes, creditos, ahora });
+
+  /* Al colaborador de una empresa no se le ofrece comprar ni renovar: no es
+     su plan. El resto del mensaje —"te falta elegir dos dias"— si le sirve
+     igual que a cualquiera, asi que solo se le cambia el boton. */
+  if (esCorporativo && estado.accion?.a === '/planes') {
+    estado.accion = { texto: 'Elegir mis platos', a: '/menu' };
+    estado.titulo = 'Elige tus almuerzos de la semana';
+    estado.detalle = `Tu almuerzo lo cubre ${empresa?.nombreVisible || 'tu empresa'}.`;
+  }
 
   return (
     <div className={`afBanner afBanner--${estado.tono}`}>

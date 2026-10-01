@@ -231,3 +231,23 @@
         color: var(--af-muted);
     }
 }
+
+
+/* En computadora las tarjetas se reparten en dos columnas en vez de dejar
+   media pantalla vacia. Se usa multicolumna y no rejilla porque son tarjetas
+   sueltas de alturas distintas: asi se acomodan solas sin huecos. */
+@media screen and (min-width: 993px){
+    .afPanel--plan{
+        max-width: 1080px;
+        columns: 2;
+        column-gap: 22px;
+    }
+    .afPanel--plan > *{
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    /* El titulo cruza las dos columnas: es el nombre de la pantalla. */
+    .afPanel--plan > *:first-child{
+        column-span: all;
+    }
+}

@@ -28,7 +28,7 @@ import {
   } from '@vis.gl/react-google-maps';
 
 import { Polygon } from './../../../../pages/dashboard/ubicaciones/circulo';
-import { API_URL } from '../../../../config';
+import { API_URL, MAPS_KEY, MAPS_ID } from '../../../../config';
 
 const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
 
@@ -331,9 +331,9 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                 </div>
 
                 <div className="dmResumenMap">
-                    <APIProvider apiKey={'AIzaSyA2RQfrTKIQNzphsuq06Czy5u-BH2XBFsI'}>
+                    <APIProvider apiKey={MAPS_KEY}>
                         <Map
-                            mapId={"8f1d9e42cf8834cfb88cbcd3"}
+                            mapId={MAPS_ID}
                             className={'dmResumenMapStyle'}
                             defaultZoom={12.5}
                             defaultCenter={defailtCenter}

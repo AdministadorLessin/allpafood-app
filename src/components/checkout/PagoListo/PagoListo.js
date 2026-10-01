@@ -77,20 +77,16 @@ const PagoListo = ({ total, plan, adicionales = 0 }) => {
 
             {/* Lo siguiente que tiene que hacer, dicho aqui. Antes el cliente
                 caia en el panel sin saber que sin elegir sus platos no come
-                el lunes. */}
+                el lunes. Ahora primero la direccion: sin ella el pedido no
+                tiene a donde ir, y es lo unico que no se puede saltar. */}
             <p className="afPago__sig">
-              Ahora elige qué vas a comer esta semana. Toma un minuto.
+              Falta lo último: dinos a dónde te llevamos el almuerzo.
             </p>
 
             <motion.button type="button" className="afBtn afBtn--mint"
-              onClick={() => navigate('/menu', { replace: true })} {...alToque}>
-              Elegir mis almuerzos
+              onClick={() => navigate('/registro/direccion', { replace: true })} {...alToque}>
+              Indicar mi dirección
             </motion.button>
-
-            <button type="button" className="afPago__luego"
-              onClick={() => navigate('/', { replace: true })}>
-              Lo hago después
-            </button>
           </>
         }
 

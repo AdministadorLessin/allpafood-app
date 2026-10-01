@@ -31,15 +31,27 @@ import './Yape.scss';
 import CheckoutPaymentFail from './FailPayment';
 import { useAuthContext } from './../../../context/authContext';
 
-const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,loadYape,serverFail}) => {
-
+const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,loadYape,serverFail,correoGuardado,errorCorreo}) => {
 
     const [yapeFormFields,setYapeFormFields] = useState({
         ynumero:'',
-        yotp:''
+        yotp:'',
+        ydni:'',
+        ycorreo: correoGuardado || ''
     });
 
     const validationSchema = Yup.object().shape({
+        /* El correo tampoco se pide al registrarse, y sin el la pasarela
+           rechazaba el cobro entero: exige un correo para el pagador. Ademas
+           es a donde va la boleta. */
+        ycorreo: Yup.string()
+                        .required('Ingresa tu correo para la boleta.')
+                        .email('Escribe un correo válido.'),
+        /* El DNI ya no se pide al registrarse —ahora el cliente entra solo con
+           su telefono—, pero la boleta lo necesita, asi que se pide aqui. */
+        ydni: Yup.string()
+                        .required('Ingresa tu DNI para la boleta.')
+                        .matches(/^[0-9]{8}$/,'El DNI tiene 8 dígitos.'),
         ynumero: Yup.string()
                         .required('Ingrese un telefono valido por favor.')
                         .min(9,'Ingrese un telefono valido por favor.')
@@ -75,6 +87,37 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
                 <div className="inlineFlex yapeFormBox">
                     <Grid container spacing={2}>
                         <Grid container spacing={2}>
+                            <Grid item xs={12} sm={12} md={12}>
+                                <div className="textFieldCheck">
+                                    <p>Correo</p>
+                                    <TextField
+                                        id="ycorreo"
+                                        name="ycorreo"
+                                        type={'email'}
+                                        variant="outlined"
+                                        placeholder="Para enviarte tu boleta"
+                                        error={errors.ycorreo || errorCorreo ? true : false}
+                                        helperText={errors.ycorreo?.message || errorCorreo}
+                                        {...register("ycorreo", { onChange: changeFields })}
+                                        value={yapeFormFields.ycorreo}
+                                    />
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12}>
+                                <div className="textFieldCheck">
+                                    <p>DNI</p>
+                                    <TextField
+                                        id="ydni"
+                                        name="ydni"
+                                        type={'text'}
+                                        variant="outlined"
+                                        error={errors.ydni ? true : false}
+                                        helperText={errors.ydni?.message}
+                                        {...register("ydni", { onChange: changeFields })}
+                                        value={yapeFormFields.ydni}
+                                    />
+                                </div>
+                            </Grid>
                             <Grid item xs={12} sm={12} md={8}>
                                 <div className="textFieldCheck">
                                     <p>Numero</p>

@@ -1,0 +1,74 @@
+/* Entrada de marca: fondo del mismo verde suave del panel, el isotipo se
+   dibuja con su trazo, se rellena y respira una vez. Nada de giros infinitos:
+   esto dura lo que tarda el panel en tener datos, no es un spinner. */
+.afCarga{
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(90% 70% at 50% 30%, #FFFFFF 0%, rgba(255,255,255,0) 60%),
+        linear-gradient(160deg, #EAF6EE 0%, #F7FAF4 45%, #E4F0FF 100%);
+    opacity: 1;
+    transition: opacity .42s ease, transform .42s ease;
+
+    &--fuera{
+        opacity: 0;
+        transform: scale(1.03);
+        pointer-events: none;
+    }
+
+    &__marca{
+        display: grid;
+        justify-items: center;
+        gap: 14px;
+        animation: afCargaSube .7s cubic-bezier(.16,.84,.44,1) both;
+    }
+
+    &__iso{
+        width: 104px;
+        height: 104px;
+        overflow: visible;
+        filter: drop-shadow(0 12px 30px rgba(23,122,76,.18));
+    }
+
+    &__hoja{
+        fill: var(--af-accent, #177A4C);
+        stroke: var(--af-accent, #177A4C);
+        stroke-width: 4;
+        stroke-dasharray: 1400;
+        stroke-dashoffset: 1400;
+        fill-opacity: 0;
+        animation:
+            afCargaTrazo .85s cubic-bezier(.65,0,.35,1) forwards,
+            afCargaRelleno .45s ease forwards;
+
+        &--1{ animation-delay: 0s, .55s; }
+        /* La hoja de abajo entra despues: se lee como un gesto, no como dos
+           formas apareciendo a la vez. */
+        &--2{ fill: var(--af-mint, #3CFB9F); stroke: var(--af-mint, #3CFB9F); animation-delay: .18s, .72s; }
+    }
+
+    &__txt{
+        margin: 0;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--af-accent, #177A4C);
+        opacity: 0;
+        animation: afCargaTexto .5s ease .78s forwards;
+    }
+}
+
+@keyframes afCargaTrazo{ to{ stroke-dashoffset: 0; } }
+@keyframes afCargaRelleno{ to{ fill-opacity: 1; } }
+@keyframes afCargaTexto{ from{ opacity: 0; transform: translateY(6px); } to{ opacity: .85; transform: none; } }
+@keyframes afCargaSube{ from{ opacity: 0; transform: translateY(10px) scale(.96); } to{ opacity: 1; transform: none; } }
+
+/* Quien pidio menos movimiento ve la marca quieta, sin dibujo ni rebote. */
+@media (prefers-reduced-motion: reduce){
+    .afCarga__marca, .afCarga__txt{ animation: none; opacity: 1; }
+    .afCarga__hoja{ animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
+}

@@ -26,7 +26,7 @@ import {
   } from '@vis.gl/react-google-maps';
 import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { API_URL } from '../../../config';
+import { API_URL, MAPS_KEY, MAPS_ID } from '../../../config';
 
 const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
@@ -51,6 +51,9 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
 
     // Calle que devuelve el mapa para el punto marcado, como en /ubicaciones.
     const [calleDelMapa,setCalleDelMapa] = useState(null);
+
+    /* Si el cliente ya corrigio la direccion, mover el pin no se la pisa. */
+    const [calleTocada,setCalleTocada] = useState(false);
 
     const handleChangeFields = (e) => {
         const { name, value, type, checked } = e.target;
@@ -557,7 +560,7 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                     const num = conCalle.address_components.find(c => c.types.includes('street_number'));
                     calle = num ? `${via.long_name} ${num.long_name}` : via.long_name;
                 }
-                setCalleDelMapa(calle);
+                if (!calleTocada) setCalleDelMapa(calle);
 
                 setDistrito(district);
 
@@ -595,9 +598,9 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                 punto es pedirlo a ciegas, y es la razon por la que en la base
                 habia direcciones que eran solo un numero. */}
             <div className="rsrMap">
-                <APIProvider apiKey={'AIzaSyA2RQfrTKIQNzphsuq06Czy5u-BH2XBFsI'}>
+                <APIProvider apiKey={MAPS_KEY}>
                     <Map
-                        mapId={"8f1d9e42cf8834cfb88cbcd3"}
+                        mapId={MAPS_ID}
                         className={'rsrMapUbiPageMapApiStyle'}
                         defaultZoom={11}
                         defaultCenter={defailtCenter}
@@ -647,11 +650,26 @@ const FormPerfilStep3 = ({stepForm,setStepForm,data,setData,loadStatus}) => {
                 }
             </div>
 
+            {/* Editable: el mapa propone y el cliente confirma. Nadie revisaba
+                lo que resolvia el mapa y en la base quedaron direcciones que
+                son solo un numero, sin calle. */}
             {dataAddPoint.location.latitude !== 0 &&
                 <div className="ubiCalle">
-                    <span className="ubiCalle__et">Dirección del punto que marcaste</span>
-                    <strong>{calleDelMapa || 'Sin nombre de calle en este punto'}</strong>
-                    {distrito && <em>{distrito}</em>}
+                    <label className="ubiCalle__et" htmlFor="calleConfirmada">
+                        Tu dirección {distrito ? `· ${distrito}` : ''}
+                    </label>
+                    <input
+                        id="calleConfirmada"
+                        className="ubiCalle__campo"
+                        value={calleDelMapa || ''}
+                        placeholder="Av. Ejemplo 123"
+                        onChange={(e) => { setCalleDelMapa(e.target.value); setCalleTocada(true); }}
+                    />
+                    <small className="ubiCalle__nota">
+                        {calleTocada
+                            ? 'Así va a quedar guardada.'
+                            : 'La sacamos del mapa. Revísala y complétale el número si falta.'}
+                    </small>
                 </div>
             }
 

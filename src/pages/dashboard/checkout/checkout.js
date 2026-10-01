@@ -328,6 +328,9 @@ const CheckoutPage = (props) => {
 
     const [openMp, setOpenMp] = useState(false);
     const [serverFail, setServerFail] = useState(false);
+    /* Un correo que ya es de otra cuenta se avisa en la misma pantalla: si se
+       dejara pasar, el cobro seguiria fallando sin decir por que. */
+    const [errorCorreo, setErrorCorreo] = useState('');
     const handleOpenMp = () => {
         setOpenMp(true);
     };
@@ -337,11 +340,47 @@ const CheckoutPage = (props) => {
     };
 
     const [loadYape,setLoadYape] = useState(false);
-    const onSubmitHandlerYape = (data) =>{
+    const onSubmitHandlerYape = async (data) =>{
 
         const aditionalsTmp = cartAdicionales.map(item => item.type);
 
         setLoadYape(true);
+
+        /* El DNI va a la ficha del cliente. Desde el registro ya no se pide
+           —se entra solo con el telefono—, pero la boleta lo necesita, asi que
+           se guarda aqui.
+           Se ESPERA a que quede guardado antes de cobrar: antes salia en
+           paralelo y el cobro solia ganarle la carrera, asi que la pasarela
+           recibia el pagador sin documento aunque el cliente lo hubiera
+           escrito. Si falla, no se bloquea el cobro. */
+        if (data.ydni) {
+            try {
+                await axios.patch(`${API_URL}profile/data/document`,
+                    { documentNumber: data.ydni },
+                    { headers: {"Authorization" : `Bearer ${token}`} });
+            } catch (error) { console.log('dni', error); }
+        }
+
+        /* El correo, antes de cobrar y esperando a que quede guardado.
+           La pasarela exige un correo para el pagador: sin el rechazaba el
+           cobro entero con un error que no explicaba nada, y el cliente
+           quedaba convencido de que el sistema no funciona. */
+        if (data.ycorreo) {
+            try {
+                await axios.patch(`${API_URL}profile/data/email`,
+                    { email: data.ycorreo },
+                    { headers: {"Authorization" : `Bearer ${token}`} });
+            } catch (error) {
+                const msg = error?.response?.data?.message;
+                if (msg) {
+                    setLoadYape(false);
+                    setErrorCorreo(msg);
+                    return;
+                }
+                console.log('correo', error);
+            }
+        }
+
         const adicionalesList = []
         if(cartAdicionales && cartAdicionales.length > 0){
             cartAdicionales.map((item,index)=>{
@@ -522,46 +561,53 @@ const CheckoutPage = (props) => {
                                                         <div className="txt">
                                                             <small>Plan:</small>
                                                             <h3>{item.description}</h3>
-                                                            {true && metricasCal &&
+                                                            {/* Las barras de macros solo si el cliente TIENE ese
+                                                                calculo. Antes bastaba con que 'needBrm' existiera, y
+                                                                para 222 de 241 clientes ese dato es un [] vacio: la
+                                                                pantalla leia metricasCal.macros.carbs sobre un
+                                                                undefined, reventaba entera y el cliente veia "Algo se
+                                                                nos rompio" en vez del checkout. Nadie podia comprar
+                                                                ni renovar, y el pago nunca llegaba al servidor. */}
+                                                            {metricasCal?.bmr && metricasCal?.macros &&
                                                                 <div 
                                                                     className="inlineFlex criLinesBox"
                                                                 >
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><IcoMacro n="kcal" /> Calorías</p>
-                                                                            <p>{Math.round(carloriasRed+item.properties[0]?.value)}/{Math.round(metricasCal.bmr)}</p>
+                                                                            <p>{Math.round(carloriasRed+item.properties[0]?.value)}/{Math.round(metricasCal?.bmr || 0)}</p>
                                                                         </div>
                                                                         <div className="line">
                                                                             
-                                                                            <span style={{width:''+(((carloriasRed+item.properties[0]?.value)/metricasCal.bmr)*100).toFixed(0)+'%'}}></span>
+                                                                            <span style={{width:''+(((carloriasRed+item.properties[0]?.value)/(metricasCal?.bmr || 1))*100).toFixed(0)+'%'}}></span>
                                                                         </div>
                                                                     </div>
 
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><IcoMacro n="carb" /> Carbohidratos</p>
-                                                                            <p>{Math.round(carboRed+item.properties[1]?.value)}/{Math.round(metricasCal.macros.carbs)}</p>
+                                                                            <p>{Math.round(carboRed+item.properties[1]?.value)}/{Math.round(metricasCal?.macros?.carbs || 0)}</p>
                                                                         </div>
                                                                         <div className="line">
-                                                                            <span style={{width:''+(((carboRed+item.properties[1]?.value)/metricasCal.macros.carbs)*100).toFixed(0)+'%'}}></span>
+                                                                            <span style={{width:''+(((carboRed+item.properties[1]?.value)/(metricasCal?.macros?.carbs || 1))*100).toFixed(0)+'%'}}></span>
                                                                         </div>
                                                                     </div>
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><IcoMacro n="gras" /> Grasas</p>
-                                                                            <p>{Math.round(grasasRed+item.properties[2]?.value)}/{Math.round(metricasCal.macros.fat)}</p>
+                                                                            <p>{Math.round(grasasRed+item.properties[2]?.value)}/{Math.round(metricasCal?.macros?.fat || 0)}</p>
                                                                         </div>
                                                                         <div className="line">
-                                                                            <span style={{width:''+(((grasasRed+item.properties[2]?.value)/metricasCal.macros.fat)*100).toFixed(0)+'%'}}></span>
+                                                                            <span style={{width:''+(((grasasRed+item.properties[2]?.value)/(metricasCal?.macros?.fat || 1))*100).toFixed(0)+'%'}}></span>
                                                                         </div>
                                                                     </div>
                                                                     <div className="inlineBlock lineItem">
                                                                         <div className="liTxt">
                                                                             <p><IcoMacro n="prot" /> Proteína</p>
-                                                                            <p>{Math.round(proteinasRed+item.properties[3]?.value)}/{Math.round(metricasCal.macros.protein)}</p>
+                                                                            <p>{Math.round(proteinasRed+item.properties[3]?.value)}/{Math.round(metricasCal?.macros?.protein || 0)}</p>
                                                                         </div>
                                                                         <div className="line">
-                                                                            <span style={{width:''+(((proteinasRed+item.properties[3]?.value)/metricasCal.macros.protein)*100).toFixed(0)+'%'}}></span>
+                                                                            <span style={{width:''+(((proteinasRed+item.properties[3]?.value)/(metricasCal?.macros?.protein || 1))*100).toFixed(0)+'%'}}></span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -783,6 +829,8 @@ const CheckoutPage = (props) => {
                                                             handleCloseMp={handleCloseMp}
                                                             openMp={openMp}
                                                             serverFail={serverFail}
+                                                            correoGuardado={planInfo?.profile?.email || ''}
+                                                            errorCorreo={errorCorreo}
                                                             loadYape={loadYape}
                                                             paymentMethod={false}
                                                         />

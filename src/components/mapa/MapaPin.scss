@@ -1,0 +1,90 @@
+/* El mapa donde el cliente marca su puerta. */
+.afMapa{
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--af-line, #E3E9DF);
+
+    &__lienzo{
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Leaflet pinta sus controles con z-index alto; el buscador tiene que
+       quedar por encima o el cliente escribe detras del mapa. */
+    .leaflet-container{ font: inherit; }
+    .leaflet-control-attribution{ font-size: 10px; }
+}
+
+/* El pin: punta abajo, que es el punto exacto. */
+.afPinWrap{ background: none; border: 0; }
+
+.afPin{
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin: 0 auto;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    background: var(--af-accent, #177A4C);
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 2px 6px rgba(16,31,24,.35);
+}
+
+.afBuscaMapa{
+    position: absolute;
+    z-index: 1000;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+
+    input{
+        width: 100%;
+        border: 1px solid var(--af-line, #E3E9DF);
+        border-radius: 999px;
+        padding: 11px 16px;
+        font: inherit;
+        font-size: 14px;
+        background: #FFFFFF;
+        box-shadow: 0 2px 10px rgba(16,31,24,.18);
+
+        &:focus{ outline: 2px solid rgba(23,122,76,.3); }
+    }
+
+    &__estado{
+        position: absolute;
+        right: 16px;
+        top: 12px;
+        font-size: 12px;
+        color: var(--af-muted, #61706A);
+    }
+
+    &__lista{
+        list-style: none;
+        margin: 6px 0 0;
+        padding: 6px;
+        background: #FFFFFF;
+        border-radius: 14px;
+        box-shadow: 0 6px 22px rgba(16,31,24,.22);
+        max-height: 190px;
+        overflow-y: auto;
+
+        button{
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: 0;
+            background: none;
+            font: inherit;
+            font-size: 13px;
+            line-height: 1.35;
+            color: var(--af-ink, #16211B);
+            padding: 9px 10px;
+            border-radius: 9px;
+            cursor: pointer;
+
+            &:hover{ background: var(--af-accent-soft, #E2F3E9); }
+        }
+    }
+}

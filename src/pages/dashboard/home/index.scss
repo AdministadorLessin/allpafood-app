@@ -146,3 +146,86 @@
     font-weight: 500;
     color: var(--af-muted);
 }
+
+/* ==========================================================================
+   Inicio en computadora
+   --------------------------------------------------------------------------
+   Muchos clientes entran desde el trabajo, en pantallas anchas. El panel vivia
+   en una tira de 560px al centro: habia que bajar para ver la semana mientras
+   medio monitor quedaba vacio.
+
+   Desde 993px se arma en dos columnas: a la izquierda lo de hoy —el pedido, lo
+   que falta hacer y la semana—, a la derecha el plan, los atajos y las cifras.
+   En el telefono los envoltorios de columna desaparecen y queda la lista de
+   siempre, en el mismo orden.
+   ========================================================================== */
+/* Todas las pantallas del panel respiran en computadora: la tira de 560px
+   nacio para el telefono y en un monitor dejaba dos tercios en blanco. */
+@media screen and (min-width: 993px){
+    .afPanel{ max-width: 920px; }
+}
+
+.afInicio__col{ display: contents; }
+
+/* Orden del telefono, independiente de en que columna viva cada tarjeta. */
+.afInicio__hoy{ order: 1; }
+.afInicio__banner{ order: 2; }
+.afInicio__kpis{ order: 3; }
+.afInicio__accesos{ order: 4; }
+.afInicio__semana{ order: 5; }
+.afInicio__plan{ order: 6; }
+.afInicio__macros{ order: 7; }
+
+.afPanel--inicio{
+    display: flex;
+    flex-direction: column;
+
+    @media screen and (min-width: 993px){
+        max-width: 1180px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(310px, 1fr);
+        align-items: start;
+        column-gap: 24px;
+
+        /* El encabezado y el titular cruzan las dos columnas: son el saludo de
+           la pantalla, no una tarjeta mas. */
+        > .afPanel__top,
+        > .afInicio__titular{ grid-column: 1 / -1; }
+
+        .afInicio__col{
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .afPanel__titular{ margin-bottom: 10px !important; }
+    }
+
+    @media screen and (min-width: 1500px){
+        max-width: 1320px;
+        column-gap: 28px;
+    }
+}
+
+/* En la columna derecha las cifras se leen de corrido: una debajo de otra,
+   con el numero a la izquierda y su nombre al lado. Tres tarjetas en fila
+   dentro de 320px dejan los numeros del tamano de la letra pequena. */
+@media screen and (min-width: 993px){
+    .afInicio__kpis .afKpis{ grid-template-columns: 1fr; gap: 8px; }
+    .afInicio__kpis .afKpi{
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 15px;
+    }
+    .afInicio__kpis .afKpi__circulo{ margin-bottom: 0; }
+    .afInicio__kpis .afKpi__valor{ font-size: 23px; }
+    .afInicio__kpis .afKpi__pie{ font-size: 12.5px; margin-left: auto; text-align: right; }
+
+    .afInicio__accesos .afAccesos{ grid-template-columns: 1fr; }
+    .afInicio__accesos .afAcceso{
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        text-align: left;
+    }
+}

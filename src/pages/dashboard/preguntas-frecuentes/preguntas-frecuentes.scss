@@ -66,3 +66,72 @@
         }
     }
 }
+/* Acordeon con el lenguaje del panel: una fila por pregunta, el signo a la
+   derecha y la respuesta debajo en gris. */
+.afFaq{
+    &__it{
+        border-bottom: 1px solid var(--af-line);
+        &:last-child{ border-bottom: 0; }
+    }
+    &__btn{
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 16px 0;
+        border: 0;
+        background: none;
+        font-family: inherit;
+        font-size: 15.5px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: var(--af-ink);
+        text-align: left;
+        cursor: pointer;
+
+        span{ flex: 1; }
+        &:focus-visible{ outline: 2px solid var(--af-accent); outline-offset: 3px; border-radius: 10px; }
+    }
+    &__mas{
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--af-accent-soft);
+        color: var(--af-accent);
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1;
+        font-style: normal;
+    }
+    &__it--on &__mas{ background: var(--af-ink); color: var(--af-mint); }
+
+    &__txt{
+        margin: -4px 0 18px;
+        padding-right: 42px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--af-muted);
+        white-space: pre-line;
+    }
+
+    &__ayuda{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+
+        b{ display: block; font-size: 15.5px; color: var(--af-ink); }
+        small{ display: block; font-size: 13px; color: var(--af-muted); margin-top: 2px; }
+    }
+    &__wa{
+        width: auto !important;
+        padding: 0 22px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+}

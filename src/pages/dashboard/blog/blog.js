@@ -3,18 +3,8 @@ import axios from 'axios';
 
 import './blog.scss';
 import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
-import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
-
-import icoMenu from '../../../assets/img/ico_factrura.svg';
-
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
-import IconButton from '@mui/material/IconButton';
-import CardNoticia from './../../../components/blog/CardNoticia/CardNoticia';
-import CardNoticiaLoad from './../../../components/blog/CardNoticiaLoad/CardNoticiaLoad';
-import BlockAnimate from './../../../components/ultil/BlockAnimate/BlockAnimate';
-import BlogNotResult from './../../../components/blog/BlogNotResult/BlogNotResult';
+import Skeleton from '@mui/material/Skeleton';
+import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
 
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
@@ -71,6 +61,7 @@ const BlogPage = (props) => {
     }
 
     const [showNot,setShowNot] = useState(false);
+    const [catActiva,setCatActiva] = useState(null);
     const applyFilter = (filter) => {
         setShowNot(true)
         const result = []
@@ -107,84 +98,116 @@ const BlogPage = (props) => {
         getCategories();
     },[]);
 
+    /* El texto de WordPress viene con etiquetas: se limpia para mostrar un
+       resumen de dos lineas, no HTML a medio pintar. */
+    const resumen = (html) => String(html || '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&hellip;/g, '…')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const nombreCategoria = (item) => {
+        if (!catList || !item?.categories?.length) return null;
+        const c = catList.find((x) => item.categories.includes(x.id));
+        return c ? c.name : null;
+    };
+
     return (
         <LayoutDasboard claseStyle={false}>
-            <CardPaper
-                data={
-                    {
-                        titulo:'Salud y bienestar:',
-                        ico:icoMenu,
-                        className:false
-                    }
-                } 
-            >
-                <div className="inlineFlex blogPageFiltros">
-                    {catList &&
-                        <div className="blogPageCat">
-                            <h4>Filtrar por:</h4>
-                            
-                            <ul>
-                                {catList.map((item)=>{
-                                    return (
-                                    <li><div className={'linkCat'} onClick={()=>applyFilter(item.id)} >{item.name}</div></li>
-                                    )
-                                })}
-                            </ul>
-                            
-                        </div>
-                    }
-                    <div className="blogPageSearch">
-                        <TextField
-                            slotProps={{
-                                input: {
-                                    startAdornment:
-                                    <InputAdornment position="start">
-                                        <IconButton
-                                        aria-label="description for action"
-                                        >
-                                        <SearchIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                },
-                            }}
-                            value={searchField}
-                            onChange={changeField}
-                            
-                        />
-                    </div>
-                </div>
+            <Cascada className="afPanel afPanel--blog">
 
-                <BlockAnimate
-                    claseStyle={'inlineBlock'}
-                    stateParam={arrayFiltered}
-                    unicId={'blogLists1a6s5d56ad4s'}
-                >
-                { arrayFiltered && arrayFiltered.length ?
-                    <div className="inlineFlex blogPageList">
-                        {arrayFiltered.map((item)=>{
-                            return (
-                                <div className="blogPageItem">
-                                    <CardNoticia data={item} catList={catList} modalOpen={handleOpenDetalle} />
-                                </div>
-                            )
-                        })}
+                <Bloque><h1 className="afPanel__titular">Salud y bienestar</h1></Bloque>
+                <Bloque>
+                    <p className="afMenu__ayuda">
+                        Recetas, consejos y nutrición del equipo de Allpa Food.
+                    </p>
+                </Bloque>
+
+                <Bloque>
+                    <div className="afBlog__barra">
+                        <div className="afBlog__buscar">
+                            <span className="afBlog__lupa" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                                     strokeLinecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+                            </span>
+                            <input
+                                type="search"
+                                placeholder="Buscar un artículo"
+                                value={searchField || ''}
+                                onChange={changeField}
+                                aria-label="Buscar un artículo"
+                            />
+                        </div>
+
+                        {catList && catList.length > 0 &&
+                            <div className="afBlog__cats">
+                                <button type="button"
+                                    className={`afBlog__cat${catActiva === null ? ' afBlog__cat--on' : ''}`}
+                                    onClick={() => { setCatActiva(null); setArrayFiltered(arrayFiltered2); }}>
+                                    Todo
+                                </button>
+                                {catList.map((item) => (
+                                    <button type="button" key={item.id}
+                                        className={`afBlog__cat${catActiva === item.id ? ' afBlog__cat--on' : ''}`}
+                                        onClick={() => { setCatActiva(item.id); applyFilter(item.id); }}>
+                                        {item.name}
+                                    </button>
+                                ))}
+                            </div>
+                        }
                     </div>
-                :arrayFiltered === 0 ?
-                    <BlogNotResult />
-                :
-                    <div className="inlineFlex blogPageList">
-                        <div className="blogPageItem">
-                            <CardNoticiaLoad />
+                </Bloque>
+
+                <Bloque>
+                    {!arrayFiltered && arrayFiltered !== 0 &&
+                        <div className="afBlog__lista">
+                            {[0, 1, 2].map((i) => (
+                                <Skeleton key={i} variant="rounded" height={300}
+                                    sx={{ borderRadius: '26px', gridColumn: i === 0 ? 'span 2' : 'auto' }} />
+                            ))}
                         </div>
-                        <div className="blogPageItem">
-                            <CardNoticiaLoad />
+                    }
+
+                    {arrayFiltered === 0 &&
+                        <div className="afCard">
+                            <p className="afMenu__nota afMenu__nota--suelta">
+                                No encontramos artículos con ese filtro. Prueba con otra categoría.
+                            </p>
                         </div>
-                        <div className="blogPageItem">
-                            <CardNoticiaLoad />
+                    }
+
+                    {arrayFiltered && arrayFiltered.length > 0 &&
+                        <div className="afBlog__lista">
+                            {arrayFiltered.map((item, i) => (
+                                /* Foto a sangre con la tipografia encima, como las tarjetas de
+                                   comida de la referencia: el plato vende, no el marco blanco.
+                                   La primera ocupa el doble de ancho: da un punto de entrada
+                                   en vez de una cuadricula pareja. */
+                                <motion.button type="button"
+                                    className={`afNota${i === 0 ? ' afNota--destacada' : ''}`}
+                                    key={item.id}
+                                    style={item.fimg_url ? { backgroundImage: `url(${item.fimg_url})` } : undefined}
+                                    onClick={() => handleOpenDetalle(item)} {...alToque}>
+                                    <span className="afNota__velo" />
+                                    {nombreCategoria(item) &&
+                                        <span className="afNota__cat">{nombreCategoria(item)}</span>}
+                                    <span className="afNota__flecha" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                                             strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                                    </span>
+                                    <span className="afNota__txt">
+                                        <b>{resumen(item?.title?.rendered)}</b>
+                                        <small>{resumen(item?.excerpt?.rendered).slice(0, 110)}…</small>
+                                    </span>
+                                </motion.button>
+                            ))}
                         </div>
-                    </div>
-                }
-                </BlockAnimate>
+                    }
+                </Bloque>
+
+            </Cascada>
 
                 <Modal
                     aria-labelledby="transition-modal-title"
@@ -205,7 +228,6 @@ const BlogPage = (props) => {
                         </div>
                     </Fade>
                 </Modal>
-            </CardPaper>
         </LayoutDasboard>
     )
 };

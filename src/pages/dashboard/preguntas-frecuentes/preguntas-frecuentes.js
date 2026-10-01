@@ -1,147 +1,111 @@
-import React,{useState,useEffect} from "react";
-import './preguntas-frecuentes.scss'
+// Preguntas frecuentes, con el lenguaje del resto del panel.
+//
+// Antes era un acordeon de MUI dentro de una tarjeta con su propio estilo:
+// tipografia distinta, bordes distintos y una flecha gris. Aqui se usa lo
+// mismo que ve el cliente en el resto de la app, y al final un camino claro a
+// WhatsApp, que es donde termina quien no encuentra su respuesta.
 
-import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
-import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
-
-import icoPreguntasFrecuentes from '../../../assets/img/ico_preguntas_frecuentes.svg';
-
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useState, useEffect } from "react";
+import './preguntas-frecuentes.scss';
 
 import Skeleton from '@mui/material/Skeleton';
-
 import axios from 'axios';
-import BlockAnimate from './../../../components/ultil/BlockAnimate/BlockAnimate';
 
-const PreguntasFrecuentesPage = (props) => {
+import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
+import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
 
-    const [faqList,setFapList] = useState();
+const WHATSAPP = '51955797697';
 
-    const getFaq = () =>{
+/* El contenido llega de WordPress con etiquetas HTML. Se limpian aqui: en una
+   respuesta de tres lineas, un <p> suelto se veria como texto roto. */
+const aTexto = (html) => String(html || '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#8217;|&#039;/g, "'")
+    .trim();
+
+const PreguntasFrecuentesPage = () => {
+
+    const [faqList, setFaqList] = useState(null);
+    const [abierta, setAbierta] = useState(0);
+
+    useEffect(() => {
         axios.get('https://admin-landing.allpafood.com/wp-json/wp/v2/preguntas-frecuentes')
-            .then((resp)=>{
-                setFapList(resp.data);
-                console.log(resp.data);
-            }).catch((error)=>{
-                console.log(error)
-            })
-    }
-
-    useEffect(()=>{
-        getFaq();
-    },[])
+            .then((resp) => setFaqList(Array.isArray(resp.data) ? resp.data : []))
+            .catch(() => setFaqList([]));
+    }, []);
 
     return (
         <LayoutDasboard claseStyle={false}>
-            <CardPaper
-                data={
-                    {
-                        titulo:'Preguntas frecuentes :',
-                        ico:icoPreguntasFrecuentes,
-                        className:false
-                    }
-                }
-            >
-                <BlockAnimate
-                    claseStyle={'inlineBlock'}
-                    stateParam={faqList}
-                    unicId={'preguntasFrecuentesas6d54asd654asd546'}
-                >
-                {faqList && faqList.length > 0 ?
-                    <div className="preFreBox">
-                        {faqList.map((item,index)=>{
-                            if(index===0){
-                                return (
-                                    <Accordion  defaultExpanded >
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel1-content"
-                                            id="panel1-header"
-                                        >
-                                            <Typography component="span">{item.title.rendered}</Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <div dangerouslySetInnerHTML={{__html: item.content.rendered}}></div>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                )
-                            }else{
-                                return (
-                                    <Accordion>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel1-content"
-                                            id="panel1-header"
-                                        >
-                                            <Typography component="span">{item.title.rendered}</Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <div dangerouslySetInnerHTML={{__html: item.content.rendered}}></div>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                )
-                            }
+            <Cascada className="afPanel">
 
+                <Bloque><h1 className="afPanel__titular">Preguntas frecuentes</h1></Bloque>
+                <Bloque>
+                    <p className="afMenu__ayuda">
+                        Lo que más nos preguntan sobre los planes, las entregas y los platos.
+                    </p>
+                </Bloque>
 
+                <Bloque>
+                    <div className="afCard afFaq">
+                        {faqList === null &&
+                            [0, 1, 2, 3].map((i) => (
+                                <div className="afFaq__it" key={i}>
+                                    <Skeleton variant="text" width={`${70 - i * 8}%`} height={28} />
+                                </div>
+                            ))
+                        }
+
+                        {faqList && faqList.length === 0 &&
+                            <p className="afMenu__nota afMenu__nota--suelta">
+                                No pudimos cargar las preguntas. Escríbenos y te respondemos al toque.
+                            </p>
+                        }
+
+                        {(faqList || []).map((item, i) => {
+                            const abierto = abierta === i;
+                            const pregunta = aTexto(item?.title?.rendered);
+                            const respuesta = aTexto(item?.content?.rendered);
+                            return (
+                                <div className={`afFaq__it${abierto ? ' afFaq__it--on' : ''}`} key={item.id || i}>
+                                    <button type="button" className="afFaq__btn"
+                                        aria-expanded={abierto}
+                                        onClick={() => setAbierta(abierto ? -1 : i)}>
+                                        <span>{pregunta}</span>
+                                        <i className="afFaq__mas" aria-hidden="true">{abierto ? '−' : '+'}</i>
+                                    </button>
+                                    {abierto &&
+                                        <p className="afFaq__txt">{respuesta}</p>
+                                    }
+                                </div>
+                            );
                         })}
-
                     </div>
-                :
-                    <div className="preFreBox">
-                        <Accordion defaultExpanded >
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1-content"
-                                id="panel1-header"
-                            >
-                                <Typography component="span" sx={{ width:'100%' }}><Skeleton variant="text" sx={{ fontSize: '2rem',width:'100%' }} /></Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                            </AccordionDetails>
-                        </Accordion>
+                </Bloque>
 
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1-content"
-                                id="panel1-header"
-                            >
-                                <Typography component="span" sx={{ width:'100%' }}><Skeleton variant="text" sx={{ fontSize: '2rem',width:'100%' }} /></Typography>
-                            </AccordionSummary>
-                        </Accordion>
-
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1-content"
-                                id="panel1-header"
-                            >
-                                <Typography component="span" sx={{ width:'100%' }}><Skeleton variant="text" sx={{ fontSize: '2rem',width:'100%' }} /></Typography>
-                            </AccordionSummary>
-                        </Accordion>
-
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1-content"
-                                id="panel1-header"
-                            >
-                                <Typography component="span" sx={{ width:'100%' }}><Skeleton variant="text" sx={{ fontSize: '2rem' }} /></Typography>
-                            </AccordionSummary>
-                        </Accordion>
+                {/* La salida: quien llega hasta abajo sin respuesta necesita una
+                    persona, no otra pantalla. */}
+                <Bloque>
+                    <div className="afCard afFaq__ayuda">
+                        <div>
+                            <b>¿No encuentras tu respuesta?</b>
+                            <small>Te contestamos por WhatsApp de lunes a viernes.</small>
+                        </div>
+                        <motion.a className="afBtn afBtn--mint afFaq__wa"
+                            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola, tengo una consulta sobre mi plan.')}`}
+                            target="_blank" rel="noreferrer" {...alToque}>
+                            Escribirnos
+                        </motion.a>
                     </div>
-                }
-                </BlockAnimate>
-            </CardPaper>
+                </Bloque>
+
+            </Cascada>
         </LayoutDasboard>
-    )
+    );
 };
 
 export default PreguntasFrecuentesPage;

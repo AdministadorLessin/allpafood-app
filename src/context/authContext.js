@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { API_URL } from '../config';
 
 export const AuthContext = createContext();
@@ -8,6 +9,7 @@ const STORAGE_KEYS = {
   INFO: 'inf',
   CART_PRODUCTS: 'cartProducts',
   CART_ADICIONAL: 'cartAdicional',
+  EMPRESA: 'af_empresa',
 };
 
 // Custom Hook auxiliar para manejar estados sincronizados con LocalStorage
@@ -46,9 +48,39 @@ export default function AuthContextProvider({ children }) {
     }
   });
 
+  /* La empresa que le paga el almuerzo, si es que hay una.
+     Se guarda para que la franja de la empresa aparezca en el primer pintado
+     y no un segundo despues, que se ve como un parpadeo. */
+  const [empresa, setEmpresa] = useState(() => {
+    try {
+      const e = localStorage.getItem(STORAGE_KEYS.EMPRESA);
+      return e ? JSON.parse(e) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [cartItems, setCartItems] = useLocalStorageState(STORAGE_KEYS.CART_PRODUCTS, []);
   const [cartAdicionales, setCartAdicionales] = useLocalStorageState(STORAGE_KEYS.CART_ADICIONAL, []);
   const [loadResp, setLoadResp] = useState(false);
+
+  /* Un cliente normal recibe {corporativo:false} y todo sigue igual. Si falla
+     la consulta no se toca lo guardado: es mejor pintar la franja de ayer que
+     dejar al colaborador viendo precios que no le corresponden. */
+  useEffect(() => {
+    if (!token) {
+      setEmpresa(null);
+      localStorage.removeItem(STORAGE_KEYS.EMPRESA);
+      return;
+    }
+    axios.get(`${baseUrl}user/empresa`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => {
+        const e = r.data?.data ?? r.data ?? null;
+        setEmpresa(e);
+        try { localStorage.setItem(STORAGE_KEYS.EMPRESA, JSON.stringify(e)); } catch { /* sin espacio */ }
+      })
+      .catch(() => {});
+  }, [token, baseUrl]);
 
   // Manejadores encapsulados con useCallback para evitar re-renderizados inútiles
   const handleUpdateToken = useCallback((code, data) => {
@@ -136,30 +168,37 @@ export default function AuthContextProvider({ children }) {
 
     setToken(null);
     setPlanInfo(null);
+    setEmpresa(null);
     setCartItems([]);
     setCartAdicionales([]);
   }, [setCartItems, setCartAdicionales]);
 
   const coverCities = ([
+    /* Zona de reparto. El borde este se abre para cubrir La Molina —que
+       figuraba en la lista de distritos pero caia fuera de este poligono, asi
+       que esa direccion no se podia guardar— y el sur baja hasta el limite de
+       Chorrillos. Cada punto sale de la caja real del distrito, no a ojo:
+       los 16 distritos de la lista quedan dentro, comprobados uno por uno. */
     {lat: -12.071775, lng: -77.127376},
-    {lat: -12.050166012430507, lng: -77.12321506194232},
-    {lat: -12.038534368978064, lng: -77.04307515149316},
-    {lat: -12.042156223443866, lng: -77.03263247775908},
-    {lat: -12.044691206072324, lng: -77.01860092752652},
-    {lat: -12.040068979242449, lng: -77.01440146938337},
-    {lat: -12.036134638578853, lng: -77.00749458554263},
-    {lat: -12.042318909975238, lng: -76.9869421953882},
-    {lat: -12.056883818600367, lng: -76.96910095272972},
-    {lat: -12.063516949630726, lng: -76.9406387898395},
-    {lat: -12.082228713133365, lng: -76.93482507680285},
-    {lat: -12.117424586830495, lng: -76.93835277213725},
-    {lat: -12.106948284912896, lng: -76.96659496993122},
-    {lat: -12.149492339619586, lng: -76.98526687489377},
-    {lat: -12.151039653870129, lng: -77.02450049768188},
-    {lat: -12.144791188231787, lng: -77.02546162670896},
-    {lat: -12.134336752232585, lng: -77.02972141600992},
-    {lat: -12.109753098397164, lng: -77.05519476345135},
-    {lat: -12.099267229821463, lng: -77.07202239891171},
+    {lat: -12.050166, lng: -77.123215},
+    {lat: -12.038534, lng: -77.043075},
+    {lat: -12.042156, lng: -77.032632},
+    {lat: -12.044691, lng: -77.018601},
+    {lat: -12.040069, lng: -77.014401},
+    {lat: -12.036135, lng: -77.007495},
+    {lat: -12.042319, lng: -76.986942},
+    {lat: -12.056884, lng: -76.969101},
+    {lat: -12.050901, lng: -76.945000},
+    {lat: -12.050901, lng: -76.877585},
+    {lat: -12.128915, lng: -76.877585},
+    {lat: -12.130000, lng: -76.955000},
+    {lat: -12.149492, lng: -76.985267},
+    {lat: -12.237816, lng: -76.966441},
+    {lat: -12.237816, lng: -77.046373},
+    {lat: -12.160000, lng: -77.046373},
+    {lat: -12.134337, lng: -77.029721},
+    {lat: -12.109753, lng: -77.055195},
+    {lat: -12.099267, lng: -77.072022},
   ]);
 
   const value = useMemo(
@@ -169,6 +208,8 @@ export default function AuthContextProvider({ children }) {
       baseUrl,
       token,
       planInfo,
+      empresa,
+      esCorporativo: !!empresa?.corporativo,
       cartItems,
       cartAdicionales,
       handleUpdateToken,
@@ -186,6 +227,7 @@ export default function AuthContextProvider({ children }) {
       baseUrl,
       token,
       planInfo,
+      empresa,
       cartItems,
       cartAdicionales,
       handleUpdateToken,

@@ -213,3 +213,344 @@
     height: auto;
     display: inline-block;
 }
+/* ==========================================================================
+   Mi cuenta, con el lenguaje del panel. Antes eran cuatro tarjetas con
+   ilustraciones grandes, etiquetas en minuscula y un boton "Editar" con icono
+   de lapiz: otra epoca de la app.
+   ========================================================================== */
+.afPanel--cuenta{
+    @media screen and (min-width: 993px){ max-width: 1040px; }
+}
+
+.afYo{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 0 !important;
+    overflow: hidden;
+
+    /* Cielo de color detras del avatar, como la cabecera de las tarjetas de
+       perfil de la referencia. */
+    &__cielo{
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 108px;
+        background:
+            radial-gradient(70% 120% at 20% 0%, rgba(60,251,159,.55) 0%, rgba(60,251,159,0) 70%),
+            linear-gradient(120deg, #DCF3E6 0%, #E9F1FF 100%);
+    }
+
+    &__foto{
+        position: relative;
+        z-index: 1;
+        width: 104px;
+        height: 104px;
+        margin-top: 52px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid var(--af-paper);
+        padding: 0;
+        background: var(--af-mint);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        box-shadow: 0 14px 30px -18px rgba(16,31,24,.6);
+
+        img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+        &:hover .afYo__lapiz{ transform: scale(1.06); }
+    }
+    &__inicial{ font-size: 38px; font-weight: 800; color: var(--af-mint-ink); }
+
+    /* El lapiz sobre la foto: dice que se puede cambiar sin ocupar una fila. */
+    &__lapiz{
+        position: absolute;
+        right: -2px;
+        bottom: 2px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--af-ink);
+        color: var(--af-mint);
+        border: 3px solid var(--af-paper);
+        transition: transform .18s ease;
+        svg{ width: 14px; height: 14px; }
+    }
+
+    &__nombre{
+        margin: 12px 0 2px;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -.025em;
+        color: var(--af-ink);
+        line-height: 1.15;
+    }
+    &__sub{
+        margin: 0;
+        font-size: 13.5px;
+        color: var(--af-muted);
+    }
+
+    &__chips{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 12px;
+    }
+
+    /* Tres acciones en cuadros, como en la referencia del perfil: lo que se
+       viene a hacer aqui, sin buscar botones dentro de las tarjetas. */
+    &__acciones{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        width: 100%;
+        margin-top: 18px;
+    }
+}
+
+.afChip{
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: var(--af-r-pill);
+    background: rgba(16,31,24,.06);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--af-ink);
+
+    &--mint{ background: var(--af-mint); color: var(--af-mint-ink); }
+}
+
+.afAccion{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 8px;
+    border: 1px solid var(--af-line);
+    border-radius: 18px;
+    background: var(--af-bg-soft, #F4F7F3);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--af-ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
+
+    &:hover{ background: var(--af-paper); border-color: var(--af-border-strong, rgba(16,31,24,.16)); }
+
+    &__ico{
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--af-paper);
+        color: var(--af-accent);
+        svg{ width: 19px; height: 19px; }
+    }
+}
+
+.afCuenta__rejilla{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+
+    @media screen and (min-width: 760px){ grid-template-columns: 1fr 1fr; }
+
+    .afCard{ margin-bottom: 0 !important; }
+}
+
+.afDato{
+    padding: 9px 0;
+    border-bottom: 1px solid var(--af-line);
+    &:last-of-type{ border-bottom: 0; }
+
+    &__et{
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+    }
+    &__v{
+        display: block;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--af-ink);
+        margin-top: 2px;
+        word-break: break-word;
+    }
+}
+
+.afCuenta__mas .afMasOpciones a{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--af-line);
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--af-ink);
+
+    &:last-child{ border-bottom: 0; }
+    span{ color: var(--af-muted); font-size: 20px; line-height: 1; }
+}
+
+/* ==========================================================================
+   Los formularios de la cuenta (datos, preferencias, contraseña, avatar).
+   Se abren desde "Editar" y seguian con el diseño viejo: título con icono
+   dentro de un círculo, campos anchos y botones verdes cuadrados. Aquí se
+   les pone la misma hoja redondeada, la misma tipografía y los mismos
+   botones que el resto del panel, sin tocar los formularios por dentro.
+   ========================================================================== */
+.profEditCont{
+    width: min(560px, 94vw) !important;
+    max-width: 560px !important;
+    max-height: 92vh;
+    overflow-y: auto;
+    border-radius: 26px !important;
+    padding: 26px 24px !important;
+    box-shadow: 0 30px 60px -34px rgba(16,31,24,.55);
+
+    @include mediaPhone{ padding: 20px 16px !important; }
+
+    /* El icono del título no aporta: el propio título ya dice qué se edita. */
+    .profEditBox .title .ico{ display: none; }
+    .profEditBox .title{
+        display: block;
+        margin-bottom: 18px;
+        padding: 0;
+        border: 0;
+    }
+    .profEditBox .title h3,
+    .profileEdithAvatar h3{
+        margin: 0 0 4px;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--af-ink);
+    }
+
+    /* Los botones del formulario, con la forma de los de la app. */
+    .btnPrimary{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 0 22px;
+        border: 0;
+        border-radius: var(--af-r-pill);
+        background: var(--af-ink);
+        color: #F1F6F2;
+        font-family: inherit;
+        font-size: 14.5px;
+        font-weight: 800;
+        cursor: pointer;
+
+        svg{ width: 18px; height: 18px; }
+        &:hover{ opacity: .92; }
+    }
+    /* El segundo boton de cada formulario es "Cancelar": no compite. */
+    /* Solo cuando hay dos: si el formulario trae un unico boton, ese es el
+       de guardar y tiene que verse como la accion principal. */
+    .peaBtnBox .btnPrimary:not(:only-child):last-child,
+    .formRowBtn .btnPrimary:not(:only-child):last-child{
+        background: transparent;
+        border: 1.5px solid var(--af-line);
+        color: var(--af-muted);
+    }
+    .peaBtnBox, .formRowBtn{
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    /* Rejilla de avatares.
+       La version anterior tenia la foto en 120px fijos dentro de una celda mas
+       angosta: sobresalia y quedaba cortada por la mitad. Aqui cada celda es
+       un cuadrado y la imagen se ajusta dentro. */
+    .profileEdithAvatar .peaList{
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        list-style: none;
+        margin: 16px 0;
+        padding: 0;
+        max-height: min(46vh, 380px);
+        overflow-y: auto;
+
+        @include mediaPhone{ grid-template-columns: repeat(4, 1fr); }
+
+        li{
+            width: 100%;
+            padding: 0;
+            border-radius: 50%;
+            overflow: visible;
+            cursor: pointer;
+            transition: transform .18s ease;
+            &:hover{ transform: translateY(-2px); }
+
+            figure{
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 1;
+                margin: 0;
+                border: 3px solid transparent;
+                border-radius: 50%;
+                overflow: hidden;
+                background: var(--af-bg-soft, #F1F5F1);
+                transition: border-color .18s ease, box-shadow .18s ease;
+            }
+            img{
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* El elegido: aro verde alrededor del circulo, no un cuadrado. */
+            &.active figure{
+                border-color: var(--af-accent);
+                box-shadow: 0 0 0 3px rgba(23,122,76,.18);
+            }
+        }
+    }
+}
+
+/* La X de cerrar, como una pastilla clara en la esquina. */
+.profEditClose{
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid !important;
+    place-items: center;
+    background: rgba(16,31,24,.06);
+    color: var(--af-ink);
+    cursor: pointer;
+    transition: background .18s ease;
+    &:hover{ background: rgba(16,31,24,.12); }
+    svg{ width: 20px; height: 20px; }
+}
+
+
+/* "Más opciones" solo tiene sentido en el telefono: ahi la barra de abajo
+   lleva cuatro secciones y esta es la unica puerta al resto. En computadora
+   todo eso ya esta en el menu lateral, asi que sobra. */
+@media screen and (min-width: 993px){
+    .afCuenta__mas{ display: none; }
+}

@@ -8,7 +8,7 @@ import Skeleton from '@mui/material/Skeleton';
 import StatusBanner from './../../../components/dashboard/StatusBanner/StatusBanner';
 import PanelSemana from './../../../components/dashboard/PanelSemana/PanelSemana';
 import { TarjetaPlan, TarjetaHoy } from './../../../components/dashboard/TarjetasResumen/TarjetasResumen';
-import { estadoDelPanel } from './../../../components/dashboard/StatusBanner/estadoPlan';
+import { estadoDelPanel, fijarDiasLibres } from './../../../components/dashboard/StatusBanner/estadoPlan';
 import { Cascada, Bloque } from './../../../components/ultil/Motion/Motion';
 import AccesosRapidos from './../../../components/dashboard/AccesosRapidos/AccesosRapidos';
 import PanelKpis from './../../../components/dashboard/PanelKpis/PanelKpis';
@@ -17,6 +17,8 @@ import Campana from './../../../components/dashboard/Campana/Campana';
 import icoObjetivo from '../../../assets/img/ico_objetivo.svg';
 import icoFecha from '../../../assets/img/icon_fecha.svg';
 import Bienvenida, { bienvenidaYaVista } from '../../../components/dashboard/Bienvenida/Bienvenida';
+import AvisosCliente from '../../../components/dashboard/AvisosCliente/AvisosCliente';
+import Tarjetas from '../../../components/dashboard/Tarjetas/Tarjetas';
 
 // Charts
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
@@ -25,7 +27,6 @@ import PlanUser from './../../../components/dashboard/PlanUser/PlanUser';
 import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
 import ObjetivosCharts from './../../../components/dashboard/ObjetivosCharts/ObjetivosCharts';
 import MenuWeek from './../../../components/dashboard/MenuWeek/MenuWeek';
-import ProgramMenu from './../../../components/dashboard/ProgramMenu/ProgramMenu';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
@@ -49,6 +50,21 @@ const DashboadHome = (props) => {
   // No se muestra hasta saber DE VERDAD si el perfil tiene avatar: mostrarla
   // un instante y taparla en cuanto llega el perfil se ve como un parpadeo.
   const [mostrarBienvenida, setMostrarBienvenida] = useState(false);
+
+  /* Los dias que el cliente reprogramo o en que viaja: el banner y la tira de
+     la semana no deben pedirle que los elija. */
+  const [, setDiasLibresListos] = useState(0);
+  useEffect(()=>{
+    if (!token) return;
+    const cab = { headers: { Authorization: `Bearer ${token}` } };
+    Promise.all([
+      axios.get(`${API_URL}order/reprogramados`, cab).then((r) => r.data?.data ?? r.data).catch(() => []),
+      axios.get(`${API_URL}plan/pause`, cab).then((r) => r.data?.data || r.data).catch(() => []),
+    ]).then(([reprog, pausas]) => {
+      fijarDiasLibres(Array.isArray(reprog) ? reprog : [], Array.isArray(pausas) ? pausas : []);
+      setDiasLibresListos((n) => n + 1);
+    });
+  },[token]);
 
   const [menuList,setMenuList] = useState();
   const todayDate = new Date();
@@ -238,22 +254,35 @@ const DashboadHome = (props) => {
     const hasProfile = planInfo.profile !== null; // o Array.isArray(planInfo.profile)
     const isPlanActive = planInfo.planActive === true;
 
-    // 1. SI AMBOS TIENEN DATA: No hace nada (se queda en la ruta actual)
-    if (hasProfile && isPlanActive ) {
-      removeLocalstorage();
+    /* Clave que le pusimos nosotros en la carga masiva: elige la suya antes
+       que nada. */
+    if (planInfo.mustChangePassword) {
+      return navigate('/cambiar-clave');
+    }
+
+    /* Quien ya pago manda al candado de la direccion, no al cuestionario.
+       Antes el orden era al reves y ganaba el cuestionario: un cliente
+       migrado, que ya come con nosotros, entraba y lo primero que veia eran
+       tres pantallas preguntandole su objetivo. Si el plan esta activo, lo
+       unico que puede faltarle es donde entregarle. */
+    if (isPlanActive) {
+      axios.get(`${API_URL}delivery/find/points`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      }).then((resp) => {
+        const puntos = resp?.data?.data;
+        if (!puntos || puntos.length === 0) navigate('/registro/direccion');
+        else removeLocalstorage();
+      }).catch(() => { /* si falla la consulta no se traba al cliente */ });
       return;
     }
 
-    // 2. Si le falta el perfil, redirige a perfil
+    // Sin plan activo: o le falta el perfil, o le falta comprar.
     if (!hasProfile) {
       removeLocalstorage();
       return navigate('/registro/perfil');
     }
 
-    // 3. Si tiene perfil pero el plan no está activo, redirige a planes
-    if (!isPlanActive) {
-      return navigate('/planes');
-    }
+    return navigate('/planes');
   }, [planInfo, planChecked, navigate]);
 
   // El titular sale del mismo calculo que el banner: una sola fuente de verdad
@@ -285,7 +314,7 @@ const DashboadHome = (props) => {
           decia por donde empezar. */}
       {/* La cascada entra de abajo hacia arriba en el orden de lectura: quien
           llega ve primero que tiene que hacer y despues el detalle. */}
-      <Cascada className="afPanel">
+      <Cascada className="afPanel afPanel--inicio">
 
         {/* Nombre y fecha en una linea, como encabezado. Antes ocupaban una
             tarjeta de 190px con una ilustracion, en el lugar donde ahora va lo
@@ -318,7 +347,7 @@ const DashboadHome = (props) => {
 
         {/* Titular a dos tonos: la primera linea situa, la segunda es el dato.
             Leerlo entero toma menos que leer una tarjeta. */}
-        <Bloque>
+        <Bloque className="afInicio__titular">
           <h1 className="afPanel__titular">
             {estado
               ? <><span className="afPanel__t1">{estado.titularPrefijo}</span>{estado.titularFuerte}</>
@@ -328,30 +357,46 @@ const DashboadHome = (props) => {
 
         {/* Va primero cuando hay entrega hoy: es la pregunta que el cliente
             trae en la cabeza al abrir la app, y la que hoy termina en WhatsApp. */}
-        <Bloque><PedidoDeHoy ordenes={menuList} aviso={avisoEntrega} /></Bloque>
+        {/* En computadora son dos columnas: a la izquierda lo de hoy y la
+            semana, a la derecha el plan, los atajos y las cifras. En el
+            telefono los envoltorios desaparecen —display:contents— y queda la
+            misma lista de siempre, en el mismo orden. */}
+        <div className="afInicio__col afInicio__col--principal">
+          <Bloque className="afInicio__hoy"><PedidoDeHoy ordenes={menuList} aviso={avisoEntrega} /></Bloque>
 
-        <Bloque><StatusBanner
-          plan={plan}
-          ordenes={menuList}
-          creditos={plan && plan.credits}
-          cargando={!planChecked}
-        /></Bloque>
+          <Bloque className="afInicio__banner"><StatusBanner
+            plan={plan}
+            ordenes={menuList}
+            creditos={plan && plan.credits}
+            cargando={!planChecked}
+          /></Bloque>
 
-        {/* Sin plan no hay semana que mostrar ni objetivo que seguir: repetir
-            tarjetas vacias solo aleja del unico paso que importa, comprar. */}
+          {/* Sin plan no hay semana que mostrar ni objetivo que seguir: repetir
+              tarjetas vacias solo aleja del unico paso que importa, comprar. */}
+          {(plan || !planChecked) &&
+            <>
+              <Bloque className="afInicio__semana"><PanelSemana ordenes={menuList} cargando={!planChecked} /></Bloque>
+              <Bloque className="afInicio__macros"><TarjetaHoy
+                ordenes={menuList}
+                metricas={metricsDay}
+                objetivo={objetMEtrics}
+                cargando={!planChecked}
+              /></Bloque>
+
+              {/* Los tips van despues de lo suyo —su pedido, su semana, sus
+                  macros—, no antes. El cliente entra a hacer algo; primero se
+                  le resuelve eso y recien despues se le cuenta algo. */}
+              <Bloque><Tarjetas lugar="inicio" titulo="Para ti" /></Bloque>
+            </>
+          }
+        </div>
+
         {(plan || !planChecked) &&
-          <>
-            <Bloque><PanelKpis plan={plan} ordenes={menuList} facturas={facturas} cargando={!planChecked} /></Bloque>
-            <Bloque><AccesosRapidos /></Bloque>
-            <Bloque><PanelSemana ordenes={menuList} cargando={!planChecked} /></Bloque>
-            <Bloque><TarjetaPlan plan={plan} cargando={!planChecked} /></Bloque>
-            <Bloque><TarjetaHoy
-              ordenes={menuList}
-              metricas={metricsDay}
-              objetivo={objetMEtrics}
-              cargando={!planChecked}
-            /></Bloque>
-          </>
+          <div className="afInicio__col afInicio__col--lateral">
+            <Bloque className="afInicio__kpis"><PanelKpis plan={plan} ordenes={menuList} facturas={facturas} cargando={!planChecked} /></Bloque>
+            <Bloque className="afInicio__accesos"><AccesosRapidos /></Bloque>
+            <Bloque className="afInicio__plan"><TarjetaPlan plan={plan} cargando={!planChecked} /></Bloque>
+          </div>
         }
 
         {/* El programador completo vive en su propia pestana (/menu). Tenerlo
@@ -360,6 +405,9 @@ const DashboadHome = (props) => {
             el boton del banner o tocando un dia de la tira. */}
 
       </Cascada>
+
+      {/* Despues de la bienvenida, nunca encima: dos hojas a la vez no se leen. */}
+      <AvisosCliente oculto={mostrarBienvenida || planInfo?.role === 'DELIVERY'} />
 
       {mostrarBienvenida &&
         <Bienvenida

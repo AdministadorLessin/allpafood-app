@@ -1,0 +1,125 @@
+/* Franja de la empresa. Ancho completo, alta en movil para que el texto
+   respire, y el recorte siempre al centro: las fotos de banner traen la
+   comida en los bordes y el espacio libre al medio. */
+.afEmpresa{
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: var(--af-r-card, 20px);
+    box-shadow: var(--af-shadow-m);
+    margin-bottom: 18px;
+    aspect-ratio: 3 / 1;
+
+    &__fondo{
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: -2;
+        /* La imagen es del 2000 de ancho; en el telefono se ve un recorte
+           central. El transform-origin al centro evita que el asentamiento
+           del inicio descubra un borde. */
+        transform-origin: center;
+    }
+
+    /* De izquierda a derecha: opaco donde va el texto, casi limpio donde esta
+       la comida. En movil no hay sitio para ese reparto y se cubre parejo. */
+    &__velo{
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background:
+            linear-gradient(90deg,
+                rgba(8, 20, 14, .90) 0%,
+                rgba(8, 20, 14, .82) 34%,
+                rgba(8, 20, 14, .46) 64%,
+                rgba(8, 20, 14, .22) 100%);
+    }
+
+    &__texto{
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 8%;
+        max-width: 620px;
+    }
+
+    &__logo{
+        display: block;
+        width: auto;
+        height: 30px;
+        max-width: 190px;
+        object-fit: contain;
+        object-position: left center;
+        margin-bottom: 2px;
+    }
+
+    &__titulo{
+        margin: 0;
+        color: #FFFFFF;
+        font-family: var(--poppins, inherit);
+        font-size: clamp(16px, 2.3vw, var(--af-t-xl, 24px));
+        font-weight: 600;
+        line-height: 1.18;
+        letter-spacing: var(--af-track-titular, -.03em);
+        text-wrap: balance;
+    }
+
+    &__detalle{
+        margin: 0;
+        color: rgba(255, 255, 255, .82);
+        font-size: clamp(11.5px, 1.35vw, var(--af-t-s, 13.5px));
+        line-height: 1.4;
+        max-width: 42ch;
+    }
+
+    /* El color de la empresa entra como un filo, no como un fondo: el banner
+       ya trae su propia paleta y dos colores peleando se ven baratos. */
+    &::after{
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--emp-color, var(--af-mint, #3CFB9F));
+    }
+
+    /* En el telefono el reparto izquierda-derecha no cabe: el texto baja al
+       pie y el velo se carga abajo, asi la comida del banner sigue viendose
+       arriba en vez de quedar tapada por una mancha oscura. */
+    @media (max-width: 720px){
+        aspect-ratio: auto;
+        min-height: 196px;
+        border-radius: 16px;
+
+        &__fondo{ object-position: 32% center; }
+
+        &__velo{
+            background: linear-gradient(180deg,
+                rgba(8, 20, 14, .12) 0%,
+                rgba(8, 20, 14, .48) 42%,
+                rgba(8, 20, 14, .88) 100%);
+        }
+
+        /* La altura vive aqui, no en la seccion: con aspect-ratio en auto la
+           seccion la marca el propio texto, y un height:100% contra un padre
+           que no tiene altura propia deja el bloque pegado arriba. */
+        &__texto{
+            min-height: 196px;
+            justify-content: flex-end;
+            padding: 16px 18px 17px;
+            max-width: none;
+            gap: 5px;
+        }
+
+        &__logo{ height: 24px; max-width: 142px; }
+        &__titulo{ font-size: 17px; }
+        &__detalle{ font-size: 12.5px; }
+    }
+}

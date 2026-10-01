@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- El contenido esta en espanol. Declararlo como "en" hacia que Chrome
+     ofreciera traducir la pagina al espanol: el traductor reemplaza los
+     nodos de texto y despues React no encuentra los suyos, revienta la
+     pantalla y el cliente ve "Algo se nos rompio". Paso con 10 clientes
+     el 25/09/2026, todos en Mi menu. -->
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#35F09A" />
+
+    <!-- Lo que se ve cuando alguien pega el enlace en WhatsApp.
+         Sin estas etiquetas, WhatsApp mostraba el texto que trae React de
+         fabrica: "Web site created using create-react-app". Justo debajo del
+         nombre de la marca, en el mensaje que reciben los clientes. -->
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Tu plan de almuerzos Allpa Food: elige tus platos de la semana, sigue tu entrega del día y revisa tus envíos."
     />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Allpa Food" />
+    <meta property="og:title" content="Allpa Food · Tu plan de almuerzos" />
+    <meta
+      property="og:description"
+      content="Elige tus platos de la semana, sigue tu entrega del día y revisa tus envíos."
+    />
+    <meta property="og:url" content="https://app.allpafood.com/" />
+    <!-- Absoluta a proposito: WhatsApp no resuelve rutas relativas. -->
+    <meta property="og:image" content="https://app.allpafood.com/og-allpafood.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_PE" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Allpa Food · Tu plan de almuerzos" />
+    <meta
+      name="twitter:description"
+      content="Elige tus platos de la semana, sigue tu entrega del día y revisa tus envíos."
+    />
+    <meta name="twitter:image" content="https://app.allpafood.com/og-allpafood.png" />
+
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -58,7 +58,7 @@ const PanelKpis = ({ plan, ordenes, facturas, cargando, ahora }) => {
     : null;
 
   const semana = semanaDelCliente(ordenes, ahora);
-  const resueltos = semana.filter((d) => ['entregado', 'enRuta', 'listo'].includes(d.estado)).length;
+  const resueltos = semana.filter((d) => ['entregado', 'enRuta', 'listo', 'hoy'].includes(d.estado)).length;
 
   // Ahorro acumulado: la suma de todos los descuentos que ya se le aplicaron,
   // sacada del detalle de sus facturas. Es un numero real y verificable —el

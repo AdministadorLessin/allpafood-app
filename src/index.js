@@ -5,11 +5,15 @@ import moment from 'moment';
 import 'moment/locale/es';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { vigilarSesion } from './components/ultil/sesion';
 
 // El idioma se fijaba dentro de cada componente, despues de que moment ya
 // hubiera creado sus fechas: los dias salian en ingles ("Wednesday 2 de
 // Septiembre"). Aqui se fija una sola vez, antes de que arranque la app.
 moment.locale('es');
+
+// Una sesion vencida saca al cliente al ingreso en vez de dejarlo con pantallas vacias.
+vigilarSesion();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

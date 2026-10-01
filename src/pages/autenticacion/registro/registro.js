@@ -58,7 +58,27 @@ const RegistroPage = (props) => {
     const [numberVerify,setNumberVerify] = useState('');
     const [codeVerify,setCodeVerify] = useState('');
 
-    const handleChangeNumber = (e) =>setNumberVerify(e.target.value);
+    /* El numero como venga: con +51, con espacios, o copiado de un contacto.
+       Antes se guardaba tal cual y el esquema exigia 9 digitos exactos, asi
+       que escribirlo con el 51 delante lo dejaba en 11 y el formulario se
+       negaba a enviar: la peticion no salia del navegador y el cliente se
+       quedaba esperando un codigo que nunca se mando. Es el mismo arreglo que
+       ya tiene "olvide mi contrasena". */
+    const soloDigitos = (valor) => {
+        const digitos = (valor || '').replace(/\D/g, '');
+        if (digitos.length >= 11 && digitos.startsWith('51')) return digitos.slice(2, 11);
+        return digitos.slice(0, 9);
+    };
+
+    const handleChangeNumber = (e) => {
+        const limpio = soloDigitos(e.target.value);
+        setNumberVerify(limpio);
+        /* react-hook-form guarda lo que venga en el evento, asi que hay que
+           decirle explicitamente el valor ya limpio: si no, valida los 11
+           digitos que se escribieron y marca error sobre un campo que en
+           pantalla muestra 9. */
+        setValue('fValidNumber', limpio, { shouldValidate: true });
+    };
     const handleChangeCode = (e) =>setCodeVerify(e.target.value);
 
     const validationSchema = Yup.object().shape({
@@ -72,6 +92,7 @@ const RegistroPage = (props) => {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
     } = useForm({
         mode: "all",
         shouldUnregister: true,
@@ -117,6 +138,46 @@ const RegistroPage = (props) => {
     };
 
     const [errorVerifyCode,setErrorVerifyCode] = useState();
+
+    /* Reenviar el codigo sin salir de esta pantalla ni volver a escribir el
+       numero. Antes este boton solo retrocedia de paso, y el servidor rechazaba
+       el segundo pedido mientras el codigo anterior siguiera vigente: quien no
+       recibia el mensaje se quedaba sin ninguna salida durante diez minutos.
+       Ojo con el token: al reenviar, el servidor borra el usuario a medio
+       verificar y crea otro, asi que devuelve un token nuevo. Si no se guarda,
+       "Verificar" seguiria usando el viejo, que ya apunta a un usuario que no
+       existe. */
+    const [reenviando,setReenviando] = useState(false);
+    const [avisoReenvio,setAvisoReenvio] = useState('');
+    const [esperaReenvio,setEsperaReenvio] = useState(0);
+
+    useEffect(()=>{
+        if(esperaReenvio <= 0) return undefined;
+        const t = setTimeout(()=> setEsperaReenvio(esperaReenvio - 1), 1000);
+        return ()=> clearTimeout(t);
+    },[esperaReenvio]);
+
+    const reenviarCodigo = () =>{
+        if(reenviando || esperaReenvio > 0) return;
+        setReenviando(true);
+        setAvisoReenvio('');
+        setErrorVerifyCode();
+
+        axios.post(`${API_URL}auth/send-code`,{ phoneNumber: '51' + numberVerify })
+            .then((resp)=>{
+                handleUpdateToken(resp.data.data.token, resp.data.data);
+                setReenviando(false);
+                setEsperaReenvio(60);
+                setAvisoReenvio('Listo, te mandamos otro código.');
+            }).catch((err)=>{
+                setReenviando(false);
+                // Tambien se espera tras un fallo: si el servidor pide esperar,
+                // insistir de inmediato solo repite el mismo rechazo.
+                setEsperaReenvio(60);
+                setErrorVerifyCode(mensajeError(
+                    err, 'No pudimos reenviar el código. Inténtalo en un momento.'));
+            });
+    };
     const sendCode = () =>{
         setLoadingVal(true)
         axios.post(`${API_URL}register/verify-code`,
@@ -174,7 +235,11 @@ const RegistroPage = (props) => {
                                     <TextField 
                                         id="fValidNumber"
                                         name="fValidNumber" 
-                                        type='number'
+                                        /* 'tel' y no 'number': el campo numerico
+                                           acepta signos y notacion cientifica, y
+                                           en algunos telefonos se come lo pegado
+                                           desde los contactos. */
+                                        type='tel'
                                         inputMode="numeric"
                                         autoComplete="tel-national"
                                         placeholder={'963 987 654'}
@@ -188,7 +253,7 @@ const RegistroPage = (props) => {
                                 {errors.fValidNumber &&
                                     <div className="afAuth__error">
                                         <IcoError />
-                                        Escribe tus 9 dígitos, sin el código de país.
+                                        Son los 9 dígitos de tu celular. El +51 lo ponemos nosotros.
                                     </div>
                                 }
                                 {errorSendCode &&
@@ -215,7 +280,7 @@ const RegistroPage = (props) => {
                                 {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
                             </h1>
                             <p className="afAuth__bajada">
-                                Vale por 15 minutos. Escríbelo aquí y seguimos.
+                                Vale por 10 minutos. Escríbelo aquí y seguimos.
                             </p>
 
                             <div className="afCampo afCampo--grande">
@@ -245,7 +310,13 @@ const RegistroPage = (props) => {
                             </motion.button>
 
                             <p className="afAuth__pie">
-                                ¿No te llegó? <button type="button" onClick={()=>updateFormStep(0)}>Reenviar el código</button>
+                                {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
+                                <button type="button" onClick={reenviarCodigo}
+                                        disabled={reenviando || esperaReenvio > 0}>
+                                    {reenviando ? 'Reenviando…'
+                                        : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio}s`
+                                        : 'Reenviar el código'}
+                                </button>
                             </p>
                         </>
 

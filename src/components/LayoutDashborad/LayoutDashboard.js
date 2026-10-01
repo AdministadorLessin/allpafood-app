@@ -1,6 +1,8 @@
 import React,{useState} from "react"
 import Sidebar from '../sidebar/sidebar';
 import TabBar from '../TabBar/TabBar';
+import NavLateral from '../NavLateral/NavLateral';
+import CargaAllpa from '../ultil/CargaAllpa/CargaAllpa';
 import ReprogramarMenu from '../ReprogramarMenu/ReprogramarMenu';
 
 import './LayoutDashboard.scss';
@@ -26,6 +28,9 @@ const LayoutDasboard = ({children,claseStyle}) => {
                 montado para no romper nada mientras se prueba, pero la navegacion
                 real pasa por aqui. */}
             <TabBar />
+            {/* En computadora, la navegacion con nombres. Se muestra desde
+                993px; debajo de eso manda la barra de abajo. */}
+            <NavLateral />
             <div className="mainLayout">
                 {/* Aqui habia cinco manchas radiales de 1000px en verde y cian.
                     Aun bajadas de opacidad tenian la fuerza suficiente para
@@ -47,6 +52,10 @@ const LayoutDasboard = ({children,claseStyle}) => {
             <ReprogramarMenu setOpenReprogramar={setOpenReprogramar} openReprogramar={openReprogramar} />
             
             <DashLoadState />
+
+            {/* La marca, dibujandose, mientras llegan los datos del cliente.
+                Una vez por visita. */}
+            <CargaAllpa />
         </main>
     )
 };

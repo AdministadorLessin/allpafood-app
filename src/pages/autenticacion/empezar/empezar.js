@@ -5,6 +5,10 @@ import { motion } from 'framer-motion';
 
 import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
 import { API_URL } from '../../../config';
+/* El horario sale de la misma constante que usa el panel. Aqui estaba escrito
+   a mano y se habia quedado viejo: prometia "entre 11:00 y 2:00" cuando el
+   reparto ya cerraba a la 1:30. */
+import { REPARTO } from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
 import './empezar.scss';
 
 /* Los distritos a los que se reparte hoy, tomados de las direcciones activas.
@@ -14,6 +18,7 @@ const DISTRITOS = [
   'San Isidro', 'Santiago de Surco', 'Miraflores', 'San Miguel',
   'Pueblo Libre', 'San Borja', 'Jesús María', 'Magdalena del Mar',
   'Surquillo', 'Breña', 'La Victoria', 'Cercado de Lima', 'La Molina',
+  'Chorrillos', 'San Luis', 'Salamanca',
 ];
 
 const WHATSAPP = '51955797697';
@@ -105,10 +110,25 @@ export default function EmpezarPage() {
     navigate('/registro');
   };
 
-  const plan = planes?.find((p) => p.id === recomendado) || planes?.[0];
+  /* El plan que se esta mirando. Arranca en el recomendado, pero el cliente
+     puede mover la vista a los otros dos: recomendar uno solo y esconder el
+     resto obliga a quien queria otra cosa a abandonar para ir a buscarla. */
+  const [mirando, setMirando] = useState(null);
+  const idActivo = mirando ?? recomendado;
+  const plan = planes?.find((p) => p.id === idActivo) || planes?.[0];
+  const esRecomendado = plan && plan.id === recomendado;
   const comidasPorDia = plan?.benefits?.principalBenefits?.length || 1;
   const platosTotales = 20 * comidasPorDia;
   const porComida = plan ? (plan.price / platosTotales) : 0;
+
+  /* Los otros planes, con la diferencia respecto al que se esta viendo. */
+  const alternativas = (planes || [])
+    .filter((p) => p.id !== idActivo)
+    .map((p) => ({
+      ...p,
+      diferencia: plan ? Math.round(p.price - plan.price) : 0,
+      porComida: p.price / (20 * (p.benefits?.principalBenefits?.length || 1)),
+    }));
 
   /* ------------------------------------------------------------ pantallas */
 
@@ -154,7 +174,10 @@ export default function EmpezarPage() {
 
           {distrito && distrito !== 'otro' && (
             <div className="empLectura">
-              <b>Sí llegamos a {distrito}.</b> Repartimos de lunes a viernes, entre 11:00 y 2:00.
+              {/* Todo en una linea a proposito: al cortarla, el salto se come el
+                  espacio despues de la coma y quedaba "viernes,entre las 10:30".
+                  Y sin punto final, que la hora ya termina en "p.m.". */}
+              <b>Sí llegamos a {distrito}.</b> Repartimos de lunes a viernes, entre las {REPARTO.desde} y la {REPARTO.hasta}
             </div>
           )}
 
@@ -212,7 +235,7 @@ export default function EmpezarPage() {
 
       {paso === 2 && plan && (
         <>
-          <p className="empEtq">Tu plan recomendado</p>
+          <p className="empEtq">{esRecomendado ? 'Tu plan recomendado' : 'Otra opción para ti'}</p>
           <h1 className="afAuth__titular"><span className="t1">{objetivoElegido?.titulo},</span>{plan.description}</h1>
 
           <div className="empPrecio">
@@ -226,6 +249,30 @@ export default function EmpezarPage() {
           </p>
 
           <div className="empLectura"><b>Tú eliges.</b> Tres opciones cada día, no un táper sorpresa.</div>
+
+          {/* Los otros planes, con lo que cuestan de mas o de menos. Antes solo
+              se mostraba el recomendado: quien queria otra cosa no tenia como
+              compararlo y se iba de la pantalla a averiguarlo por WhatsApp. */}
+          {alternativas.length > 0 && (
+            <div className="empOtros">
+              <span className="empOtros__t">Los otros planes</span>
+              {alternativas.map((o) => (
+                <button type="button" key={o.id} className="empOtro"
+                  onClick={() => setMirando(o.id)}>
+                  <span className="empOtro__nom">
+                    {o.description}
+                    {o.id === recomendado && <em>recomendado</em>}
+                  </span>
+                  <span className="empOtro__det">
+                    S/ {o.porComida.toFixed(2)} por comida · S/ {Number(o.price).toFixed(0)} en total
+                  </span>
+                  <span className={`empOtro__dif${o.diferencia > 0 ? '' : ' empOtro__dif--menos'}`}>
+                    {o.diferencia > 0 ? `+ S/ ${o.diferencia}` : `− S/ ${Math.abs(o.diferencia)}`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {semana.length > 0 && (
             <div className="empPlatos">

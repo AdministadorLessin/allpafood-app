@@ -48,7 +48,8 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       id: `ruta-${claveHoy}`,
       tono: 'ruta',
       titulo: 'Tu almuerzo salió a ruta',
-      texto: `Llega entre las ${REPARTO.desde} y la ${REPARTO.hasta}. No hace falta que estés pendiente.`,
+      // Sin punto tras la hora: la constante ya termina en "p.m." y quedaban dos.
+      texto: `Llega entre las ${REPARTO.desde} y la ${REPARTO.hasta} No hace falta que estés pendiente.`,
       cuando: 'Hoy',
       ruta: '/',
       accion: 'Seguir mi pedido',
@@ -73,17 +74,20 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
     const porElegir = semanaDelCliente(ordenes, ahora).filter((d) => d.estado === 'elegir');
     if (porElegir.length > 0) {
       const queda = tiempoRestante(ahora);
-      const manana = primerDiaElegible(ahora);
+      /* El primer dia que le falta, no "mañana": un viernes, mañana es sabado
+         y el aviso decia "para recibir el sábado". */
+      const primero = porElegir[0].fecha;
+      const cierraHoy = primero.isSame(primerDiaElegible(ahora), 'day') && queda;
       lista.push({
         id: `programar-${claveHoy}-${porElegir.length}`,
         tono: 'aviso',
         titulo: porElegir.length === 1
           ? `Te falta elegir el ${porElegir[0].fecha.format('dddd')}`
           : `Te faltan ${porElegir.length} días por elegir`,
-        texto: queda
-          ? `Para recibir el ${manana.format('dddd')} tienes hasta las 10 p.m. de hoy` +
-            ` — quedan ${queda.horas} h ${String(queda.minutos).padStart(2, '0')} min.`
-          : 'La ventana de hoy ya cerró. Puedes elegir los días siguientes.',
+        texto: cierraHoy
+          ? `Para recibir el ${primero.format('dddd')} tienes hasta hoy a las 10:00 p.m.` +
+            ` Quedan ${queda.horas} h ${String(queda.minutos).padStart(2, '0')} min.`
+          : `Para el ${primero.format('dddd')} tienes hasta el ${primero.clone().subtract(1, 'day').format('dddd')} a las 10:00 p.m.`,
         cuando: 'Esta semana',
         ruta: '/menu',
         accion: 'Elegir mis días',
@@ -103,7 +107,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       lista.push({
         id: `pocos-${restantes}`,
         tono: 'alerta',
-        titulo: restantes === 1 ? 'Te queda 1 almuerzo' : `Te quedan ${restantes} almuerzos`,
+        titulo: restantes === 1 ? 'Te queda 1 envío' : `Te quedan ${restantes} envíos`,
         texto: 'Renueva antes de que se acaben para no cortar la semana.',
         cuando: 'Tu plan',
         ruta: '/planes',
@@ -115,9 +119,9 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       lista.push({
         id: `vence-${vence.format('YYYY-MM-DD')}`,
         tono: 'alerta',
-        titulo: dias === 0 ? 'Tu plan vence hoy' : `Tu plan vence en ${dias} días`,
+        titulo: dias === 0 ? 'Tu plan vence hoy' : dias === 1 ? 'Tu plan vence mañana' : `Tu plan vence en ${dias} días`,
         texto: restantes > 0
-          ? `Todavía tienes ${restantes} almuerzos sin usar. Después de esa fecha se pierden.`
+          ? `Todavía tienes ${restantes} ${restantes === 1 ? 'envío' : 'envíos'} sin usar. Si renuevas antes, se suman a tu plan nuevo.`
           : `Vence el ${vence.format('D [de] MMMM')}.`,
         cuando: 'Tu plan',
         ruta: '/mi-plan',

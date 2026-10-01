@@ -28,3 +28,21 @@ export const API_URL =
   || 'https://api.allpafood.com/dev/api-af/v1/';
 
 export default API_URL;
+
+/**
+ * La llave de Google Maps.
+ *
+ * Estaba escrita a mano en seis archivos del app y tres del panel. Rotarla
+ * —algo que toca hacer si se filtra o si se cambia de proyecto en Google—
+ * significaba encontrar los nueve sitios sin olvidar ninguno.
+ *
+ * Ahora es un solo lugar, y se puede cambiar sin tocar codigo poniendo
+ * REACT_APP_MAPS_KEY antes de compilar.
+ *
+ * El mapId va aparte porque pertenece al mismo proyecto de Google: si algun
+ * dia se cambia la llave, este tambien cambia.
+ */
+export const MAPS_KEY =
+  process.env.REACT_APP_MAPS_KEY || 'AIzaSyBtKeD-JuzJdX7HvLrxzBPkuTPrB7EgtUk';
+
+export const MAPS_ID = process.env.REACT_APP_MAPS_ID || 'e151d2a33166c8baa4ff73ee';

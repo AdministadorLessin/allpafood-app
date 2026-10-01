@@ -384,3 +384,94 @@ input[type=number] {
     background: var(--af-paper);
     opacity: .92;
 }
+
+/* La tarjeta del plato dejo de ser un boton para pasar a ser un contenedor:
+   adentro va el boton que elige el plato y, solo cuando ya esta elegido, el
+   contador de porciones. Quien pide uno —la mayoria— no ve ningun control
+   nuevo; quien pide dos almuerzos el viernes lo dice ahi mismo. */
+.afPlato{ flex-wrap: wrap; }
+.afPlato__cuerpo{
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    border: 0; background: transparent; padding: 0; margin: 0;
+    font-family: inherit; text-align: left; color: inherit; cursor: pointer;
+}
+.afCant{
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    width: 100%; margin-top: 9px; padding-top: 9px;
+    border-top: 1px solid rgba(16,31,24,.08);
+    &__n{ font-size: 12px; font-weight: 700; color: var(--af-ink); }
+    &__btn{
+        width: 30px; height: 30px; border-radius: 50%; flex: 0 0 auto;
+        border: 1.5px solid rgba(16,31,24,.16); background: var(--af-paper);
+        font-size: 17px; line-height: 1; color: var(--af-ink); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        &:disabled{ opacity: .35; cursor: default; }
+    }
+}
+
+
+/* --- "Me voy de viaje" --- */
+/* Discreto pero visible donde el cliente mira su semana: si avisar cuesta mas
+   que no avisar, nadie avisa y la comida se cocina igual. */
+/* A un lado, discreto: lo del dia a dia es reprogramar un dia puntual. */
+.afMenu__viaje{
+    display: block;
+    margin-left: auto;
+    border: 0;
+    background: transparent;
+    padding: 6px 0;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--af-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.afViaje{
+    display: flex;
+    gap: 10px;
+    margin: 12px 0 14px;
+    label{
+        flex: 1;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+    }
+    input{
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 46px;
+        margin-top: 6px;
+        padding: 0 12px;
+        border-radius: 14px;
+        border: 1.5px solid var(--af-line);
+        background: var(--af-paper);
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--af-ink);
+    }
+}
+.afMenu__ok{
+    margin: 0;
+    padding: 11px 14px;
+    border-radius: 14px;
+    background: var(--af-accent-soft);
+    color: var(--af-accent);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.afMenu__mini{
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--af-accent);
+    cursor: pointer;
+    padding: 0;
+}

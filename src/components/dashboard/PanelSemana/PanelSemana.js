@@ -32,7 +32,7 @@ const PanelSemana = ({ ordenes, cargando, ahora }) => {
   }
 
   const dias = semanaDelCliente(ordenes, ahora);
-  const listos = dias.filter((d) => ['entregado', 'enRuta', 'listo'].includes(d.estado)).length;
+  const listos = dias.filter((d) => ['entregado', 'enRuta', 'listo', 'hoy'].includes(d.estado)).length;
 
   return (
     <div className="afCard afSemana">

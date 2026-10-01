@@ -29,11 +29,12 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
 
     const validationSchema = Yup.object().shape({
         oldPassword: Yup.string().min(8, "Deben tener al menos ocho caracteres.").required(),
+        /* Las mismas tres reglas que el registro y que la clave temporal: si
+           aqui fueran mas duras, alguien podria entrar con una clave que
+           despues no puede cambiar. */
         password: Yup.string().min(8, "Deben tener al menos ocho caracteres.").required()
-            .matches(/^(?=.*[a-z])/,"Incluir mayúsculas y minúsculas.")
-            .matches(/^(?=.*[A-Z])/,"Incluir mayúsculas y minúsculas.")
-            .matches(/^(?=.*[0-9])/,"Incluir números.")
-            .matches(/^(?=.*[!@#\$%\^&\*])/,"Incluir símbolos."),
+            .matches(/^(?=.*[a-zA-Z])/,"Incluir al menos una letra.")
+            .matches(/^(?=.*[0-9])/,"Incluir al menos un número."),
         passwordConfirm: Yup
             .string()
             .required('Las contraseñas no coinciden.')

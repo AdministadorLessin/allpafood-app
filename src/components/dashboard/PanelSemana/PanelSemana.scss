@@ -69,7 +69,7 @@
     }
 
     /* Ya resueltos: verde suave, presentes pero sin pedir atencion. */
-    &--entregado, &--listo{
+    &--entregado, &--listo, &--hoy{
         background: var(--af-accent-soft);
         .afDia__s{ color: var(--af-accent); }
     }
@@ -89,6 +89,7 @@
     /* Fuera de plazo: se muestra apagado en vez de desaparecer, para que el
        cliente entienda que existio y ya cerro. */
     &--cerrado, &--pasado{ opacity: .38; }
+    &--reprogramado{ opacity: .6; }
 }
 
 

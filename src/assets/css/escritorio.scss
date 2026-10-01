@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Panel en computadora
+   --------------------------------------------------------------------------
+   TODO lo de este archivo vive dentro de @media (min-width: 993px): en el
+   telefono no cambia ni un pixel.
+
+   La idea: el panel deja de ser una pagina web y pasa a verse como una app —
+   una hoja redondeada flotando sobre un degradado suave, la navegacion en
+   vidrio a un lado y tarjetas claras con sombra corta. Es el estilo de las
+   referencias que pidio operacion, con los verdes de la marca.
+   ========================================================================== */
+
+@media screen and (min-width: 993px){
+
+    /* El lienzo: degradado fijo detras de todo, con un respiro de luz arriba.
+       Sobre el flota la hoja del panel. */
+    body{
+        background:
+            radial-gradient(58% 50% at 88% 2%, rgba(150,194,255,.95) 0%, rgba(150,194,255,0) 60%),
+            radial-gradient(50% 46% at 2% 98%, rgba(60,251,159,.55) 0%, rgba(60,251,159,0) 60%),
+            linear-gradient(155deg, #C6E2D6 0%, #EDF5F0 46%, #CFE0FF 100%) !important;
+        background-attachment: fixed !important;
+    }
+
+    .pageLayout{ padding: 20px; }
+
+    /* La hoja. Translucida para que el degradado se intuya debajo: es lo que
+       da la sensacion de profundidad de las referencias. */
+    .mainLayout{
+        min-height: calc(100vh - 40px);
+        border-radius: 32px;
+        background: rgba(255,255,255,.5);
+        border: 1px solid rgba(255,255,255,.75);
+        box-shadow:
+            0 1px 2px rgba(16,31,24,.04),
+            0 30px 60px -40px rgba(16,31,24,.35);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        backdrop-filter: blur(14px) saturate(130%);
+        /* 'clip' y no 'hidden': hidden crea un contenedor de scroll y anula el
+           encabezado pegajoso del panel. */
+        overflow: clip;
+    }
+    .mainLayoutBox{ min-height: calc(100vh - 40px); }
+
+    /* --- Navegacion en vidrio, dentro de la hoja --- */
+    .afNav.afNav{
+        top: 34px;
+        left: 34px;
+        bottom: 34px;
+        width: 236px;
+        padding: 18px 12px 12px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 28px;
+        box-shadow: 0 18px 44px -34px rgba(16,31,24,.5);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        backdrop-filter: blur(18px) saturate(150%);
+    }
+    .afNav .afNav__item{
+        border-radius: 16px;
+        padding: 10px 12px;
+    }
+    /* La seccion actual en tinta, como en las referencias: el contraste hace
+       de ancla y deja el menta para las acciones. */
+    .afNav .afNav__item--on{
+        background: var(--af-ink);
+        color: #F4F8F4;
+        box-shadow: 0 10px 22px -14px rgba(16,31,24,.8);
+        &:hover{ background: var(--af-ink); }
+        .afNav__ic{ color: var(--af-mint); }
+    }
+    .afNav .afNav__yo{
+        background: rgba(255,255,255,.75);
+        border-color: rgba(255,255,255,.9);
+        border-radius: 20px;
+    }
+
+    .mainLayoutBox{ padding-left: 306px; padding-right: 34px; padding-top: 30px; }
+
+    /* --- Tarjetas: mas redondeadas y con sombra corta --- */
+    .afCard,
+    .afKpi,
+    .afAcceso,
+    .afHoyPedido,
+    .afSemana,
+    .afHero{
+        border-radius: 22px !important;
+        box-shadow: 0 1px 2px rgba(16,31,24,.04), 0 16px 32px -26px rgba(16,31,24,.45) !important;
+    }
+    .afCard, .afKpi, .afAcceso{
+        border: 1px solid rgba(255,255,255,.8);
+        background: rgba(255,255,255,.92);
+    }
+
+    /* Las cifras del panel toman un tinte pastel, como las tarjetas de las
+       referencias: se distinguen entre si sin leer el texto. */
+    .afKpi--verde{ background: linear-gradient(150deg, #EAF8F0 0%, #FFFFFF 70%); }
+    .afKpi--azul{ background: linear-gradient(150deg, #EAF1FF 0%, #FFFFFF 70%); }
+    .afKpi--coral{ background: linear-gradient(150deg, #FFF0EA 0%, #FFFFFF 70%); }
+    .afKpi--destacado{ background: var(--af-ink); }
+
+    /* Encabezado: nombre, fecha y campana como pildoras flotando sobre la
+       hoja. Al bajar se pega arriba con el mismo vidrio. */
+    .afPanel__top{
+        padding: 6px 0 12px;
+    }
+    .afPanel__top--pegado{
+        background: rgba(255,255,255,.72) !important;
+        border-radius: 22px !important;
+        padding: 10px 14px !important;
+        margin-left: -14px !important;
+        margin-right: -14px !important;
+        box-shadow: 0 14px 30px -24px rgba(16,31,24,.5) !important;
+    }
+    .afChipUser{
+        background: rgba(255,255,255,.9);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 10px 24px -20px rgba(16,31,24,.5);
+    }
+    .afChipFecha{
+        background: rgba(255,255,255,.9);
+        border: 1px solid rgba(255,255,255,.9);
+    }
+}

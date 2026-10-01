@@ -1,0 +1,119 @@
+@import '../../assets/css/mixin.scss';
+
+/* Navegacion de escritorio: columna fija a la izquierda con nombres, no una
+   tira de iconos. Solo existe de 993px para arriba; en el celular manda la
+   barra de abajo. */
+.afNav{
+    display: none;
+
+    @media screen and (min-width: 993px){
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        bottom: 16px;
+        width: 248px;
+        z-index: 60;
+
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px 14px 14px;
+
+        background: var(--af-paper, #fff);
+        border: 1px solid var(--af-line);
+        border-radius: 26px;
+        box-shadow: 0 18px 40px -28px rgba(16,31,24,.45);
+    }
+
+    &__marca{
+        padding: 2px 8px 0;
+        img{ display: block; height: 30px; width: auto; }
+    }
+
+    &__menu{
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    &__grupo{ display: flex; flex-direction: column; gap: 2px; }
+
+    /* El nombre del grupo ordena sin pesar: se lee una vez y despues se ignora. */
+    &__grupoT{
+        margin: 0 0 4px 12px;
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--af-muted);
+    }
+
+    &__item{
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        text-decoration: none;
+        color: var(--af-ink);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+        transition: background .18s ease, color .18s ease;
+
+        &:hover{ background: var(--af-bg-soft, rgba(16,31,24,.05)); }
+        &:focus-visible{ outline: 2px solid var(--af-accent); outline-offset: 2px; }
+    }
+
+    /* La seccion actual en menta llena: a un metro de la pantalla el color
+       dice donde estas antes que el texto. */
+    &__item--on{
+        background: var(--af-mint, #D8FBE8);
+        color: var(--af-mint-ink, #0F2A1E);
+        font-weight: 800;
+        &:hover{ background: var(--af-mint, #D8FBE8); }
+    }
+
+    &__ic{ width: 20px; height: 20px; flex: 0 0 auto; }
+
+    &__yo{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--af-line);
+        border-radius: 18px;
+        background: transparent;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background .18s ease;
+        &:hover{ background: var(--af-bg-soft, rgba(16,31,24,.05)); }
+    }
+    &__ava{
+        width: 38px; height: 38px; flex: 0 0 auto;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--af-mint, #D8FBE8);
+        display: grid; place-items: center;
+        img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+    &__inicial{ font-size: 15px; font-weight: 800; color: var(--af-mint-ink, #0F2A1E); }
+    &__yoTxt{
+        min-width: 0;
+        b{ display: block; font-size: 13.5px; font-weight: 800; color: var(--af-ink);
+           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        small{ display: block; font-size: 11.5px; color: var(--af-muted); }
+    }
+}
+
+/* En escritorio mandan los nombres: la tira de iconos vieja y la barra
+   flotante de abajo se esconden para no duplicar la navegacion. */
+@media screen and (min-width: 993px){
+    .sideBar{ display: none !important; }
+    .afTabs{ display: none !important; }
+}

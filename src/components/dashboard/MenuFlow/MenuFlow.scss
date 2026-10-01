@@ -68,3 +68,306 @@
     padding: 0 0 10px;
     cursor: pointer;
 }
+
+/* La fila ya no es un solo boton: el texto abre el detalle y "Reprogramar"
+   queda a un lado, con su confirmacion en la misma fila. */
+.afPedidoFila{
+    cursor: default;
+
+    &__abrir{
+        flex: 1 1 auto;
+        min-width: 0;
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+    .afMenu__mini{
+        flex: 0 0 auto;
+        border: 1.5px solid var(--af-line);
+        border-radius: var(--af-r-pill);
+        padding: 7px 12px;
+        color: var(--af-ink);
+    }
+    &--confirmar .afPedidoFila__txt b{ text-transform: none; }
+    &__acciones{ display: flex; gap: 8px; flex: 0 0 auto; }
+}
+.afMenu__mini--si{
+    background: var(--af-ink) !important;
+    border-color: var(--af-ink) !important;
+    color: var(--af-bg, #fff) !important;
+}
+.afMenu__cancelado{ color: var(--af-muted); font-weight: 600; font-size: 12.5px; }
+.afDia--reprog{
+    opacity: .75;
+    .afDia__s{ color: var(--af-muted); }
+}
+
+.afMenu__guia{ display: grid; gap: 8px; }
+.afMenu__noDia{
+    width: 100%;
+    min-height: 44px;
+    border: 1.5px dashed var(--af-line);
+    border-radius: var(--af-r-pill);
+    background: transparent;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--af-ink);
+    cursor: pointer;
+    &:disabled{ opacity: .5; cursor: default; }
+}
+
+/* ==========================================================================
+   Mi menú en computadora: dos columnas.
+   A la izquierda lo que se elige —los días, los platos—; a la derecha lo que
+   ya está armado y el botón de guardar, siempre a la vista. En el teléfono
+   los envoltorios desaparecen y queda la misma lista de siempre.
+   ========================================================================== */
+.afMenu__col{ display: contents; }
+
+@media screen and (min-width: 993px){
+    .afPanel--menu{
+        max-width: 1120px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+        align-items: start;
+        column-gap: 24px;
+
+        /* El encabezado cruza las dos columnas. */
+        > .afVolver,
+        > *:not(.afMenu__col){ grid-column: 1 / -1; }
+
+        .afMenu__col{
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .afMenu__col--principal{ grid-column: 1; }
+        .afMenu__col--lateral{
+            grid-column: 2;
+            position: sticky;
+            top: 12px;
+        }
+    }
+
+    /* Los platos, de dos en dos: con uno por fila se recorría toda la
+       pantalla para ver tres opciones. */
+    .afPanel--menu .afMenu__col--principal .afPlato{
+        margin-bottom: 0;
+    }
+    .afPanel--menu .afMenu__col--principal{
+        > .afMenu__platos{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+    }
+}
+
+/* ==========================================================================
+   Una fila por día: qué te llega y qué puedes hacer.
+   Reemplaza las tres tarjetas separadas —días disponibles, ya pediste y
+   reprogramaste—, donde el mismo día saltaba de una a otra según su estado.
+   ========================================================================== */
+.afDiaFila{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--af-line);
+    &:last-child{ border-bottom: 0; }
+
+    &__fecha{
+        flex: 0 0 auto;
+        width: 52px;
+        height: 56px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        background: var(--af-bg-soft, #F2F6F1);
+
+        b{
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--af-muted);
+        }
+        span{
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--af-ink);
+        }
+    }
+
+    &__txt{
+        flex: 1;
+        min-width: 0;
+        b{ display: block; font-size: 14.5px; font-weight: 700; color: var(--af-ink); line-height: 1.3; }
+        small{ display: block; font-size: 12.5px; color: var(--af-muted); margin-top: 2px; line-height: 1.35; }
+    }
+
+    &__acciones{
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    &__confirma{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        b{ font-size: 12.5px; color: var(--af-ink); }
+    }
+
+    &__cerrado{
+        font-size: 11.5px;
+        font-weight: 800;
+        color: var(--af-muted);
+        padding: 6px 10px;
+        border-radius: var(--af-r-pill);
+        background: rgba(16,31,24,.06);
+        white-space: nowrap;
+    }
+
+    /* El día con plato elegido se lee de un vistazo. */
+    &--listo .afDiaFila__fecha{ background: var(--af-accent-soft); b{ color: var(--af-accent); } }
+    &--sin{ opacity: .75; }
+}
+
+/* Los dos botones de cada fila: elegir pesa más que descartar. */
+.afMenu__mini--si{
+    background: var(--af-ink) !important;
+    border-color: var(--af-ink) !important;
+    color: #F1F6F2 !important;
+    padding: 8px 14px;
+    border-radius: var(--af-r-pill);
+    border: 1.5px solid var(--af-ink);
+}
+.afMenu__mini--no{
+    border: 1.5px solid var(--af-line);
+    border-radius: var(--af-r-pill);
+    padding: 8px 14px;
+    color: var(--af-muted);
+}
+
+/* El panel de viaje vive en la columna de la derecha: suelto ocupaba todo el
+   ancho y la columna pegajosa se le montaba encima al bajar. */
+@media screen and (min-width: 993px){
+    .afPanel--menu .afMenu__col--lateral .afViaje{ margin-top: 8px; }
+}
+
+/* En el telefono no cabe fecha + plato + dos botones en una linea: el nombre
+   del plato quedaba en una columna de una palabra por renglon. Los botones
+   bajan a su propio renglon, debajo del dia. */
+@media screen and (max-width: 599px){
+    .afDiaFila{
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        column-gap: 12px;
+        row-gap: 10px;
+        align-items: start;
+        padding: 14px 0;
+
+        &__fecha{ grid-column: 1; grid-row: 1; }
+        &__txt{ grid-column: 2; grid-row: 1; }
+        &__acciones{
+            grid-column: 1 / -1;
+            grid-row: 2;
+            justify-content: flex-start;
+        }
+        &__confirma{ flex-wrap: wrap; }
+    }
+}
+
+/* Salida a Mis direcciones desde el paso del plato. Se ve como un lugar más
+   de la lista —del mismo alto y con el mismo borde—, pero punteado, para que
+   se lea como "el siguiente, el que todavía no existe". */
+.afMenu__nuevaDir{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 1.5px dashed var(--af-line);
+    border-radius: var(--af-r-card);
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--af-accent);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover{ border-color: var(--af-accent); background: var(--af-accent-soft); }
+}
+
+/* ── Lo que falta confirmar ───────────────────────────────────────────────
+   El domingo 27, 17 de 59 clientes eligieron sus platos y se fueron sin
+   confirmar, convencidos de que ya habían pedido. El botón estaba en la
+   columna de al lado: en el teléfono, debajo de toda la lista de días. */
+.afMenu__pendiente{
+    margin: 0 0 10px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    background: #FFF4E0;
+    border: 1px solid #F5D99B;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #6B4B10;
+
+    b{ color: #5A3D07; }
+
+    &--falta{
+        background: var(--af-soft, #EFF7F2);
+        border-color: #D6E7DD;
+        color: var(--af-ink);
+    }
+}
+
+/* La barra no se puede perder de vista: queda pegada abajo mientras haya
+   algo elegido y sin confirmar. */
+.afConfirmaFija{
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px -4px 0;
+    padding: 12px 14px;
+    border-radius: var(--af-r-card, 20px);
+    background: var(--af-ink);
+    box-shadow: 0 -8px 28px -18px rgba(16,31,24,.8);
+
+    span{ flex: 1; min-width: 0; }
+    b{ display: block; font-size: 14px; color: #FFFFFF; line-height: 1.25; }
+    small{ display: block; margin-top: 2px; font-size: 12px; color: #A8BCB1; }
+
+    button{
+        flex: 0 0 auto;
+        padding: 11px 22px;
+        border: 0;
+        border-radius: var(--af-r-pill, 999px);
+        background: var(--af-mint, #3CFB9F);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        color: #08301D;
+        cursor: pointer;
+    }
+
+    /* En el teléfono va por encima de la barra de navegación de abajo. */
+    @media screen and (max-width: 599px){
+        margin-left: 0;
+        margin-right: 0;
+        bottom: 84px;
+    }
+}

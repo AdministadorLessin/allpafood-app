@@ -156,6 +156,20 @@
         gap: 12px;
         margin-bottom: 11px;
     }
+    /* Cuantos tapers deja en esa puerta. Solo sale cuando es mas de uno; por
+       eso puede ocupar la esquina sin competir con el nombre del cliente. */
+    &__tapers{
+        margin-left: auto;
+        flex: 0 0 auto;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .02em;
+        color: #fff;
+        background: var(--af-ink, #101F18);
+        white-space: nowrap;
+    }
     &__n{
         flex: 0 0 auto;
         width: 32px;
@@ -236,6 +250,43 @@
         font-weight: 700;
         cursor: pointer;
     }
+
+    /* Segunda salida, no segunda opcion: se usa tanto como la de arriba, pero
+       la de arriba es la que cierra el caso sin dudas. */
+    &__recepcion{
+        display: block;
+        width: 100%;
+        min-height: 46px;
+        margin-top: 8px;
+        border: 1.5px solid var(--af-line);
+        border-radius: var(--af-r-pill);
+        background: transparent;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--af-ink);
+        cursor: pointer;
+    }
+
+    &__despues{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        min-height: 40px;
+        margin-top: 8px;
+        border: 0;
+        background: none;
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--af-muted);
+        cursor: pointer;
+    }
+    &__despuesIc{ width: 15px; height: 15px; }
+
+
 
     &--listo{
         border-color: var(--af-accent);
@@ -408,4 +459,214 @@
 .afParada__motivo--bloq{
     opacity: .5;
     cursor: not-allowed;
+}
+
+
+/* Cuantos tapers carga hoy. Se cuadra contra la bolsa en cocina antes de
+   salir: si le dan 22 y aqui dice 24, se entera ahi y no en la ultima puerta. */
+.afMoto__carga{
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--af-muted);
+}
+
+/* Toda la ruta de un toque. Antes habia que abrir Maps parada por parada. */
+.afMoto__ruta{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 48px;
+    border-radius: var(--af-r-pill);
+    background: var(--af-ink);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.afMoto__rutaIc{ width: 17px; height: 17px; }
+
+/* La que se dejo para el final: se distingue de la siguiente parada. */
+.afParada__toca--espera{
+    background: rgba(16,31,24,.08);
+    color: var(--af-muted);
+}
+
+
+/* --- Su perfil y sus numeros --- */
+.afMoto__hola--btn{
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 0; padding: 0;
+    font-family: inherit; cursor: pointer;
+}
+.afMoto__holaIc{ font-style: normal; font-size: 11px; color: var(--af-muted); }
+
+.afMoto__perfil{
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--af-paper);
+    border: 1.5px solid var(--af-line);
+}
+.afMoto__perfilCab{
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 14px; margin-bottom: 14px;
+    border-bottom: 1px solid var(--af-line);
+    b{ display: block; font-size: 15px; }
+    small{ display: block; font-size: 12.5px; color: var(--af-muted); margin-top: 1px; }
+}
+.afMoto__avatar{
+    flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--af-accent-soft); color: var(--af-accent);
+    font-size: 18px; font-weight: 800;
+}
+.afMoto__numeros{
+    display: flex; gap: 10px;
+    > div{
+        flex: 1; text-align: center;
+        padding: 12px 6px; border-radius: 14px; background: rgba(16,31,24,.04);
+    }
+    b{ display: block; font-size: 24px; font-weight: 800; line-height: 1;
+       font-variant-numeric: tabular-nums; }
+    span{ display: block; font-size: 11px; color: var(--af-muted); margin-top: 5px; line-height: 1.3; }
+}
+.afMoto__perfilNota{
+    margin: 14px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--af-muted);
+}
+
+/* --- Ordenar la ruta --- */
+.afMoto__ordenar{
+    display: block; width: 100%; min-height: 46px;
+    border: 1.5px solid var(--af-line); border-radius: var(--af-r-pill);
+    background: var(--af-paper); font-family: inherit;
+    font-size: 14px; font-weight: 700; color: var(--af-ink); cursor: pointer;
+}
+.afOrden{
+    padding: 14px; border-radius: 20px;
+    background: var(--af-paper); border: 1.5px solid var(--af-line);
+    &__tit{
+        margin: 0 0 10px; font-size: 11px; font-weight: 800;
+        letter-spacing: .1em; text-transform: uppercase; color: var(--af-muted);
+    }
+    /* Filas cortas y apiladas: la ruta entera tiene que caber sin bajar. */
+    &__fila{
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 0; border-bottom: 1px solid var(--af-line);
+        &:last-of-type{ border-bottom: 0; }
+    }
+    &__n{
+        flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--af-ink); color: #fff;
+        font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    &__txt{
+        flex: 1; min-width: 0;
+        b{ display: block; font-size: 13.5px; line-height: 1.25; }
+        small{
+            display: block; font-size: 12px; color: var(--af-muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+    }
+    /* Flechas y no arrastre: se usa de pie, con una mano y a veces con
+       guantes, y un arrastre fallido deja la lista peor que antes. */
+    &__flechas{
+        flex: 0 0 auto; display: flex; gap: 4px;
+        button{
+            width: 38px; height: 38px; border-radius: 11px;
+            border: 1.5px solid var(--af-line); background: transparent;
+            font-size: 13px; color: var(--af-ink); cursor: pointer;
+            &:disabled{ opacity: .3; cursor: default; }
+        }
+    }
+    &__guardar{
+        display: block; width: 100%; min-height: 48px; margin-top: 14px;
+        border: 0; border-radius: var(--af-r-pill);
+        background: var(--af-mint); color: var(--af-mint-ink);
+        font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    &__cancelar{
+        display: block; width: 100%; margin-top: 8px; padding: 10px 0 2px;
+        border: 0; background: none; font-family: inherit;
+        font-size: 13.5px; font-weight: 700; color: var(--af-muted); cursor: pointer;
+    }
+}
+
+
+/* --- Hoy / Mañana --- */
+.afMoto__dias{
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    border-radius: var(--af-r-pill);
+    background: rgba(16,31,24,.06);
+}
+.afMoto__dia{
+    flex: 1;
+    min-height: 38px;
+    border: 0;
+    border-radius: var(--af-r-pill);
+    background: transparent;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--af-muted);
+    cursor: pointer;
+    &--on{
+        background: var(--af-paper);
+        color: var(--af-ink);
+        box-shadow: var(--af-shadow-s);
+    }
+}
+
+/* Una parada de mañana: se mira y se ordena, no se cierra. */
+.afParada__futuro{
+    margin: 0;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--af-muted);
+}
+
+/* Arrastrar para ordenar: asa grande, pensada para el pulgar. */
+.afOrden__lista{ list-style: none; margin: 0; padding: 0; }
+.afOrden__ayuda{ margin: -4px 0 8px; font-size: 12px; color: var(--af-muted); }
+.afOrden .afOrden__fila{ background: var(--af-paper); position: relative; }
+.afOrden__asa{
+    flex: 0 0 auto; width: 34px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; line-height: 1; color: var(--af-muted);
+    cursor: grab; touch-action: none; user-select: none;
+    &:active{ cursor: grabbing; }
+}
+
+/* Confirmacion de entrega. */
+.afParada__confirma{
+    margin-top: 12px; padding: 14px; border-radius: 16px;
+    background: var(--af-accent-soft); display: grid; gap: 8px;
+    small{ color: var(--af-muted); font-size: 12px; margin-top: -4px; }
+}
+.afParada__confirmaT{ margin: 0; font-size: 15px; font-weight: 800; color: var(--af-ink); }
+
+/* Salir, dentro del panel del motorizado.
+   Esta pantalla no tiene el menu lateral del cliente y no habia por donde
+   cerrar sesion: quien entraba con la cuenta equivocada se quedaba dentro. */
+.afMoto__salir{
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    border: 1px solid var(--af-line, #E3E9DF);
+    border-radius: 999px;
+    background: #FFFFFF;
+    color: #B3261E;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    /* 46 px de alto: en la calle y con una sola mano, menos que eso se falla. */
+    min-height: 46px;
+    cursor: pointer;
+
+    &:active{ background: #FDF1EF; }
 }

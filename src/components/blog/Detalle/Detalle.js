@@ -1,116 +1,87 @@
-import React,{useState,useEffect} from "react";
-import './Detalle.scss'
-import BlockAnimate from './../../ultil/BlockAnimate/BlockAnimate';
+import React, { useState, useEffect } from "react";
+import './Detalle.scss';
 import Skeleton from '@mui/material/Skeleton';
-
-import blogImg1 from '../../../assets/img/blog_img1.png';
-
-import EastIcon from '@mui/icons-material/East';
-
 import axios from 'axios';
 
-const BlogDetalle = ({data,closeModal,catList}) => {
+/**
+ * Un articulo de Salud y bienestar, abierto.
+ *
+ * Sigue la misma linea que la lista: la foto manda, el titulo va encima de
+ * ella y el texto abajo en una columna comoda de leer. Antes el titulo iba
+ * arriba en negro, la foto despues y el contenido con los estilos crudos de
+ * WordPress; parecia otra pagina, no parte de la app.
+ *
+ * Esto es un beneficio del plan, asi que tiene que sentirse cuidado.
+ */
+const BlogDetalle = ({ data, closeModal, catList }) => {
 
-    const [detalle,setDetalle] = useState();
-    const getDetalle = ()=>{
-        axios.get('https://admin-landing.allpafood.com/wp-json/wp/v2/posts?slug='+data.slug+'&acf_format=standard')
-        .then((resp)=>{
-            setDetalle(resp.data[0])
-            console.log(resp.data[0])
-        }).catch((err)=>{
-            console.log(err)
-        })
-    }
+    const [detalle, setDetalle] = useState(null);
 
-    const [catVer,setCatVer] = useState();
+    useEffect(() => {
+        if (!data?.slug) return;
+        axios.get('https://admin-landing.allpafood.com/wp-json/wp/v2/posts?slug=' + data.slug + '&acf_format=standard')
+            .then((resp) => setDetalle(resp.data?.[0] || null))
+            .catch(() => setDetalle(null));
+    }, [data]);
 
-    useEffect(()=>{
+    const categoria = (() => {
+        if (!catList || !data?.categories?.length) return null;
+        const c = catList.find((x) => data.categories.includes(x.id));
+        return c ? c.name : null;
+    })();
 
-        if(data){
-            getDetalle();
-        }
-        if(catList){
-            setCatVer(catList);
-        }
-    },[])
+    const fecha = (() => {
+        const d = new Date(data?.date);
+        return Number.isNaN(d.valueOf())
+            ? null
+            : d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+    })();
 
-    
-    const formatDate = (date ) => {
-        date = String(date).split(' ');
-        var days = String(date[0]).split('-');
-        return parseInt(days[0])+'/'+ (parseInt(days[1]))+'/'+ parseInt(days[2]);
-    }
-
+    const titulo = String(detalle?.title?.rendered || data?.title?.rendered || '')
+        .replace(/<[^>]+>/g, '').replace(/&amp;/g, '&');
+    const foto = detalle?.fimg_url || data?.fimg_url;
 
     return (
-        <div className="blogDetalleCont">
-            <div className={'blogDetalleClose'} onClick={closeModal}>
-                Volver <EastIcon />
-            </div>
-            <BlockAnimate
-                claseStyle={'inlineBlock blogDetalleBox'}
-                stateParam={detalle}
-                unicId={'blogDetalleASDSAd11232'}
-            >
-                {detalle ?
-                    <div className="inlineBlock blogDetalleBox">
-                        
-                        <h2>{detalle.title.rendered}</h2>
-                        {catVer && catVer.length > 0 &&
-                            <div className="cat">
-                            {catVer.map((catItem)=>{
-                                return (
-                                    <div>
-                                        {data.categories && data.categories.length > 0 &&
-                                            data.categories.map((blogCat)=>{
-                                                if(parseInt(blogCat)  === parseInt(catItem.id)){
-                                                    return ( <span> {catItem.name}</span>)
-                                                }
-                                            })  
-                                        }
-                                    </div>
-                                )
-                            })}
-                            </div>
-                        }
-                        <div className="date">
-                            {formatDate(data.date)}
-                        </div>
-                        <figure>
-                            {detalle.fimg_url ?
-                                <img src={detalle.fimg_url} alt="" />
-                            :
-                                <img src={blogImg1} alt="" />
-                            }
-                            
-                        </figure>
-                        {detalle.content && detalle.content.rendered &&
-                            <div className="blogDetallesCampTxt" dangerouslySetInnerHTML={{__html:detalle.content.rendered}}>
-                            </div>
-                        }
-                    </div>
-                :
-                    <div className="inlineBlock blogDetalleLoad">
-                        <div onClick={()=>closeModal()}>cerrar</div>
-                        <h2><Skeleton variant="text" sx={{ fontSize: '3rem' }} /></h2>
-                        <h3><Skeleton variant="text" sx={{ fontSize: '1rem' }} /></h3>
-                        <h4><Skeleton variant="text" sx={{ fontSize: '1rem' }} /></h4>
-                        <figure>
-                            
-                        </figure>
-                        <div className="txt">
-                            
+        <div className="afArt">
+            <button type="button" className="afArt__volver" onClick={closeModal}>
+                ← Volver
+            </button>
+
+            <article className="afArt__hoja">
+                {/* Portada: la misma tarjeta de la lista, ahora a lo ancho. */}
+                <header className="afArt__portada"
+                    style={foto ? { backgroundImage: `url(${foto})` } : undefined}>
+                    <span className="afArt__velo" />
+                    {categoria && <span className="afArt__cat">{categoria}</span>}
+                    <h1 className="afArt__titulo">{titulo || <Skeleton variant="text" width={280} />}</h1>
+                    {fecha && <p className="afArt__fecha">{fecha}</p>}
+                </header>
+
+                <div className="afArt__cuerpo">
+                    {!detalle &&
+                        <>
                             <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
                             <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                            
-                        </div>
-                    </div>
-                }
-            </BlockAnimate>
+                            <Skeleton variant="text" width="75%" sx={{ fontSize: '1rem' }} />
+                            <Skeleton variant="rounded" height={180} sx={{ borderRadius: '18px', mt: 2 }} />
+                        </>
+                    }
+
+                    {detalle?.content?.rendered &&
+                        <div className="afArt__txt"
+                            dangerouslySetInnerHTML={{ __html: detalle.content.rendered }} />
+                    }
+                </div>
+
+                <footer className="afArt__pie">
+                    <p>Contenido del equipo de Allpa Food, incluido en tu plan.</p>
+                    <button type="button" className="afBtn afBtn--fantasma" onClick={closeModal}>
+                        Volver a los artículos
+                    </button>
+                </footer>
+            </article>
         </div>
-    )
+    );
 };
 
 export default BlogDetalle;

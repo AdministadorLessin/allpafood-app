@@ -2,55 +2,18 @@ import React, {useState,useEffect} from "react";
 import './facturacion.scss';
 
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
-import CardPaper from './../../../components/ultil/CardPaper/CardPaper';
 import Modal from '@mui/material/Modal';
-import Grid from '@mui/material/Grid';
-
-import icoMenu from '../../../assets/img/ico_factrura.svg';
-import icoEntrega from '../../../assets/img/ico_entrega.svg';
-
-import perfilMarcador from '../../../assets/img/perfil_marcador.png';
-
-// @ts-ignore
-import { DataGrid } from '@mui/x-data-grid';
-import BtnEditar from './../../../components/ultil/BtnEditar/BtnEditar';
+import Skeleton from '@mui/material/Skeleton';
+import moment from 'moment';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
-import HelloPaper from './../../../components/dashboard/HelloPaper/HelloPapper';
-import PlanUser from './../../../components/dashboard/PlanUser/PlanUser';
-import TitleCard from './../../../components/ultil/TitleCard/TitleCard';
-
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import { Cascada, Bloque, motion, alToque } from '../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
-
-const paginationModel = { page: 0, pageSize: 5 };
 
 const FacturacionPage = (props) => {
 
-  const columns = [
-    { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'estado', headerName: 'Estado de factura', flex: 1 },
-    { field: 'fecha', headerName: 'Fecha', flex: 1 },
-    {field: 'total',headerName: 'Total',type: 'number',flex: 1},
-    {
-      field: 'detalle',
-      headerName: 'Acción',
-      flex: 1,
-      sortable: false,
-      renderCell: (params) => (
-        <button
-          className="btnPrimary"
-          onClick={() => {
-            handleOpen(params.row)
-          }}
-        >
-          Ver detalle
-        </button>
-      ),
-    }
-  ];
-  const [rows,setRows] = useState([]);
+  const [cargado,setCargado] = useState(false);
   // Las facturas tal cual llegan: la tabla solo muestra cuatro campos, pero el
   // comprobante necesita el detalle por lineas, el metodo de pago y la
   // referencia del cobro.
@@ -60,24 +23,14 @@ const FacturacionPage = (props) => {
   const { token, handleUpdateToken } = useAuthContext();
 
   const getFacturas = () =>{
-    const rowsTmp = [];
     axios.get(`${API_URL}invoice/list`,{
       headers: {"Authorization" : `Bearer ${token}`} 
     }).then((resp)=>{
-      if(resp.data.data && resp.data.data.length){
-        resp.data.data.map((item)=>{
-          rowsTmp.push({
-            id:item.id,
-            estado:item.status,
-            fecha:item.emissionDate,
-            total:'S/.'+item.totalPrice
-          })
-        })
-      }
       setFacturas(resp.data.data || []);
-      setRows(rowsTmp);
+      setCargado(true);
     }).catch((error)=>{
       console.log(error);
+      setCargado(true);
     })
   }
 
@@ -132,68 +85,110 @@ const FacturacionPage = (props) => {
       getPlan();
   },[])
 
+  /* Lo gastado y lo pagado, que es lo que se viene a ver aqui. */
+  const totalPagado = facturas
+    .filter((f) => ['C','COMPLETED'].includes(f.status))
+    .reduce((s2, f) => s2 + Number(f.totalPrice || 0), 0);
+  const ahorro = facturas.reduce((s2, f) => s2 + (f.details || [])
+    .filter((d) => Number(d.value) < 0)
+    .reduce((s3, d) => s3 + Math.abs(Number(d.value)), 0), 0);
+
+  const fechaLarga = (v) => {
+    const m = moment(v, ['YYYY-MM-DD', moment.ISO_8601], true);
+    return m.isValid() ? m.format('D [de] MMMM YYYY') : (v || '—');
+  };
+
+  const TONO_ESTADO = {
+    C: 'ok', COMPLETED: 'ok',
+    P: 'espera', PENDING: 'espera',
+    I: 'espera', 'IN PROGRESS': 'espera',
+    X: 'nulo', CANCELLED: 'nulo',
+  };
+
   return (
     <LayoutDasboard claseStyle={false}>
-      <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={7} >
-            <HelloPaper data={helloCard} />
-          </Grid>
-          <Grid item xs={12} sm={12} md={5} >
-            <PlanUser data={plan} />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} >
-              <CardPaper 
-                  data={
-                      {
-                          titulo:'Facturas:',
-                          ico:icoMenu,
-                          className:false
-                      }
-                  } 
-              >
-                <div className="facturasTable">
-                  <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{ pagination: { paginationModel } }}
-                    pageSizeOptions={[5, 10]}
-                    //checkboxSelection
-                    sx={{ border: 0 }}
-                  />
-                </div>
-              </CardPaper>
-          </Grid>
-          {false &&
-            <Grid item xs={12} sm={12} md={5}>
-                <CardPaper 
-                    data={
-                        {
-                            titulo:'Facturación:',
-                            ico:icoEntrega,
-                            className:false
-                        }
-                    } 
-                >
-                <BtnEditar />
-                <div className="displayFlex perfilBox perfilBox2">
-                    <figure>
-                    <img src={perfilMarcador} alt="Avatar 1" title="Avatar 1" />
-                    </figure>
-                    <div className="txt">
-                    <div className="perfilLblField">
-                        <small>Direccion:</small>
-                        <p>Av. Arequipa 1150</p>
-                    </div>
-                    <div className="perfilLblField">
-                        <small>Lugar:</small>
-                        <p>Oficina - Departamento 105</p>
-                    </div>
-                    </div>
-                </div>
-                </CardPaper>
-            </Grid>
-          }
-      </Grid>
+      <Cascada className="afPanel">
+
+        <Bloque><h1 className="afPanel__titular">Mis pagos</h1></Bloque>
+
+        {/* Lo que pago y lo que se ahorro: las dos cifras que el cliente busca
+            antes de revisar factura por factura. */}
+        <Bloque>
+          <div className="afPagos__cifras">
+            <div className="afCard afPagos__cifra">
+              <span className="afPagos__et">Pagado hasta hoy</span>
+              <b className="afPagos__n">S/ {totalPagado.toFixed(2)}</b>
+              <small>{facturas.length} {facturas.length === 1 ? 'comprobante' : 'comprobantes'}</small>
+            </div>
+            {ahorro > 0 &&
+              <div className="afCard afPagos__cifra afPagos__cifra--ahorro">
+                <span className="afPagos__et">Te ahorraste</span>
+                <b className="afPagos__n">S/ {ahorro.toFixed(2)}</b>
+                <small>en descuentos aplicados</small>
+              </div>
+            }
+            {plan &&
+              <div className="afCard afPagos__cifra">
+                <span className="afPagos__et">Tu plan</span>
+                <b className="afPagos__n afPagos__n--txt">{plan.planName}</b>
+                <small>
+                  {plan.expirationDate
+                    ? `Vence el ${moment(plan.expirationDate).format('D [de] MMM')}`
+                    : 'Sin fecha de vencimiento'}
+                </small>
+              </div>
+            }
+          </div>
+        </Bloque>
+
+        <Bloque>
+          <div className="afCard">
+            <div className="afCard__head">
+              <span className="afCard__title">Tus comprobantes</span>
+              {facturas.length > 0 &&
+                <span className="afCard__label">{facturas.length}</span>}
+            </div>
+
+            {!cargado &&
+              <>
+                <Skeleton variant="rounded" height={58} sx={{ borderRadius: '14px', mb: 1 }} />
+                <Skeleton variant="rounded" height={58} sx={{ borderRadius: '14px' }} />
+              </>
+            }
+
+            {cargado && facturas.length === 0 &&
+              <p className="afMenu__nota afMenu__nota--suelta">
+                Todavía no tienes pagos registrados. Cuando compres un plan, tu
+                comprobante aparece aquí.
+              </p>
+            }
+
+            {facturas.map((f) => (
+              <motion.button type="button" className="afRecibo" key={f.id}
+                onClick={() => handleOpen(f)} {...alToque}>
+                <span className="afRecibo__txt">
+                  <b>{fechaLarga(f.emissionDate)}</b>
+                  <small>Comprobante N° {f.id}</small>
+                </span>
+                <span className={`afRecibo__estado afRecibo__estado--${TONO_ESTADO[f.status] || 'espera'}`}>
+                  {ESTADOS[f.status] || f.status}
+                </span>
+                <span className="afRecibo__monto">{soles(f.totalPrice)}</span>
+                <span className="afRecibo__ir">›</span>
+              </motion.button>
+            ))}
+          </div>
+        </Bloque>
+
+        <Bloque>
+          <p className="afMenu__nota afMenu__nota--suelta">
+            Son comprobantes internos de Allpa Food. Si necesitas una boleta o
+            factura electrónica, escríbenos y te la enviamos.
+          </p>
+        </Bloque>
+
+      </Cascada>
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -201,10 +196,7 @@ const FacturacionPage = (props) => {
         aria-describedby="modal-modal-description"
       >
         <div className="inlineFlex factModal">
-          <TitleCard
-            icon={<FormatListBulletedIcon />}
-            title={'Comprobante'}
-          />
+          <p className="afComp__titulo">Comprobante</p>
 
           {!factura && <p className="afComp__vacio">No pudimos cargar esta factura.</p>}
 

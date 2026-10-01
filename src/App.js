@@ -1,8 +1,9 @@
 
 import '../src/assets/css/global.scss';
+import '../src/assets/css/escritorio.scss';
 import React from 'react'
 
-import { BrowserRouter, Route,Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import DashboadHome from './pages/dashboard/home/index.js';
 import DashboardMotorizado from './pages/dashboard/motorizado/motorizado';
@@ -23,13 +24,18 @@ import MiPlanPage from './pages/dashboard/miplan/miplan';
 
 import AuthContextProvider from './context/authContext';
 import RegistroPageProfile from './pages/autenticacion/registro/profile';
+import RegistroDireccionPage from './pages/autenticacion/registro/direccion';
+import CambiarClavePage from './pages/autenticacion/clave/cambiar';
 
 import ProtectedRoutes from './components/ultil/ProtectedRoutes/ProtectedRoutes';
+
+import PantallaError from './components/ultil/PantallaError';
 
 function App() {
 
  
   return (
+      <PantallaError>
       <AuthContextProvider>
         <HelmetProvider>
             <BrowserRouter >
@@ -53,6 +59,8 @@ function App() {
                         creditos y compras. Antes no existia en ningun lado. */}
                     <Route path='/mi-plan' element={ <MiPlanPage /> } />
                     <Route path='/registro/perfil' element={ <RegistroPageProfile /> } />
+                    <Route path='/registro/direccion' element={ <RegistroDireccionPage /> } />
+                    <Route path='/cambiar-clave' element={ <CambiarClavePage /> } />
                   </Route>
                   { 
                     // Rutas Publicas
@@ -63,11 +71,19 @@ function App() {
                       de pedir un solo dato de cuenta. Va fuera del area
                       protegida: quien todavia no existe tiene que poder verla. */}
                   <Route path='/empezar' element={ <EmpezarPage /> } />
+
+                  {/* Cualquier otra direccion. Sin esto, una URL que no existe
+                      —un enlace de WhatsApp que llego con un caracter de mas,
+                      un marcador viejo— no coincidia con ninguna ruta y React
+                      no dibujaba nada: el cliente veia una pantalla en blanco,
+                      sin un boton ni un mensaje, y ahi se acababa su visita. */}
+                  <Route path='*' element={ <Navigate to="/" replace /> } />
                 </Routes>
             </BrowserRouter>
           
         </HelmetProvider>
       </AuthContextProvider>
+      </PantallaError>
   );
 }
 

@@ -12,14 +12,20 @@
     &--sel{ background:#35F09A; border-color:#35F09A; font-weight:600; }
     &--otro{ border-style:dashed; }
 }
+/* El paso 2 hace tres preguntas distintas y antes iban todas pegadas, con 4px
+   entre una y la siguiente: se leia como un solo bloque y el cliente no sabia
+   donde terminaba una pregunta y empezaba otra. Cada grupo respira. */
 .empPregunta{
-    font-size:15px; font-weight:600; margin-top:4px;
+    font-size:15px; font-weight:600;
+    margin:28px 0 12px;
+    &:first-of-type{ margin-top:20px; }
 }
 .empLectura{
     background:rgba(53,240,154,.13); border-radius:12px;
-    padding:12px 14px; font-size:14px; line-height:1.4;
+    padding:12px 14px; font-size:14px; line-height:1.45;
+    margin-top:12px;
 }
-.empMedidas{ display:flex; gap:10px; flex-wrap:wrap; }
+.empMedidas{ display:flex; gap:12px; flex-wrap:wrap; }
 .empCampo{
     flex:1 1 90px; display:flex; flex-direction:column; gap:4px;
     font-size:12.5px; color:rgba(17,38,28,.6);
@@ -46,3 +52,47 @@
     }
 }
 .empBtnLink{ display:block; text-align:center; text-decoration:none; }
+
+/* Los otros dos planes, para comparar sin salir de la pantalla. */
+.empOtros{
+    display:flex; flex-direction:column; gap:8px; margin-top:6px;
+    &__t{
+        font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+        color:rgba(17,38,28,.5); font-weight:600;
+    }
+}
+.empOtro{
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-areas:"nom dif" "det dif";
+    align-items:center;
+    gap:2px 12px;
+    width:100%;
+    font-family:inherit; text-align:left; cursor:pointer;
+    background:#fff; border:1px solid rgba(17,38,28,.14);
+    border-radius:14px; padding:12px 14px;
+    transition:border-color .15s ease;
+    &:hover{ border-color:rgba(17,38,28,.34); }
+
+    &__nom{
+        grid-area:nom;
+        font-size:15px; font-weight:600; color:#11261C;
+        em{
+            font-style:normal; font-size:10.5px; font-weight:700;
+            text-transform:uppercase; letter-spacing:.08em;
+            color:#0A6B41; background:rgba(53,240,154,.2);
+            border-radius:999px; padding:2px 7px; margin-left:7px;
+        }
+    }
+    &__det{
+        grid-area:det;
+        font-size:12.5px; color:rgba(17,38,28,.6);
+        font-variant-numeric:tabular-nums;
+    }
+    &__dif{
+        grid-area:dif;
+        font-size:15px; font-weight:700; color:#11261C;
+        font-variant-numeric:tabular-nums; white-space:nowrap;
+        &--menos{ color:#0A6B41; }
+    }
+}

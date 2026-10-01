@@ -4,10 +4,13 @@ import moment from 'moment';
 import './PedidoDeHoy.scss';
 import { motion, alToque } from './../../ultil/Motion/Motion';
 
-/* Horario de reparto. Si cambia la operacion, se cambia aqui y en el mensaje
-   de WhatsApp: hoy el cliente solo se entera por la difusion de las 11. */
+/* Horario de reparto: una sola fuente para toda la app. De aqui salen el menu
+   semanal, los avisos de la campana, el pedido de hoy y la pantalla de
+   inscripcion, asi que cambiarlo aqui alcanza.
+   Lo que NO sale de aqui son las plantillas de WhatsApp aprobadas en Meta: si
+   alguna menciona la hora, hay que corregirla en Meta Business Manager. */
 export const REPARTO = {
-  desde: '11:00',
+  desde: '10:30',
   hasta: '1:30 p.m.',
   horaCierre: 13.5,      // 1:30 p.m. en horas decimales
   margenGracia: 0.5,     // media hora antes de reconocer el retraso
@@ -47,7 +50,52 @@ const PedidoDeHoy = ({ ordenes, direccion, aviso }) => {
 
   if (!pedido) return null;
 
-  const estado = pedido.status || 'P';
+  /* El estado que se muestra, no el crudo.
+     - A partir de la hora de reparto, un pedido "en preparacion" ya salio: las
+       rutas parten antes de las 10:30 y la pantalla no puede seguir diciendo
+       que la cocina lo esta armando mientras va en la moto.
+     - Un pedido que no se pudo entregar, o cancelado, no es "en preparacion":
+       antes caia ahi por defecto y el cliente esperaba algo que ya no iba a
+       llegar. */
+  const [hDesde, mDesde] = REPARTO.desde.split(':').map(Number);
+  const yaSalio = moment().isSameOrAfter(moment().hour(hDesde).minute(mDesde).second(0));
+  const crudo = pedido.status || 'P';
+  const estado = crudo === 'P' && yaSalio ? 'I' : crudo;
+
+  if (estado === 'F' || estado === 'X') {
+    return (
+      <div className="afHoyPedido afHoyPedido--retraso">
+        <div className="afHoyPedido__cab">
+          <span className="afHoyPedido__et">Tu pedido de hoy</span>
+        </div>
+        <p className="afHoyPedido__promesa">
+          {estado === 'F' ? <>Hoy <b>no pudimos entregarlo</b></> : <>Este pedido <b>se canceló</b></>}
+        </p>
+        {estado === 'F' && pedido.deliveryNote &&
+          <p className="afHoyPedido__nota">Motivo: {pedido.deliveryNote}</p>}
+        <a className="afHoyPedido__ayuda"
+           href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hola, tengo una consulta sobre mi pedido #${pedido.id} del ${moment(pedido.date).format('D [de] MMMM')}.`)}`}
+           target="_blank" rel="noreferrer">
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+    );
+  }
+
+  /* Entregado: ya no hay nada que seguir. Queda una linea corta de
+     confirmacion durante el reparto —por si abre la app a preguntar "¿ya
+     llego?"— y desde las 2 p.m. la tarjeta desaparece del panel. */
+  if (estado === 'C') {
+    if (moment().hour() >= 14) return null;
+    return (
+      <div className="afHoyPedido afHoyPedido--listo">
+        <p className="afHoyPedido__promesa">
+          Tu pedido de hoy <b>ya fue entregado</b>. ¡Que lo disfrutes!
+        </p>
+      </div>
+    );
+  }
+
   const indice = Math.max(pasos(REPARTO.hasta).findIndex((p) => p.clave === estado), 0);
   const platos = (pedido.items || []).map((i) => i?.menu?.name).filter(Boolean).join(' · ');
 
@@ -77,7 +125,7 @@ const PedidoDeHoy = ({ ordenes, direccion, aviso }) => {
       </div>
 
       {/* La frase ancla en la hora final, no en la inicial: si el cliente se
-          queda con las 11:00 en la cabeza, a las 11:15 ya se siente tarde. */}
+          queda con las 10:30 en la cabeza, a las 10:45 ya se siente tarde. */}
       <p className="afHoyPedido__promesa">
         {estado === 'C' && 'Entregado'}
         {estado !== 'C' && retrasado && (

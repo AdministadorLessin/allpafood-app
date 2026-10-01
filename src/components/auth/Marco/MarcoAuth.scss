@@ -713,6 +713,30 @@
             color: var(--af-ink);
             line-height: 1.3;
         }
+        /* La direccion dejo de ser un texto para mirar y paso a ser un campo
+           que el cliente confirma antes de guardar. */
+        &__campo{
+            width: 100%;
+            border: 1px solid var(--af-line);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--af-ink);
+            background: #FFFFFF;
+            &:focus{
+                outline: 2px solid rgba(23,122,76,.25);
+                border-color: var(--af-accent);
+            }
+        }
+        &__nota{
+            display: block;
+            margin-top: 6px;
+            font-size: 11.5px;
+            line-height: 1.35;
+            color: var(--af-muted);
+        }
         em{
             display: block;
             font-style: normal;
@@ -722,4 +746,135 @@
             margin-top: 2px;
         }
     }
+}
+
+/* --------------------------------------------------------------------------
+   Alergias y refresco, en la ultima pantalla del registro.
+
+   Van en un bloque aparte y despues de la direccion a proposito: la direccion
+   es obligatoria y esto no. Se lee como un anexo, no como mas formulario.
+   -------------------------------------------------------------------------- */
+.afExtras{
+    width: 100%;
+    margin: 6px 0 4px;
+    padding: 18px 16px 6px;
+    background: var(--af-paper);
+    border: 1.5px solid var(--af-line);
+    border-radius: 18px;
+}
+
+.afExtras__t{
+    font-family: var(--poppins);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--af-ink);
+    margin: 0 0 4px;
+}
+
+.afExtras__d{
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--af-muted);
+    margin: 0 0 14px;
+}
+
+.afOpciones{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 18px;
+}
+
+.afOpcion{
+    flex: 1 1 130px;
+    padding: 12px 14px;
+    background: transparent;
+    border: 1.5px solid var(--af-line);
+    border-radius: 14px;
+    font-family: var(--poppins);
+    font-size: 14px;
+    color: var(--af-ink);
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+.afOpcion:hover{ border-color: var(--af-ink); }
+
+.afOpcion--on{
+    border-color: var(--af-mint, #5AD178);
+    background: var(--af-mint-soft, rgba(90, 209, 120, .14));
+    font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Las reglas de la entrega y la aceptacion de terminos, en la ultima pantalla
+   del registro. Se dicen antes de la primera entrega, no despues del primer
+   reclamo.
+   -------------------------------------------------------------------------- */
+.afReglas{
+    width:100%;
+    margin: 4px 0 2px;
+    padding: 16px 18px;
+    background: var(--af-paper);
+    border: 1.5px solid var(--af-line);
+    border-radius: 18px;
+
+    &__t{
+        font-family: var(--poppins);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--af-ink);
+        margin: 0 0 10px;
+    }
+
+    ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+
+    li{
+        position: relative;
+        padding-left: 18px;
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--af-muted);
+
+        /* Un punto discreto: son tres reglas, no una lista de compras. */
+        &::before{
+            content:"";
+            position:absolute; left:2px; top:8px;
+            width:5px; height:5px; border-radius:50%;
+            background: var(--af-mint, #5AD178);
+        }
+    }
+
+    b{ color: var(--af-ink); font-weight:600; }
+}
+
+.afTerminos{
+    display:flex; align-items:flex-start; gap:10px;
+    width:100%; margin: 14px 0 2px;
+    font-size:13.5px; line-height:1.5; color:var(--af-muted);
+    cursor:pointer;
+
+    input{
+        flex: 0 0 auto;
+        width:18px; height:18px; margin:1px 0 0;
+        accent-color: var(--af-mint, #5AD178);
+        cursor:pointer;
+    }
+
+    a{ color: var(--af-ink); text-decoration: underline; }
+}
+
+/* Aviso de sesion vencida: informa, no alarma. Va en menta y no en rojo
+   porque no es un error del cliente ni algo que tenga que corregir. */
+.afAuth__aviso{
+    display: flex;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--af-accent-soft, #E7FBF0);
+    color: var(--af-ink, #16211B);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.4;
 }

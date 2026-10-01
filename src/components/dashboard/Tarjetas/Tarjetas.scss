@@ -1,0 +1,233 @@
+/* Tarjetas de tips. En fila, con desplazamiento lateral: en un celular,
+   apilarlas empujaria hacia abajo lo que el cliente vino a hacer. */
+.afTarjetas{
+    margin: 22px 0 6px;
+
+    &__titulo{
+        margin: 0 0 11px;
+        font-size: var(--af-t-m, 15px);
+        font-weight: 700;
+        letter-spacing: var(--af-track-titular, -.02em);
+        color: var(--af-ink, #16211B);
+    }
+
+    &__fila{
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        /* El encaje tiene que respetar el margen lateral. Sin esto el
+           navegador pega la primera tarjeta al borde de la pantalla y queda
+           16 px corrida respecto del titulo de la seccion. */
+        scroll-padding-left: 16px;
+        /* El respiro de los costados va aqui y no en el padre, para que la
+           primera y la ultima tarjeta no queden pegadas al borde al deslizar. */
+        padding: 2px 16px 10px;
+        margin: 0 -16px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar{ display: none; }
+    }
+}
+
+.afTarjeta{
+    position: relative;
+    flex: 0 0 auto;
+    /* Explicito y no heredado: el ancho de la tarjeta tiene que ser el mismo
+       aunque cambie el reset global del app. */
+    box-sizing: border-box;
+    width: 232px;
+    min-height: 186px;
+    border-radius: 20px;
+    padding: 14px 16px 16px;
+    color: var(--af-ink, #16211B);
+    scroll-snap-align: start;
+    box-shadow: var(--af-shadow-s, 0 1px 2px rgba(16,31,24,.05));
+    overflow: hidden;
+
+    &__zona{
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 156px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    &__alto{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+        /* Sitio para la equis, que va sobre la esquina. */
+        padding-right: 22px;
+    }
+
+    &__pildora{
+        color: inherit;
+        display: inline-block;
+        background: rgba(255,255,255,.72);
+        border-radius: 999px;
+        padding: 4px 11px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+
+    &__flecha{
+        display: grid;
+        place-items: center;
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: var(--af-ink, #16211B);
+        color: #FFFFFF;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    &__icono{
+        width: 34px;
+        height: 34px;
+        margin-bottom: 10px;
+        opacity: .85;
+    }
+
+    /* Con foto, la imagen ocupa toda la tarjeta y el texto va encima. Una
+       foto metida en un recuadro dentro de un fondo de color no se ve: las
+       dos cosas compiten y ninguna gana. */
+    &__fondo{
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        transform-origin: center;
+    }
+
+    /* El velo lo dibuja el codigo, no la imagen: asi el texto se lee aunque
+       manana pongan una foto clara desde el panel. */
+    &__velo{
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        /* Denso desde la mitad para abajo, que es donde cae el texto. Con un
+           velo suave, una foto clara —un jardin, un plato con luz— deja el
+           titulo blanco casi ilegible. */
+        /* La parte densa arranca en el 38%, que es donde empieza el titulo
+           (medido: cae al 47% de la altura). Con la rampa mas abajo, una foto
+           clara —un jardin, un plato con luz— dejaba el texto blanco al
+           limite de lo legible. */
+        background: linear-gradient(180deg,
+            rgba(8, 20, 14, .32) 0%,
+            rgba(8, 20, 14, .06) 22%,
+            rgba(8, 20, 14, .48) 38%,
+            rgba(8, 20, 14, .80) 55%,
+            rgba(8, 20, 14, .92) 75%,
+            rgba(8, 20, 14, .96) 100%);
+    }
+
+    /* El color va explicito y no heredado. Los estilos globales del app le
+       ponen color a h3 y a p, y cualquier color puesto directo sobre el
+       elemento le gana a lo que herede del padre: la tarjeta decia blanco y
+       el titulo salia oscuro igual, ilegible sobre la foto. */
+    &__titulo{
+        color: inherit;
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.22;
+        letter-spacing: -.01em;
+        text-wrap: balance;
+    }
+
+    &__texto{
+        color: inherit;
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.38;
+        opacity: .78;
+        /* Tres lineas y corta: una tarjeta no es un articulo, y si necesita
+           mas espacio es que deberia llevar enlace. */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    &__pie{
+        color: inherit;
+        margin-top: auto;
+        padding-top: 10px;
+        font-size: 11.5px;
+        font-weight: 600;
+        opacity: .62;
+    }
+
+    &__cerrar{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,.55);
+        color: inherit;
+        font-size: 15px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: .55;
+
+        &:hover{ opacity: 1; }
+    }
+
+    /* Con foto: mas alta —una imagen necesita sitio para respirar— y el
+       texto empujado al pie, que es donde el velo es mas denso. */
+    &--foto{
+        min-height: 252px;
+        color: #FFFFFF;
+
+        .afTarjeta__zona{ justify-content: flex-end; min-height: 222px; }
+        .afTarjeta__alto{ margin-bottom: auto; }
+        .afTarjeta__pildora{ background: rgba(255,255,255,.22); color: #FFFFFF; backdrop-filter: blur(6px); }
+        .afTarjeta__flecha{ background: rgba(255,255,255,.92); color: var(--af-ink, #16211B); }
+        .afTarjeta__cerrar{ background: rgba(8,20,14,.35); color: #FFFFFF; }
+        .afTarjeta__texto{ opacity: .9; -webkit-line-clamp: 2; }
+        /* Ultima red por si la foto trae una zona clara justo detras de una
+           letra: cuesta nada y salva la legibilidad. */
+        .afTarjeta__titulo,
+        .afTarjeta__texto,
+        .afTarjeta__pie{ text-shadow: 0 1px 3px rgba(8,20,14,.45); }
+        .afTarjeta__pie{ margin-top: 8px; opacity: .8; }
+        .afTarjeta__titulo{ font-size: 17px; }
+    }
+
+    /* Si desde el panel eligen un color oscuro, el texto se invierte solo en
+       vez de quedar ilegible. */
+    &--oscura{
+        color: #FFFFFF;
+
+        .afTarjeta__pildora{ background: rgba(255,255,255,.18); }
+        .afTarjeta__flecha{ background: #FFFFFF; color: var(--af-ink, #16211B); }
+        .afTarjeta__cerrar{ background: rgba(255,255,255,.18); color: #FFFFFF; }
+    }
+}
+
+@media (min-width: 760px){
+    .afTarjetas__fila{
+        flex-wrap: wrap;
+        overflow: visible;
+        margin: 0;
+        padding: 2px 0 4px;
+    }
+
+    .afTarjeta{ width: calc(33.333% - 8px); }
+
+    .afTarjetas__fila{ scroll-padding-left: 0; }
+}

@@ -385,22 +385,36 @@
 /* Marcador del mapa: gota con el isotipo dentro. El logo suelto no señalaba
    ningún punto concreto. */
 .ubiPin{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
     background: #FFFFFF;
     border: 2.5px solid var(--af-ink);
-    border-radius: 50% 50% 50% 4px;
-    transform: rotate(-45deg);
-    box-shadow: 0 6px 14px -4px rgba(16,31,24,.45);
+    border-radius: 50%;
+    box-shadow: 0 8px 16px -6px rgba(16,31,24,.5);
+    cursor: grab;
+
+    /* La punta, centrada abajo. Antes el pin era un cuadrado rotado: su punta
+       quedaba fuera del ancla y el punto guardado salia corrido unos metros. */
+    &::after{
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -11px;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 12px solid var(--af-ink);
+    }
+
+    &:active{ cursor: grabbing; }
 
     img{
         width: 24px;
         height: auto;
         display: block;
-        transform: rotate(45deg);
     }
 }
 
@@ -434,5 +448,247 @@
         color: var(--af-muted);
         text-transform: capitalize;
         margin-top: 2px;
+    }
+}
+
+/* ==========================================================================
+   Mis direcciones, explicado paso a paso.
+   Antes la pantalla abria con un formulario vacio y bloqueado, sin decir que
+   primero habia que marcar el punto en el mapa: la gente escribia su calle
+   en "¿Cómo le llamas a este lugar?" y se quedaba trabada.
+   ========================================================================== */
+.afDirs__col{ display: contents; }
+
+@media screen and (min-width: 993px){
+    .afPanel--dirs{
+        max-width: 1120px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 1.05fr);
+        align-items: start;
+        column-gap: 22px;
+
+        > *:not(.afDirs__col){ grid-column: 1 / -1; }
+        .afDirs__col{ display: flex; flex-direction: column; min-width: 0; }
+        .afDirs__col--mapa{ position: sticky; top: 12px; }
+    }
+}
+
+/* Una dirección guardada */
+.afDir2{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--af-line);
+    &:last-of-type{ border-bottom: 0; }
+
+    &__ico{
+        flex: 0 0 auto;
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: var(--af-accent-soft);
+        img{ width: 20px; height: auto; }
+    }
+    &__txt{
+        flex: 1;
+        min-width: 0;
+        b{ display: block; font-size: 14.5px; font-weight: 800; color: var(--af-ink); }
+        small{ display: block; font-size: 12.5px; color: var(--af-muted); line-height: 1.35; }
+    }
+    &__acciones{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+    &__aqui{
+        padding: 6px 12px;
+        border-radius: var(--af-r-pill);
+        background: var(--af-mint);
+        color: var(--af-mint-ink);
+        font-size: 11.5px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    &__usar{
+        padding: 8px 14px;
+        border: 1.5px solid var(--af-line);
+        border-radius: var(--af-r-pill);
+        background: transparent;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        color: var(--af-ink);
+        cursor: pointer;
+        white-space: nowrap;
+        &:hover{ background: var(--af-bg-soft, rgba(16,31,24,.05)); }
+    }
+    &__borrar{
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--af-muted);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        svg{ width: 18px; height: 18px; }
+        &:hover{ background: rgba(190,60,40,.08); color: #A33718; }
+    }
+
+    /* La que esta en uso se ve distinta sin gritar. */
+    &--activa{
+        background: var(--af-accent-soft);
+        border-radius: 16px;
+        border-bottom: 0;
+        padding: 12px;
+        margin-bottom: 6px;
+        .afDir2__ico{ background: #fff; }
+    }
+}
+
+/* Los tres pasos para agregar */
+.afPasos3{
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+
+    li{
+        display: flex;
+        gap: 12px;
+        opacity: .5;
+        transition: opacity .2s ease;
+
+        b{ display: block; font-size: 14px; color: var(--af-ink); }
+        small{ display: block; font-size: 12.5px; color: var(--af-muted); line-height: 1.4; }
+    }
+    /* El paso en el que estas, encendido; los cumplidos, en verde. */
+    li.afPasos3__on{ opacity: 1; }
+    li.afPasos3__ok{ opacity: 1; }
+    li.afPasos3__ok .afPasos3__n{ background: var(--af-accent); color: #fff; }
+    li.afPasos3__on .afPasos3__n{ background: var(--af-ink); color: var(--af-mint); }
+
+    &__n{
+        flex: 0 0 auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(16,31,24,.08);
+        color: var(--af-muted);
+        font-size: 13px;
+        font-weight: 800;
+    }
+}
+
+.afDirs__calle{
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--af-accent-soft);
+    font-size: 13px;
+    color: var(--af-accent);
+    b{ color: var(--af-accent); }
+}
+
+.afDirs__form{
+    display: grid;
+    gap: 10px;
+
+    /* Mientras no hay punto marcado, los campos se ven apagados: se entiende
+       que falta algo antes, en vez de parecer rotos. */
+    &--espera{
+        opacity: .55;
+        pointer-events: none;
+    }
+}
+.afDirs__guardar{
+    margin-top: 4px;
+    &:disabled{ opacity: .45; cursor: default; }
+}
+
+/* El mapa, dentro de una tarjeta */
+.afDirs__mapa{
+    /* El envoltorio viejo traia 450px fijos de la version anterior; el mapa de
+       dentro mide 320 en el telefono, asi que sobraban 130px en blanco dentro
+       de la tarjeta. Aqui manda el mapa. */
+    .ubiPageMapRight{
+        width: 100%;
+        height: auto;
+        padding: 0;
+        margin: 0;
+    }
+    .ubiPageMapApi{
+        position: relative;
+        width: 100%;
+        height: 420px;
+        border-radius: 18px;
+        overflow: hidden;
+
+        @media screen and (max-width: 599px){ height: 320px; }
+    }
+    .ubiPageMapApiStyle{ width: 100%; height: 100%; }
+}
+
+/* En el teléfono el mapa iba al final, debajo del formulario y medio tapado
+   por la barra de abajo. El paso 1 dice "marca el punto en el mapa" y el mapa
+   no se veía: había que adivinar que existía y bajar a buscarlo. Ahora va
+   antes del formulario, que es el orden en que se usa. */
+@media screen and (max-width: 992px){
+    .afPanel--dirs{
+        display: flex;
+        flex-direction: column;
+
+        .afDirs__col--mapa > *{ order: 1; }
+        .afDirs__forma{ order: 2; }
+    }
+}
+
+/* La direccion que resolvio el mapa, para confirmarla antes de guardar.
+   Antes era un texto que nadie revisaba y en la base quedaban direcciones
+   como "3101", sin calle. */
+.afDirs__calle{
+    margin: 10px 0 0;
+
+    label{
+        display: block;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+        color: var(--af-muted, #61706A);
+        margin-bottom: 5px;
+    }
+
+    input{
+        width: 100%;
+        border: 1px solid var(--af-line, #E3E9DF);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: var(--af-ink, #16211B);
+        background: #FFFFFF;
+
+        &:focus{
+            outline: 2px solid rgba(23,122,76,.25);
+            border-color: var(--af-accent, #177A4C);
+        }
+    }
+
+    small{
+        display: block;
+        margin-top: 5px;
+        font-size: 11.5px;
+        color: var(--af-muted, #61706A);
+        line-height: 1.35;
     }
 }

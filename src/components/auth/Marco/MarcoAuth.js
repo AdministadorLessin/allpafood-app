@@ -9,11 +9,16 @@ import { Cascada, Bloque } from './../../ultil/Motion/Motion';
    aqui, en un solo sitio, porque hasta ahora cada pantalla del embudo era una
    isla: el cliente no sabia cuanto le faltaba y abandonaba sin saber que
    estaba a dos pasos. */
+/* El embudo nuevo. 'perfil' ya no esta en la barra: el cuestionario se
+   pregunta ahora en 'empezar', antes de pedir el telefono, y la direccion se
+   pide al final, cuando el pago ya esta hecho. El registro viejo sigue
+   pasando fase="perfil" y en ese caso no se dibuja barra, como hasta ahora. */
 export const FASES = [
-  { clave: 'cuenta', nombre: 'Cuenta', pasos: 3 },
-  { clave: 'perfil', nombre: 'Perfil', pasos: 3 },
-  { clave: 'plan',   nombre: 'Plan',   pasos: 1 },
-  { clave: 'pago',   nombre: 'Pago',   pasos: 1 },
+  { clave: 'empezar',   nombre: 'Tu objetivo',  pasos: 3 },
+  { clave: 'cuenta',    nombre: 'Cuenta',       pasos: 3 },
+  { clave: 'plan',      nombre: 'Plan',         pasos: 1 },
+  { clave: 'pago',      nombre: 'Pago',         pasos: 1 },
+  { clave: 'direccion', nombre: 'Entrega',      pasos: 1 },
 ];
 
 /**
