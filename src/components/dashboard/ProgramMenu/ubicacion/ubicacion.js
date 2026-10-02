@@ -157,8 +157,18 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
+        /* Sin distrito la base rechaza el punto. Aqui el catch solo escribia
+           en consola: el cliente tocaba "Agregar y seleccionar", no pasaba
+           nada y no habia forma de saber por que. */
+        const distritoFinal = (distrito || distritoManual || '').trim();
+        if (!distritoFinal) {
+            setErrorUbi('Escribe tu distrito para poder guardar la dirección.');
+            return;
+        }
+        setErrorUbi('');
+
         axios.post(`${API_URL}delivery/create/point`,
-            dataAddPoint
+            { ...dataAddPoint, district: distritoFinal }
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then((resp)=>{
@@ -175,16 +185,24 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
             handleResumenMapClose();
             
         }).catch((error)=>{
-            console.log(error)
+            setErrorUbi(error?.response?.data?.message || 'No pudimos guardar la dirección. Revisa los datos e intenta de nuevo.');
         })
     };
 
 
     const [distrito,setDistrito] = useState();
+    /* Igual que en Mis direcciones: cuando el mapa no devuelve el distrito
+       —contesta "Lima" en varias avenidas, o no contesta— se pide a mano. */
+    const [distritoManual,setDistritoManual] = useState('');
+    const [distritoNoDetectado,setDistritoNoDetectado] = useState(false);
+    const [errorUbi,setErrorUbi] = useState('');
 
     const getDistrictFromCoords = (latLng) => {
 
-        if (!window.google?.maps?.Geocoder) return;
+        if (!window.google?.maps?.Geocoder) {
+            setDistritoNoDetectado(true);
+            return;
+        }
 
         const lat = typeof latLng.lat === 'function'
             ? latLng.lat()
@@ -206,6 +224,8 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
             (results, status) => {
 
                 if (status !== 'OK' || !results?.length) {
+                    setDistrito(undefined);
+                    setDistritoNoDetectado(true);
                     return;
                 }
 
@@ -259,6 +279,10 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                         'Distrito no detectado'
                     );
 
+                    /* Se limpia el anterior: con el pin en otro distrito,
+                       dejar el de antes manda el pedido a la ruta que no es. */
+                    setDistrito(undefined);
+                    setDistritoNoDetectado(true);
                     return;
                 }
 
@@ -268,6 +292,7 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                 );
 
                 setDistrito(district);
+                setDistritoNoDetectado(false);
 
                 setDataAddPoint(prev => ({
                     ...prev,
@@ -292,7 +317,24 @@ const ProgramMenuMap = ({setPointList,handleResumenMapClose,updateUbi}) => {
                 <div className="dmResumenMapForm">
                     <h3><img src={icoMarkerPin} alt="" /> Agregar ubicación:</h3>
                     <form onSubmit={handleSubmit(onSubmitHandler)} className={dataAddPoint.location.latitude !== 0 ? '' : 'dmResumenMapFormDisabled'}>
-                        <Chip label={distrito} />
+                        {distrito
+                            ? <Chip label={distrito} />
+                            : <div className="textFieldBox">
+                                <TextField
+                                    id="distritoManual"
+                                    label="Distrito"
+                                    placeholder="San Isidro"
+                                    variant="filled"
+                                    value={distritoManual}
+                                    onChange={(e) => setDistritoManual(e.target.value)}
+                                    helperText={distritoNoDetectado
+                                        ? 'No pudimos detectarlo desde el mapa. Escríbelo aquí.'
+                                        : 'Escribe el distrito donde te entregamos.'}
+                                />
+                              </div>
+                        }
+
+                        {errorUbi && <p className="dmResumenMapError">{errorUbi}</p>}
                         <div className="textFieldBox">
                             <TextField
 

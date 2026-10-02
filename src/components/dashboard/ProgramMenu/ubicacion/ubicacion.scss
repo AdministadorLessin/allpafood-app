@@ -83,6 +83,18 @@
 }
 
 
+/* El aviso de por que no se pudo guardar. Antes el error solo iba a la
+   consola: el boton no hacia nada y el cliente no tenia como enterarse. */
+.dmResumenMapError{
+    margin: 8px 0 0;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #FDECEC;
+    color: #9B2C2C;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
 .dmResumenMapFormDisabled{
     filter: grayscale(100%);
     opacity: .7;

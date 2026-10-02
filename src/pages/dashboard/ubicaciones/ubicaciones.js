@@ -181,6 +181,16 @@ const UbicacionesPage = (props) => {
 
     // Add ubi
     const onSubmitHandler = (datsa) => {
+        /* El distrito es lo que mete el punto en la ruta de un motorizado.
+           Sin el, la base lo rechaza: antes el cliente recibia el error de
+           SQL en pantalla sin saber que le faltaba. */
+        const distritoFinal = (distrito || distritoManual || '').trim();
+        if (!distritoFinal) {
+            setErrorUbi('Escribe tu distrito para poder guardar la dirección.');
+            return;
+        }
+        setErrorUbi('');
+
         // Se guarda la calle del mapa junto al numero que escribio el cliente.
         // Antes solo viajaba el numero, asi que en la base quedaban direcciones
         // como "776" sin ninguna calle.
@@ -190,7 +200,7 @@ const UbicacionesPage = (props) => {
             : detalle;
 
         axios.post(`${API_URL}delivery/create/point`,
-            { ...dataAddPoint, address: direccionCompleta }
+            { ...dataAddPoint, address: direccionCompleta, district: distritoFinal }
             ,{
             headers: {"Authorization" : `Bearer ${token}`} 
         }).then(()=>{
@@ -199,6 +209,7 @@ const UbicacionesPage = (props) => {
                de su oficina. */
             setCalleTocada(false);
             setCalleDelMapa(null);
+            setDistritoManual('');
             getDirections()
         }).catch((error)=>{
             setErrorUbi(error?.response?.data?.message || 'No pudimos guardar la dirección. Revisa los datos e intenta de nuevo.');
@@ -239,6 +250,13 @@ const UbicacionesPage = (props) => {
 
 
     const [distrito,setDistrito] = useState();
+    /* Google devuelve "Lima" en muchas avenidas principales, y a veces no
+       responde del todo. Cuando pasa, el distrito se pide a mano en lugar de
+       dejar al cliente trabado: la pantalla de registro ya lo resolvia asi,
+       esta no, y una clienta nueva se quedo ocho intentos sin poder guardar
+       su direccion. */
+    const [distritoManual,setDistritoManual] = useState('');
+    const [distritoNoDetectado,setDistritoNoDetectado] = useState(false);
     // Calle que devuelve el mapa para el punto marcado.
     const [calleDelMapa,setCalleDelMapa] = useState(null);
 
@@ -254,7 +272,10 @@ const UbicacionesPage = (props) => {
 
     const getDistrictFromCoords = (latLng) => {
 
-        if (!window.google?.maps?.Geocoder) return;
+        if (!window.google?.maps?.Geocoder) {
+            setDistritoNoDetectado(true);
+            return;
+        }
 
         const lat = typeof latLng.lat === 'function'
             ? latLng.lat()
@@ -284,7 +305,12 @@ const UbicacionesPage = (props) => {
             },
             (results, status) => {
 
+                /* Puede fallar por cuota diaria agotada o por la llave: en
+                   los dos casos el cliente no tiene la culpa ni puede hacer
+                   nada, asi que se le abre el campo para escribirlo. */
                 if (status !== 'OK' || !results?.length) {
+                    setDistrito(undefined);
+                    setDistritoNoDetectado(true);
                     return;
                 }
 
@@ -338,6 +364,12 @@ const UbicacionesPage = (props) => {
                         'Distrito no detectado'
                     );
 
+                    /* Se limpia el anterior a proposito: si el cliente movio
+                       el pin a otro distrito y aqui no se detecta, dejar el
+                       de antes guardaria la direccion en el distrito
+                       equivocado y el pedido saldria en la ruta que no es. */
+                    setDistrito(undefined);
+                    setDistritoNoDetectado(true);
                     return;
                 }
 
@@ -347,6 +379,7 @@ const UbicacionesPage = (props) => {
                 );
 
                 setDistrito(district);
+                setDistritoNoDetectado(false);
 
                 // La calle ya venia en la respuesta del mapa y se descartaba:
                 // solo se aprovechaba el distrito. Por eso lo unico que quedaba
@@ -499,6 +532,26 @@ const UbicacionesPage = (props) => {
                                                     {calleTocada
                                                         ? 'Así va a quedar guardada.'
                                                         : 'La sacamos del mapa. Corrígela si le falta el número o está mal.'}
+                                                </small>
+                                            </div>
+                                        }
+
+                                        {/* El mapa no siempre devuelve el distrito —en
+                                            varias avenidas grandes contesta "Lima" y nada
+                                            mas—. Sin esto el cliente no tenia como seguir. */}
+                                        {hayPunto && !distrito &&
+                                            <div className="afDirs__calle">
+                                                <label htmlFor="distritoManual">Distrito</label>
+                                                <input
+                                                    id="distritoManual"
+                                                    placeholder="San Isidro"
+                                                    value={distritoManual}
+                                                    onChange={(e) => setDistritoManual(e.target.value)}
+                                                />
+                                                <small>
+                                                    {distritoNoDetectado
+                                                        ? 'No pudimos detectarlo desde el mapa. Escríbelo aquí.'
+                                                        : 'Escribe el distrito donde te entregamos.'}
                                                 </small>
                                             </div>
                                         }

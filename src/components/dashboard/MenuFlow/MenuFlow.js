@@ -129,7 +129,11 @@ const MenuFlow = ({ plan, alTerminar }) => {
       .then((r) => setDiasTodos(Array.isArray(r.data.data) ? r.data.data : []))
       .catch(() => setDiasTodos([]));
 
-    axios.get(`${baseUrl}dashboard/orders`, cab)
+    /* incluirProxima: tambien los dias ya pedidos de la semana siguiente.
+       Sin eso, un dia de la proxima semana con pedido no sale ni en la lista
+       de dias libres —esta pedido— ni aqui —estaba fuera del rango—, y
+       desaparecia de la pantalla. */
+    axios.get(`${baseUrl}dashboard/orders?incluirProxima=true`, cab)
       .then((r) => setPedidos(Array.isArray(r.data.data) ? r.data.data : []))
       .catch(() => setPedidos([]));
 
@@ -162,6 +166,8 @@ const MenuFlow = ({ plan, alTerminar }) => {
   }, [plan]);
 
   const NOMBRE_COMIDA = { lunch: 'almuerzo', dinner: 'cena', breakfast: 'desayuno' };
+  /* Lo que acompana al plato. La entrada salia como "Plato" a secas. */
+  const ETIQUETA_EXTRA = { drinks: 'Bebida', snacks: 'Snack', starter: 'Entrada' };
 
   const platosDe = (dia, tipo) =>
     dia?.menuTypeGroups?.find((g) => g.type === tipo)?.menuTypes ?? [];
@@ -266,7 +272,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
 
   const recargar = () => {
     const cab = { headers: { Authorization: `Bearer ${token}` } };
-    axios.get(`${baseUrl}dashboard/orders`, cab)
+    axios.get(`${baseUrl}dashboard/orders?incluirProxima=true`, cab)
       .then((r) => setPedidos(Array.isArray(r.data.data) ? r.data.data : []))
       .catch(() => {});
     axios.get(`${baseUrl}dashboard/menus?initDate=${desde}`, cab)
@@ -611,7 +617,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
       if (!i?.menu?.name) return;
       porTipo.push({ tipo: i.type, nombre: i.menu.name });
     });
-    const ORDEN = ['lunch', 'dinner', 'breakfast', 'snacks', 'drinks'];
+    const ORDEN = ['lunch', 'dinner', 'breakfast', 'starter', 'snacks', 'drinks'];
     porTipo.sort((a, b) => ORDEN.indexOf(a.tipo) - ORDEN.indexOf(b.tipo));
 
     /* Cerrado se mide por la HORA, no por si el pedido ya tiene motorizado.
@@ -646,7 +652,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
               <div className="afSrow"><span>Plato</span><b>—</b></div>}
             {porTipo.map((p, i) => (
               <div className="afSrow" key={i}>
-                <span>{NOMBRE_COMIDA[p.tipo] ? NOMBRE_COMIDA[p.tipo].charAt(0).toUpperCase() + NOMBRE_COMIDA[p.tipo].slice(1) : (p.tipo === 'drinks' ? 'Bebida' : p.tipo === 'snacks' ? 'Snack' : 'Plato')}</span>
+                <span>{NOMBRE_COMIDA[p.tipo] ? NOMBRE_COMIDA[p.tipo].charAt(0).toUpperCase() + NOMBRE_COMIDA[p.tipo].slice(1) : (ETIQUETA_EXTRA[p.tipo] || 'Plato')}</span>
                 <b>{p.nombre}</b>
               </div>
             ))}
@@ -1163,7 +1169,16 @@ const MenuFlow = ({ plan, alTerminar }) => {
             el snack ya estan programados por dia, mostrarlos es gratis y
             "Refresco de Jamaica" da mas ganas que una frase generica. */}
         {(() => {
-          const fijos = ['drinks', 'snacks']
+          /* Lo que acompana al plato, segun SU plan: los extras que trae el
+             paquete mas los adicionales que se le hayan marcado en el panel.
+             No se puede listar lo que ese dia esta programado y ya: la entrada
+             del dia es del paquete de una empresa, y mostrarsela a todos seria
+             ofrecer algo que no les llega. */
+          const suyos = [
+            ...(plan?.consumption?.extraBenefits || []),
+            ...(plan?.consumption?.additional || []),
+          ];
+          const fijos = [...new Set(suyos)]
             .flatMap((t) => platosDe(dia, t))
             .filter((x) => !comidas.includes(x.type));
           if (!fijos.length) return null;

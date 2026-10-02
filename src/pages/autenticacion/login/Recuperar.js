@@ -60,7 +60,7 @@ export default function Recuperar({ volver, telefonoInicial = '' }) {
     setError('');
     axios.post(`${API_URL}auth/password/forgot`, { phoneNumber: numero })
       .then(() => {
-        setAviso('Te enviamos un código por WhatsApp. Vence en 10 minutos.');
+        setAviso('Te enviamos un código por WhatsApp. Tienes 30 minutos para usarlo.');
         setPaso(2);
       })
       .catch((e) => setError(mensajeDe(e)))
