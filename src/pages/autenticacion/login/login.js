@@ -16,6 +16,8 @@ import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
 import { motion, alToque } from './../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 import { useVerClave } from '../../../components/ultil/VerClave';
+import { esNativo } from '../../../nativo';
+import IngresoNativo from './IngresoNativo';
 
 const IcoError = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -150,6 +152,39 @@ const validationSchema = Yup.object().shape({
   useEffect(()=>{
     removeLocalstorage();
   },[])
+
+  /* Cuantas veces se intento entrar con algo mal: el ingreso del app hace
+     temblar los campos con cada intento fallido. */
+  const [intento,setIntento] = useState(0);
+  useEffect(()=>{
+    if (errorAxios) setIntento((i) => i + 1);
+  },[errorAxios])
+
+  const vencida = typeof window !== 'undefined' && window.location.search.includes('sesion=vencida');
+
+  if (esNativo) {
+    const errorTexto = errorAxios
+      ? (typeof errorAxios === 'string'
+          ? errorAxios
+          : 'Los datos no coinciden. Revisa tu celular y tu contraseña.')
+      : intento > 0 && (errors.lfcorreo?.message
+          || (errors.lfpassword ? 'Escribe tu contraseña.' : ''));
+    return (
+      <IngresoNativo
+        campos={bodyFields}
+        registrarCelular={register("lfcorreo", { onChange: handleFieldChange })}
+        registrarClave={register("lfpassword", { onChange: handleFieldChange })}
+        verClave={verClave}
+        alEnviar={handleSubmit(onSubmitHandler, () => setIntento((i) => i + 1))}
+        enviando={enviando}
+        errorTexto={errorTexto || ''}
+        intento={intento}
+        modo={modo}
+        setModo={setModo}
+        vencida={vencida}
+      />
+    );
+  }
 
 
   return (

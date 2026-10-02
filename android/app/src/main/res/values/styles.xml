@@ -18,8 +18,8 @@
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
-        <!-- El fondo marfil del panel, no el gris lila que pone Android. -->
-        <item name="windowSplashScreenBackground">#F7FAF4</item>
+        <!-- El verde tinta del ingreso: la marca se dibuja sobre el mismo fondo. -->
+        <item name="windowSplashScreenBackground">#0E1713</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

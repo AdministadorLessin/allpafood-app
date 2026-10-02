@@ -17,8 +17,12 @@ const Barras = registerPlugin('Barras');
    degradado de marfil a menta que el body en global.scss. */
 const BLANCO = { arriba: '#FFFFFF', abajo: '#FFFFFF' };
 const PANEL = { arriba: '#F7FAF4', abajo: '#E6F2E2' };
+/* El ingreso es oscuro; con la hoja abierta, la franja de abajo toma el
+   blanco de la hoja. */
+const INGRESO = { arriba: '#0E1713', abajo: '#0E1713', oscuro: true };
+const INGRESO_HOJA = { arriba: '#0E1713', abajo: '#F4F6F5', oscuro: true };
 
-/* La pantalla de arranque (el logo sobre marfil) se queda hasta que hay algo
+/* La pantalla de arranque (el logo sobre verde tinta) se queda hasta que hay algo
    que leer. Antes se iba apenas cargaba el codigo y el cliente miraba una
    pantalla vacia varios segundos mientras llegaban sus datos. Con tope de 10
    segundos, para que una red lenta nunca deje a nadie mirando el logo. */
@@ -33,7 +37,10 @@ const hayContenido = () =>
 
 let ultimo = '';
 const pintarBarras = () => {
-  const colores = document.querySelector('.afAuth') ? BLANCO : PANEL;
+  const ingreso = document.querySelector('.afIngreso');
+  const colores = ingreso
+    ? (ingreso.classList.contains('afIngreso--hoja') ? INGRESO_HOJA : INGRESO)
+    : (document.querySelector('.afAuth') ? BLANCO : PANEL);
   const clave = colores.arriba + colores.abajo;
   if (clave === ultimo) return;
   ultimo = clave;
@@ -56,13 +63,20 @@ export const iniciarNativo = () => {
       pintarBarras();
       if (arranqueVisible && hayContenido()) quitarArranque();
     });
-  }).observe(document.getElementById('root'), { childList: true, subtree: true });
+  }).observe(document.getElementById('root'), {
+    childList: true, subtree: true, attributes: true, attributeFilter: ['class'],
+  });
   pintarBarras();
   setTimeout(quitarArranque, 10000);
 
   /* El boton atras de Android. Sin esto cerraba el app desde cualquier
      pantalla: el cliente estaba eligiendo platos, tocaba atras y se iba. */
   App.addListener('backButton', ({ canGoBack }) => {
+    /* Una pantalla con algo abierto encima (la hoja de ingreso) lo cierra
+       primero; solo si nadie lo atiende se navega. */
+    const aviso = new CustomEvent('af-atras', { cancelable: true });
+    window.dispatchEvent(aviso);
+    if (aviso.defaultPrevented) return;
     const enInicio = ['/', '/ingresar'].includes(window.location.pathname);
     if (canGoBack && !enInicio) window.history.back();
     else App.minimizeApp();
