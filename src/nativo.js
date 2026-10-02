@@ -1,6 +1,7 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { iniciarAvisos } from './avisos';
 
 /**
  * Lo que hace que el app instalado se sienta app y no una pagina web.
@@ -51,6 +52,7 @@ export const iniciarNativo = () => {
   if (!esNativo) return;
 
   document.documentElement.classList.add('es-nativo');
+  iniciarAvisos();
 
   /* Cada cambio de pantalla cambia el contenido de #root; se revisa una vez
      por cuadro, no en cada nodo que React toca. */

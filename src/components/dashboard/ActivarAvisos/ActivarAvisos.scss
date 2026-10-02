@@ -1,0 +1,34 @@
+/* La invitacion a activar avisos. Tinta con acento menta: tiene que verse,
+   pero sin parecer un error ni una alerta. */
+.afActivarAvisos{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px 14px;
+    margin: 18px 0 4px;
+    padding: 18px;
+    border-radius: 22px;
+    background: var(--af-ink, #16211B);
+    color: #FFFFFF;
+
+    &__ico{
+        width: 42px; height: 42px; border-radius: 14px;
+        background: rgba(60,251,159,.16); color: #3CFB9F;
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 22px; height: 22px; }
+    }
+    &__texto{
+        h3{ margin: 2px 0 4px; font-size: 15.5px; font-weight: 700; letter-spacing: -.02em; color: #FFFFFF; }
+        p{ margin: 0; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.72); }
+    }
+    &__acciones{
+        grid-column: 1 / -1;
+        display: flex; gap: 10px; margin-top: 4px;
+        button{
+            height: 46px; border-radius: 999px; font: inherit; font-size: 14px;
+            cursor: pointer; transition: transform .12s ease;
+            &:active{ transform: scale(.97); }
+        }
+    }
+    &__si{ flex: 1; border: 0; background: #3CFB9F; color: #0E1713; font-weight: 700; }
+    &__no{ padding: 0 18px; border: 1px solid rgba(255,255,255,.22); background: transparent; color: #FFFFFF; font-weight: 600; }
+}

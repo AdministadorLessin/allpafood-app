@@ -19,6 +19,7 @@ import icoFecha from '../../../assets/img/icon_fecha.svg';
 import Bienvenida, { bienvenidaYaVista } from '../../../components/dashboard/Bienvenida/Bienvenida';
 import AvisosCliente from '../../../components/dashboard/AvisosCliente/AvisosCliente';
 import Tarjetas from '../../../components/dashboard/Tarjetas/Tarjetas';
+import ActivarAvisos from '../../../components/dashboard/ActivarAvisos/ActivarAvisos';
 
 // Charts
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
@@ -386,6 +387,8 @@ const DashboadHome = (props) => {
               {/* Los tips van despues de lo suyo —su pedido, su semana, sus
                   macros—, no antes. El cliente entra a hacer algo; primero se
                   le resuelve eso y recien despues se le cuenta algo. */}
+              {/* Solo en el app instalado y solo si aun no se le pregunto. */}
+              <ActivarAvisos />
               <Bloque><Tarjetas lugar="inicio" titulo="Para ti" /></Bloque>
             </>
           }

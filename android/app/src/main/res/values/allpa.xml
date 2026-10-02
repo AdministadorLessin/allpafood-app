@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- El verde con el que Android acompana el icono de los avisos. -->
+    <color name="allpa_verde">#177A4C</color>
+</resources>

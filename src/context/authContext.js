@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
+import { olvidarCelular } from '../avisos';
 
 export const AuthContext = createContext();
 
@@ -162,6 +163,8 @@ export default function AuthContextProvider({ children }) {
    * en 'inf' y sobrevivian a cualquier limpieza parcial.
    */
   const logout = useCallback(() => {
+    // Ese celular deja de recibir los avisos de esta cuenta (solo en el app).
+    olvidarCelular(localStorage.getItem(STORAGE_KEYS.TOKEN));
     Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
     ['needBrm', 'regfrm', 'registro_step_cache', 'valfact', 'registro_data_cache']
       .forEach((key) => localStorage.removeItem(key));
