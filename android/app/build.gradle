@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+/* La firma del app vive fuera del repositorio (el repositorio es publico):
+   ~/Documents/AllpaFood-firma/firma.properties apunta a la llave y trae su
+   clave. Sin ese archivo el app compila igual para pruebas, pero la version
+   para Play sale sin firmar y Google la rechaza. */
+def firmaProps = new Properties()
+def firmaArchivo = new File(System.getProperty('user.home'), 'Documents/AllpaFood-firma/firma.properties')
+if (firmaArchivo.exists()) {
+    firmaArchivo.withInputStream { firmaProps.load(it) }
+}
+
 android {
     namespace = "com.allpafood.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +17,9 @@ android {
         applicationId "com.allpafood.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        // Subir uno con cada version que va a Play; Google rechaza repetidos.
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +27,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (firmaArchivo.exists()) {
+                storeFile file(firmaProps['storeFile'])
+                storePassword firmaProps['storePassword']
+                keyAlias firmaProps['keyAlias']
+                keyPassword firmaProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (firmaArchivo.exists()) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
