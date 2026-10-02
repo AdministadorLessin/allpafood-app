@@ -121,7 +121,12 @@ export default function IngresoNativo({
         <div className="afIngreso__agarre" />
 
         {modo === 'recuperar' ? (
-          <Recuperar volver={() => setModo('entrar')} telefonoInicial={campos.lfcorreo} />
+          <div className="afIngreso__recuperar">
+            <div className="afIngreso__hojaCab">
+              <h2>Recupera tu contraseña</h2>
+            </div>
+            <Recuperar volver={() => setModo('entrar')} telefonoInicial={campos.lfcorreo} />
+          </div>
         ) : (
           <form onSubmit={alEnviar} noValidate>
             <div className="afIngreso__hojaCab">
