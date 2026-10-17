@@ -20,6 +20,7 @@ import ProfileChangePrivacity from './../../../components/perfil/Edit/Privacidad
 import ProfileEditAvatar from './../../../components/perfil/Edit/Avatars/Avatars';
 import { Link } from 'react-router-dom';
 import CerrarSesion from './../../../components/perfil/CerrarSesion/CerrarSesion';
+import EliminarCuenta from './../../../components/perfil/EliminarCuenta/EliminarCuenta';
 import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 
@@ -279,6 +280,7 @@ const PerfilPage = (props) => {
         </Bloque>
 
         <Bloque><CerrarSesion /></Bloque>
+        <Bloque><EliminarCuenta /></Bloque>
 
       </Cascada>
 
