@@ -1,0 +1,63 @@
+import React, { useEffect, useState } from 'react';
+import { SplashScreen } from '@capacitor/splash-screen';
+import './AperturaNativa.scss';
+
+/*
+ * La apertura del app instalado: una sola, igual para todos.
+ *
+ * Android pone el fondo verde de la marca (sin icono) y aqui sigue sin corte:
+ * se traza la sonrisa, brotan las hojas, se llenan de color y aparece
+ * "Allpa Food" letra a letra. Luego se desvanece sobre la pantalla que toque,
+ * el inicio o el ingreso.
+ *
+ * Antes eran dos: Android mostraba su icono en un circulo y despues el ingreso
+ * volvia a dibujar el logo. El logo aparecia dos veces.
+ *
+ * Una sola vez por arranque: volver al app desde segundo plano no la repite.
+ */
+
+const HOJAS = 'M47.1079 34.4313C47.9669 32.1255 48.7516 29.8069 49.6849 27.5431C52.0164 21.8821 55.2264 16.783 59.5989 12.4492C65.4634 6.63641 72.4452 2.90331 80.5024 1.13687C84.0256 0.365055 87.5876 -0.00631499 91.1947 0.00983168C91.579 0.00983168 91.7534 0.103478 91.7599 0.510374C91.8535 5.74512 91.4595 10.9218 89.8998 15.9563C88.3335 21.0199 85.7242 25.5216 82.3689 29.5905C77.4152 35.6003 71.4603 40.3119 64.2298 43.3281C59.1242 45.4595 53.8055 46.5251 48.2704 46.5413C45.167 46.551 42.0733 46.4896 39.0055 45.9439C32.1916 44.7329 26.03 42.0267 20.5208 37.8608C14.6078 33.385 9.83166 27.9339 6.50221 21.2685C4.45481 17.1705 3.23413 12.8303 2.8563 8.2737C2.64639 5.73221 2.6367 3.1778 2.51722 0.626626C2.49461 0.126079 2.67223 0.000134214 3.15663 0.000134214C10.3516 -0.0160125 17.2236 1.42428 23.7049 4.56965C28.1129 6.7107 31.972 9.62679 35.3725 13.1532C40.5749 18.5462 43.9302 25.0081 46.3005 32.0416C46.5653 32.8296 46.8237 33.6207 47.0885 34.4119C47.0917 34.4216 47.1176 34.4248 47.1079 34.4216V34.4313Z';
+const SONRISA = 'M20.6435 52.4639C22.9557 59.6201 26.9181 65.4749 33.4413 69.3178C37.8364 71.9045 42.5933 73.2446 47.7602 73.1025C53.883 72.9346 59.3051 70.8872 64.0296 67.0927C68.7573 63.295 71.8058 58.3187 73.5981 52.4897C73.766 52.5575 73.921 52.6092 74.0663 52.677C80.5961 55.7416 87.1258 58.8031 93.6523 61.8709C94.353 62.2003 94.3659 62.2068 94.1044 62.9753C92.015 69.1143 88.8276 74.6268 84.5068 79.4579C81.3711 82.9617 77.8414 86.0134 73.8468 88.5291C67.6884 92.4107 61.0198 94.8715 53.7958 95.7466C43.6234 96.9802 33.8644 95.5626 24.6543 90.9349C20.9244 89.0619 17.4916 86.74 14.3463 83.9886C9.38601 79.6549 5.38164 74.5848 2.52691 68.6396C1.63884 66.7892 0.925158 64.8516 0.166265 62.9398C-0.121146 62.2165 -0.0791675 62.1971 0.637745 61.858C6.07271 59.3068 11.5109 56.7589 16.9459 54.2077C18.1601 53.6361 19.3743 53.0645 20.6435 52.4671V52.4639Z';
+
+let yaSeVio = false;
+
+const Nombre = ({ texto, desde }) => (
+  <span>
+    {texto.split('').map((letra, i) => (
+      <span key={i} className="afApertura__letra"
+            style={{ animationDelay: `${(desde + i * 0.06).toFixed(2)}s` }}>{letra}</span>
+    ))}
+  </span>
+);
+
+export default function AperturaNativa() {
+  const [fase, setFase] = useState(() => (yaSeVio ? 'fin' : 'dibuja'));
+
+  useEffect(() => {
+    if (fase === 'fin') return undefined;
+    yaSeVio = true;
+    /* El fondo de Android y el nuestro son el mismo verde: se cambia sin que
+       se note. */
+    SplashScreen.hide({ fadeOutDuration: 0 }).catch(() => {});
+    const sale = setTimeout(() => setFase('sale'), 2600);
+    const fin = setTimeout(() => setFase('fin'), 3150);
+    return () => { clearTimeout(sale); clearTimeout(fin); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (fase === 'fin') return null;
+
+  return (
+    <div className={`afApertura${fase === 'sale' ? ' afApertura--sale' : ''}`} aria-hidden="true">
+      <div className="afApertura__aura" />
+      <svg className="afApertura__iso" viewBox="0 0 94 97">
+        <path className="afApertura__traza afApertura__traza--b" pathLength="1" d={SONRISA} />
+        <path className="afApertura__traza afApertura__traza--a" pathLength="1" d={HOJAS} />
+      </svg>
+      <div className="afApertura__nombre">
+        <Nombre texto="Allpa" desde={1.45} />
+        <Nombre texto="Food" desde={1.79} />
+      </div>
+    </div>
+  );
+}

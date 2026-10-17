@@ -1,0 +1,58 @@
+/* La apertura del app instalado. Ver AperturaNativa.js.
+   El verde es el del logo oficial (#183A2A), el mismo del fondo que pone
+   Android al tocar el icono. */
+
+$fondo: #183A2A;
+$menta: #3CFB9F;
+$curva: cubic-bezier(.2, .8, .2, 1);
+
+.afApertura{
+    position: fixed; inset: 0; z-index: 9999;
+    background: $fondo;
+    font-family: var(--poppins);
+    color: #FFFFFF;
+    transition: opacity .5s ease;
+    &--sale{ opacity: 0; pointer-events: none; }
+
+    &__aura{
+        position: absolute; left: 50%; top: 45%;
+        width: 280px; height: 280px; margin: -140px 0 0 -140px; border-radius: 50%;
+        background: radial-gradient(circle, $menta 0%, rgba(24,58,42,0) 68%);
+        filter: blur(40px); opacity: 0;
+        animation: afApAura 1s ease .1s forwards, afApRespira 3.2s ease-in-out 1.1s infinite alternate;
+    }
+
+    &__iso{
+        position: absolute; left: 50%; top: calc(45% - 55px);
+        width: 104px; height: auto; transform: translateX(-50%);
+        overflow: visible;
+    }
+    &__traza{
+        stroke-width: 1.4;
+        fill-opacity: 0; stroke-dasharray: 1; stroke-dashoffset: 1;
+        animation: afApTrazo 1.2s cubic-bezier(.65,0,.35,1) .5s forwards,
+                   afApLlena .6s ease 1.35s forwards;
+        &--a{ fill: $menta; stroke: $menta; animation-delay: .3s, 1.2s; }
+        &--b{ fill: #FFFFFF; stroke: #FFFFFF; }
+    }
+
+    &__nombre{
+        position: absolute; left: 0; right: 0; top: calc(45% + 70px);
+        display: flex; justify-content: center; gap: 9px;
+        font-size: 30px; font-weight: 600; letter-spacing: -.02em;
+    }
+    &__letra{
+        display: inline-block; opacity: 0; filter: blur(12px); transform: translateY(10px);
+        animation: afApLetra .7s $curva forwards;
+    }
+}
+
+@keyframes afApAura{ to{ opacity: .5; } }
+@keyframes afApRespira{ from{ transform: scale(1); opacity: .5; } to{ transform: scale(1.18); opacity: .3; } }
+@keyframes afApTrazo{ to{ stroke-dashoffset: 0; } }
+@keyframes afApLlena{ to{ fill-opacity: 1; stroke-opacity: 0; } }
+@keyframes afApLetra{ to{ opacity: 1; filter: blur(0); transform: none; } }
+
+@media (prefers-reduced-motion: reduce){
+    .afApertura *{ animation-duration: .01ms !important; animation-delay: 0s !important; }
+}

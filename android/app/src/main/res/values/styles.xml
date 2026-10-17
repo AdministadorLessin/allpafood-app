@@ -18,8 +18,9 @@
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
-        <!-- El verde tinta del ingreso: la marca se dibuja sobre el mismo fondo. -->
-        <item name="windowSplashScreenBackground">#0E1713</item>
+        <!-- El verde del logo oficial; la apertura del app sigue sobre el mismo fondo. -->
+        <item name="windowSplashScreenBackground">#183A2A</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/apertura_sin_icono</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

@@ -20,6 +20,8 @@ const BLANCO = { arriba: '#FFFFFF', abajo: '#FFFFFF' };
 const PANEL = { arriba: '#F7FAF4', abajo: '#E6F2E2' };
 /* El ingreso es oscuro; con la hoja abierta, la franja de abajo toma el
    blanco de la hoja. */
+/* La apertura usa el verde del logo oficial. */
+const APERTURA = { arriba: '#183A2A', abajo: '#183A2A', oscuro: true };
 const INGRESO = { arriba: '#0E1713', abajo: '#0E1713', oscuro: true };
 const INGRESO_HOJA = { arriba: '#0E1713', abajo: '#F4F6F5', oscuro: true };
 
@@ -38,6 +40,11 @@ const hayContenido = () =>
 
 let ultimo = '';
 const pintarBarras = () => {
+  if (document.querySelector('.afApertura:not(.afApertura--sale)')) {
+    const clave = 'apertura';
+    if (clave !== ultimo) { ultimo = clave; Barras.colores(APERTURA).catch(() => {}); }
+    return;
+  }
   const ingreso = document.querySelector('.afIngreso');
   const colores = ingreso
     ? (ingreso.classList.contains('afIngreso--hoja') ? INGRESO_HOJA : INGRESO)

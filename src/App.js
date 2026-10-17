@@ -30,12 +30,16 @@ import CambiarClavePage from './pages/autenticacion/clave/cambiar';
 import ProtectedRoutes from './components/ultil/ProtectedRoutes/ProtectedRoutes';
 
 import PantallaError from './components/ultil/PantallaError';
+import AperturaNativa from './components/ultil/AperturaNativa/AperturaNativa';
+import { esNativo } from './nativo';
 
 function App() {
 
  
   return (
       <PantallaError>
+      {/* Solo en el app instalado: el logo se dibuja al abrir. */}
+      {esNativo && <AperturaNativa />}
       <AuthContextProvider>
         <HelmetProvider>
             <BrowserRouter >

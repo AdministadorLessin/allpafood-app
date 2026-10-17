@@ -55,7 +55,9 @@ export default function IngresoNativo({
   alEnviar, enviando, errorTexto, intento,
   modo, setModo, vencida,
 }) {
-  const [fase, setFase] = useState(() => (tocaVerMarca() ? 'marca' : 'lista'));
+  /* La marca ya se dibujo en la apertura del app (AperturaNativa): aqui el
+     logo solo queda en la cabecera. */
+  const [fase, setFase] = useState('lista');
   const [hoja, setHoja] = useState(vencida);
 
   useEffect(() => {
@@ -97,10 +99,10 @@ export default function IngresoNativo({
             <span>Hecho en Perú</span>
           </div>
           <h1 className="afIngreso__entra afIngreso__titulo" style={{ animationDelay: '.18s' }}>
-            Tu almuerzo,<br /><em>resuelto.</em>
+            Tu comida del día,<br /><em>resuelta.</em>
           </h1>
           <p className="afIngreso__entra afIngreso__bajada" style={{ animationDelay: '.26s' }}>
-            Almuerzos saludables hechos esta mañana, en tu puerta antes de la 1:30.
+            Desayuno, almuerzo, cena, snacks y bebidas en una sola app.
           </p>
           <button type="button" className="afIngreso__entra afIngreso__btn afIngreso__btn--menta"
                   style={{ animationDelay: '.34s' }} onClick={() => setHoja(true)}>
