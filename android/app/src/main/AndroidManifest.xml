@@ -36,4 +36,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- "Usar mi ubicacion" al guardar una direccion de entrega. Android lo
+         pregunta la primera vez que el cliente toca el boton; sin estas lineas
+         el boton fallaba en silencio dentro del app. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>
