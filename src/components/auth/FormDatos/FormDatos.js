@@ -26,7 +26,7 @@ const LOCAL_STORAGE_KEY = 'form_datos_cache';
 const FormDatos = ({telefono}) => {
     const verClave = useVerClave();
 
-    const { token } = useAuthContext();
+    const { token, handleUpdateToken } = useAuthContext();
     let navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
@@ -123,7 +123,7 @@ const FormDatos = ({telefono}) => {
      * perfil y lo que usa el calculo de calorias. Se toma el primero de enero
      * del ano correspondiente: la precision al dia no cambia ningun macro.
      */
-    const guardarCuestionario = () => {
+    const guardarCuestionario = (datos) => {
         let previo = null;
         try { previo = JSON.parse(window.localStorage.getItem('preregistro')); } catch (e) { previo = null; }
         if (!previo || !previo.objetivo) return Promise.resolve();
@@ -152,7 +152,20 @@ const FormDatos = ({telefono}) => {
                 }
             },
             { headers: { Authorization: `Bearer ${token}` } }
-        ).catch((e) => {
+        ).then(() => {
+            /* Lo que el app sabe de la cuenta se guardo al pedir el codigo,
+               cuando todavia no habia perfil, y nadie lo actualizaba. El
+               inicio leia "sin perfil" y mandaba al cliente a contestar otra
+               vez las mismas preguntas en el cuestionario viejo. */
+            let inf = null;
+            try { inf = JSON.parse(window.localStorage.getItem('inf')); } catch (e) { inf = null; }
+            if (inf && !inf.profile) {
+                handleUpdateToken(token, {
+                    ...inf,
+                    profile: { name: datos?.fdnombre, lastname: datos?.fdapellidos },
+                });
+            }
+        }).catch((e) => {
             // No bloquea la compra: el perfil se puede completar despues.
             console.log('cuestionario', e);
         });
@@ -177,7 +190,7 @@ const FormDatos = ({telefono}) => {
             window.localStorage.setItem('regfrm',1);
             window.localStorage.setItem('valfact',0);
 
-            guardarCuestionario()
+            guardarCuestionario(data)
                 .finally(() => {
                     /* Derecho a elegir su plan. La direccion se pide despues
                        de pagar, en su propia pantalla. */
