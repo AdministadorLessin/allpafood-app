@@ -252,8 +252,10 @@ $curva: cubic-bezier(.2, .8, .2, 1);
 
     /* El logo esta siempre: en la marca al centro y grande, despues en la
        cabecera y chico. Viaja de un lugar al otro. */
+    /* En el iPhone, debajo de la isla dinamica: arriba al centro es justo
+       donde va la camara. En Android el margen extra es 0. */
     &__iso{
-        position: absolute; left: 50%; top: 22px;
+        position: absolute; left: 50%; top: calc(22px + env(safe-area-inset-top, 0px));
         width: 30px; height: auto;
         transform: translateX(-50%);
         overflow: visible;
