@@ -1,9 +1,11 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef } from "react";
+import { createPortal } from 'react-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import './MarcoAuth.scss';
 import isotipo from '../../../assets/img/isotipo_allpafood.png';
 import { Cascada, Bloque } from './../../ultil/Motion/Motion';
+import { esNativo } from '../../../nativo';
 
 /* Las cuatro fases reales entre "quiero probar" y "ya tengo mi plan". Estan
    aqui, en un solo sitio, porque hasta ahora cada pantalla del embudo era una
@@ -67,7 +69,82 @@ const Progreso = ({ fase, paso }) => {
  * mismo degradado y la misma escala que el panel, para que la app se sienta
  * una sola cosa desde la primera pantalla.
  */
-const MarcoAuth = ({ fase, paso = 0, children, volver }) => (
+/* Dentro del app, el registro cuenta los ocho pasos donde el cliente hace
+   algo —zona, objetivo, plan, numero, codigo, datos, pago y direccion— en una
+   sola barra. Las fases de arriba siguen siendo las de la web. */
+const PASOS_APP = 8;
+const pasoEnApp = (fase, paso) => (
+  fase === 'empezar' ? paso + 1
+  : fase === 'cuenta' ? paso + 4
+  : fase === 'pago' ? 7
+  : fase === 'direccion' ? 8
+  : null
+);
+
+/**
+ * El boton principal de la pantalla.
+ *
+ * En la web va donde se escribe. En el app va fijo abajo, al alcance del
+ * pulgar, y sube con el teclado: se dibuja fuera de la pantalla (en el body)
+ * porque cualquier contenedor animado con transform haria que "fijo" se
+ * midiera contra el y no contra el telefono. Un boton de enviar que quede
+ * afuera del <form> necesita el atributo form="id" para seguir enviandolo.
+ */
+export const Accion = ({ children }) => (
+  esNativo
+    ? createPortal(<div className="afNatPie">{children}</div>, document.body)
+    : <>{children}</>
+);
+
+const MarcoNativo = ({ fase, paso, children, volver, sinVolver }) => {
+  const navigate = useNavigate();
+  const n = pasoEnApp(fase, paso);
+
+  /* Sin un "volver" propio, la flecha regresa a la pantalla anterior; si se
+     entro directo (sin historial), a la bienvenida. */
+  const atras = volver || (() => (window.history.length > 1 ? navigate(-1) : navigate('/ingresar')));
+
+  /* El boton atras de Android hace lo mismo que la flecha: retrocede un paso
+     dentro de la pantalla en vez de salir de ella. */
+  const volverRef = useRef(volver);
+  volverRef.current = volver;
+  useEffect(() => {
+    const alAtras = (e) => {
+      if (volverRef.current) { e.preventDefault(); volverRef.current(); }
+    };
+    window.addEventListener('af-atras', alAtras);
+    return () => window.removeEventListener('af-atras', alAtras);
+  }, []);
+
+  return (
+    <main className="afAuth afAuth--nat">
+      <header className="afNat__top">
+        {!sinVolver &&
+          <button type="button" className="afNat__volver" onClick={atras} aria-label="Volver">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        }
+        {n &&
+          <>
+            <div className="afNat__barra" role="progressbar" aria-valuemin={1}
+                 aria-valuemax={PASOS_APP} aria-valuenow={n}>
+              <i style={{ transform: `scaleX(${n / PASOS_APP})` }} />
+            </div>
+            <span className="afNat__cuenta">{n}/{PASOS_APP}</span>
+          </>
+        }
+      </header>
+      <div className="afAuth__col">{children}</div>
+    </main>
+  );
+};
+
+const MarcoAuth = (props) => (
+  esNativo ? <MarcoNativo {...props} /> : <MarcoWeb {...props} />
+);
+
+const MarcoWeb = ({ fase, paso = 0, children, volver }) => (
   <main className="afAuth">
     <Cascada className="afAuth__col">
 

@@ -1,6 +1,7 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { iniciarAvisos } from './avisos';
 
 /**
@@ -12,6 +13,19 @@ import { iniciarAvisos } from './avisos';
 export const esNativo = Capacitor.isNativePlatform();
 
 const Barras = registerPlugin('Barras');
+const esIphone = Capacitor.getPlatform() === 'ios';
+
+/* Android pinta las dos franjas del color que se le pide (el plugin Barras,
+   propio). En el iPhone la pantalla llega hasta arriba y la hora va encima de
+   ella: ahi solo se elige si la hora va en blanco (fondo oscuro) o en negro
+   (fondo claro). Sin esto salia negra sobre la foto oscura del ingreso. */
+const aplicarBarras = (colores) => {
+  if (esIphone) {
+    StatusBar.setStyle({ style: colores.oscuro ? Style.Dark : Style.Light }).catch(() => {});
+    return;
+  }
+  Barras.colores(colores).catch(() => {});
+};
 
 /* Los colores de las franjas del telefono (la de la hora y la de abajo).
    Las pantallas de ingreso y registro son blancas; el panel lleva el mismo
@@ -42,7 +56,7 @@ let ultimo = '';
 const pintarBarras = () => {
   if (document.querySelector('.afApertura:not(.afApertura--sale)')) {
     const clave = 'apertura';
-    if (clave !== ultimo) { ultimo = clave; Barras.colores(APERTURA).catch(() => {}); }
+    if (clave !== ultimo) { ultimo = clave; aplicarBarras(APERTURA); }
     return;
   }
   const ingreso = document.querySelector('.afIngreso');
@@ -59,10 +73,10 @@ const pintarBarras = () => {
      en el primer cuadro de la animacion la hacia arrancar a tirones. */
   const esLaHoja = (c) => c === INGRESO.arriba + INGRESO.abajo || c === INGRESO_HOJA.arriba + INGRESO_HOJA.abajo;
   if (esLaHoja(anterior) && esLaHoja(clave)) {
-    barrasDiferidas = setTimeout(() => Barras.colores(colores).catch(() => {}), 520);
+    barrasDiferidas = setTimeout(() => aplicarBarras(colores), 520);
     return;
   }
-  Barras.colores(colores).catch(() => {});
+  aplicarBarras(colores);
 };
 let barrasDiferidas = null;
 

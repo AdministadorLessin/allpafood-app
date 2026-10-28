@@ -516,4 +516,19 @@ input[type=number] {
         margin-top: auto;
         padding-top: 24px;
     }
+
+    /* En el iPhone el app se dibuja tambien detras de la hora y la camara.
+       El panel deja ese espacio libre arriba, y lo que se queda pegado al
+       bajar (el saludo con la fecha) se pega debajo de el, no encima. Una
+       franja del color del fondo tapa lo que pasa por detras de la hora. En
+       Android estos valores son 0: ahi la barra de la hora va aparte. */
+    .mainLayout{ padding-top: env(safe-area-inset-top, 0px); }
+    .afPanel__top{ top: env(safe-area-inset-top, 0px); }
+    .pageLayout::before{
+        content: '';
+        position: fixed; left: 0; right: 0; top: 0; z-index: 80;
+        height: env(safe-area-inset-top, 0px);
+        background: #F7FAF4;
+        pointer-events: none;
+    }
 }

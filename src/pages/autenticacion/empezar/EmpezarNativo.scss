@@ -1,0 +1,283 @@
+/* ==========================================================================
+   Registro dentro del app: zona, objetivo y plan.
+
+   Sin desenfoques en vivo (backdrop-filter): eran los que trababan el ingreso
+   viejo en Android. Lo que parece vidrio es blanco semitransparente con
+   sombra, y lo unico que se anima es mover y aparecer.
+   ========================================================================== */
+
+$tinta: #16211B;
+$muted: #55655C;
+$menta: #3CFB9F;
+$menta2: #12C97B;
+$verde: #177A4C;
+
+.empN__ico{
+    width: 52px; height: 52px; border-radius: 16px;
+    background: linear-gradient(135deg, $menta, $menta2);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 24px rgba(18,201,123,.30);
+    margin-bottom: 18px;
+    svg{ width: 26px; height: 26px; color: $tinta; }
+}
+
+.empN__h{
+    margin: 0;
+    font-size: 28px; line-height: 1.12; font-weight: 700;
+    letter-spacing: -.035em; color: $tinta;
+    text-wrap: balance;
+    em{
+        font-style: normal;
+        background: linear-gradient(90deg, #12B36E, #0B7A4A);
+        -webkit-background-clip: text; background-clip: text;
+        color: transparent;
+    }
+}
+.empN__b{ margin: 8px 0 0; font-size: 14.5px; line-height: 1.45; color: $muted; }
+
+/* --- Zona --- */
+.empN__busca{
+    margin-top: 18px; height: 46px; border-radius: 14px;
+    background: #fff; border: 1px solid rgba(22,33,27,.08);
+    display: flex; align-items: center; gap: 10px; padding: 0 14px;
+    svg{ width: 18px; height: 18px; color: #66736C; flex: 0 0 auto; }
+    input{
+        flex: 1; min-width: 0; border: 0; background: transparent; outline: 0;
+        font-family: inherit; font-size: 16px; color: $tinta;
+        &::placeholder{ color: #66736C; }
+        &::-webkit-search-cancel-button{ display: none; }
+    }
+}
+.empN__chips{ margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.empN__chip{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 14px; border-radius: 999px;
+    background: #fff; border: 1px solid rgba(22,33,27,.10);
+    font-family: inherit; font-size: 14px; font-weight: 500; color: $tinta;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .12s ease;
+    &:active{ transform: scale(.95); }
+    &--otro{ background: transparent; border-style: dashed; border-color: rgba(22,33,27,.25); color: $muted; }
+    &.is-on{
+        background: $tinta; border-color: $tinta; color: #fff; font-weight: 600;
+        padding-left: 10px;
+        box-shadow: 0 8px 18px rgba(22,33,27,.22);
+    }
+}
+.empN__chipCheck{
+    width: 20px; height: 20px; border-radius: 50%; background: $menta;
+    display: inline-flex; align-items: center; justify-content: center;
+    svg{ width: 12px; height: 12px; color: $tinta; stroke-width: 3.2; }
+}
+
+/* La tarjeta "vidrio": blanca y con sombra, sin desenfoque. */
+.empN__vidrio{
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin-bottom: 12px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,.97), rgba(255,255,255,.86));
+    border: 1.5px solid #fff;
+    box-shadow: 0 16px 36px rgba(22,35,29,.12);
+    b{ display: block; font-size: 14px; line-height: 1.3; color: $tinta; }
+    small{ display: block; font-size: 12.5px; color: #4F5F57; }
+    &--suelto{ margin: 12px 0 0; box-shadow: 0 12px 30px rgba(22,35,29,.08); }
+}
+.empN__cuad{
+    width: 40px; height: 40px; border-radius: 13px; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 20px; height: 20px; color: $tinta; }
+    &--menta{ background: linear-gradient(135deg, $menta, $menta2); }
+    &--crema{ background: linear-gradient(135deg, #FFD27A, #FF9F45); }
+}
+.empN__allpa{ font-size: 12.5px; line-height: 1.45; color: #4F5F57; b{ display: inline; font-size: inherit; } }
+
+.empN__pie{
+    margin: 12px 0 0; text-align: center; font-size: 13px; color: $muted;
+    a{ color: $verde; font-weight: 700; text-decoration: none; }
+}
+.empN__btnLink{ display: block; text-align: center; text-decoration: none; }
+
+/* --- Objetivo --- */
+.empN__q{ margin: 22px 0 10px; font-size: 14px; font-weight: 600; color: $tinta; }
+.empN__metas{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.empN__meta{
+    position: relative;
+    padding: 14px 6px 12px; border-radius: 18px;
+    background: #fff; border: 1px solid rgba(22,33,27,.08);
+    font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1.25; color: $tinta;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .12s ease;
+    &:active{ transform: scale(.96); }
+    &.is-on{ background: $tinta; border-color: $tinta; color: #fff; box-shadow: 0 12px 26px rgba(22,33,27,.25); }
+}
+.empN__metaIco{
+    width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 20px; height: 20px; }
+    .empN__meta--LOSE &{ background: #FFF1DE; color: #C26A12; }
+    .empN__meta--IMPROVE &{ background: #EAFBF3; color: $verde; }
+    .empN__meta--GAIN &{ background: #E4EFFA; color: #2A5F9E; }
+    .empN__meta.is-on &{ background: linear-gradient(135deg, $menta, $menta2); color: $tinta; }
+}
+.empN__metaCheck{
+    position: absolute; top: 8px; right: 8px;
+    width: 18px; height: 18px; border-radius: 50%; background: $menta;
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 11px; height: 11px; color: $tinta; stroke-width: 3.4; }
+}
+.empN__lectura{
+    margin: 10px 0 0; padding: 11px 14px; border-radius: 14px;
+    background: rgba(60,251,159,.12); font-size: 13.5px; line-height: 1.45; color: $tinta;
+}
+.empN__lados{
+    padding: 4px; border-radius: 16px; background: rgba(22,33,27,.06);
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px;
+    button{
+        height: 42px; border: 0; border-radius: 12px; background: transparent;
+        font-family: inherit; font-size: 14px; font-weight: 500; color: $muted;
+        cursor: pointer; transition: background .18s ease, color .18s ease;
+        &.is-on{ background: #fff; color: $tinta; font-weight: 600; box-shadow: 0 4px 12px rgba(22,35,29,.10); }
+    }
+}
+.empN__medidas{
+    border-radius: 20px; overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,255,255,.97), rgba(255,255,255,.86));
+    border: 1.5px solid #fff; box-shadow: 0 12px 30px rgba(22,35,29,.08);
+}
+.empN__medida{
+    display: flex; align-items: center; padding: 12px 16px;
+    border-bottom: 1px solid rgba(22,33,27,.07);
+    transition: background .18s ease, box-shadow .18s ease;
+    &:last-child{ border-bottom: 0; }
+    span{ flex: 1; font-size: 14px; color: $muted; }
+    /* 16px como minimo: con menos, el iPhone hace zoom al tocar el campo. */
+    input{
+        width: 80px; border: 0; background: transparent; outline: 0; padding: 0;
+        text-align: right; font-family: inherit; font-size: 18px; font-weight: 700; color: $tinta;
+        &::placeholder{ font-size: 16px; font-weight: 500; color: #8A968F; }
+    }
+    em{ width: 40px; text-align: right; font-style: normal; font-size: 13px; color: #66736C; }
+    &:focus-within{
+        background: rgba(60,251,159,.10); box-shadow: inset 3px 0 0 $menta2;
+        span{ color: $tinta; font-weight: 600; }
+    }
+}
+.empN__nota{
+    margin: 10px 0 0; display: flex; gap: 8px; align-items: flex-start;
+    font-size: 12.5px; line-height: 1.4; color: $muted;
+    svg{ width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: $verde; }
+}
+.empN__conFlecha{
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    svg{ width: 18px; height: 18px; stroke-width: 2.4; }
+}
+
+/* --- Plan --- */
+.empN__plan{
+    position: relative; overflow: hidden;
+    border-radius: 28px; color: #fff;
+    background: linear-gradient(160deg, #2E4238 0%, #16231D 45%, #0A120E 100%);
+    box-shadow: 0 24px 50px rgba(22,35,29,.28);
+    padding-bottom: 18px;
+    &::after{
+        content: ''; position: absolute; left: -60px; bottom: -80px;
+        width: 260px; height: 260px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(60,251,159,.30) 0%, rgba(60,251,159,0) 65%);
+        pointer-events: none;
+    }
+}
+.empN__planFoto{
+    position: absolute; right: -60px; top: -30px;
+    width: 230px; height: 230px; object-fit: cover; border-radius: 50%;
+}
+.empN__planVelo{
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(14,23,19,.94) 0%, rgba(14,23,19,.6) 58%, rgba(14,23,19,.1) 100%);
+}
+.empN__planTxt{ position: relative; z-index: 1; padding: 22px 22px 0; }
+.empN__etq{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px 5px 6px; border-radius: 999px;
+    background: rgba(60,251,159,.16); border: 1px solid rgba(60,251,159,.4);
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: $menta;
+    svg{ width: 14px; height: 14px; }
+    &--otro{ background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #fff; }
+}
+/* El color va explicito: un estilo general de los parrafos le ganaba al
+   blanco de la tarjeta y el nombre salia oscuro sobre oscuro. */
+.empN__planNom{ margin: 14px 0 0; font-size: 30px; line-height: 1.05; font-weight: 700; letter-spacing: -.035em; color: #fff; }
+.empN__precio{
+    margin: 12px 0 0; display: flex; align-items: baseline; gap: 6px;
+    font-size: 13px; color: rgba(255,255,255,.7);
+    b{ font-size: 42px; line-height: 1; font-weight: 800; letter-spacing: -.04em; color: #fff; font-variant-numeric: tabular-nums; }
+}
+.empN__total{
+    margin: 10px 0 0; font-size: 13px; color: rgba(255,255,255,.75);
+    b{ color: #fff; }
+}
+.empN__trae__t{
+    margin: 16px 0 0; font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: rgba(255,255,255,.6);
+}
+.empN__trae{
+    margin-top: 7px; display: flex; flex-wrap: wrap; gap: 6px;
+    > span{
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 4px 11px 4px 4px; border-radius: 999px;
+        background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+        font-size: 11.5px; font-weight: 600; white-space: nowrap;
+    }
+    i{
+        width: 24px; height: 24px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 13px; height: 13px; color: $tinta; stroke-width: 2.2; }
+    }
+    &--menta{ background: $menta; }
+    &--crema{ background: #FFD27A; }
+    &--cielo{ background: #9CC8FF; }
+    &--lila{ background: #D9C2FF; }
+    &--sol{ background: #FFB3A1; }
+}
+.empN__eliges{
+    position: relative; z-index: 1;
+    margin: 16px 22px 0; display: inline-flex; align-items: center; gap: 10px;
+    padding: 9px 14px 9px 9px; border-radius: 16px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+    font-size: 12.5px; line-height: 1.3;
+    .empN__cuad{ width: 30px; height: 30px; border-radius: 10px; svg{ width: 16px; height: 16px; } }
+}
+
+.empN__seccion{
+    margin: 22px 0 10px; font-size: 12px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: $muted;
+}
+.empN__otros{
+    border-radius: 20px; background: #fff; border: 1px solid rgba(22,33,27,.07); overflow: hidden;
+}
+.empN__otro{
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; border: 0; border-bottom: 1px solid rgba(22,33,27,.07);
+    background: #fff; font-family: inherit; color: $tinta; text-align: left; cursor: pointer;
+    &:last-child{ border-bottom: 0; }
+    &:active{ background: #F4F8F5; }
+}
+.empN__otroTxt{
+    flex: 1; min-width: 0;
+    b{ display: flex; align-items: center; gap: 6px; font-size: 14px; }
+    em{
+        font-style: normal; padding: 2px 7px; border-radius: 999px;
+        background: #EAFBF3; color: $verde;
+        font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    }
+    small{ display: block; margin-top: 2px; font-size: 12px; color: #66736C; }
+}
+.empN__dif{
+    font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums;
+    &--menos{ color: $verde; }
+}
+.empN__semana{
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 14px; border-radius: 20px; background: #fff; border: 1px solid rgba(22,33,27,.07);
+    span{ display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: $tinta; }
+    svg{ width: 16px; height: 16px; color: $verde; flex: 0 0 auto; }
+}

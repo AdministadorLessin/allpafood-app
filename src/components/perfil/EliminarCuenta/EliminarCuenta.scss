@@ -30,6 +30,10 @@
         margin: 0 0 12px;
         &:last-of-type{ margin-bottom: 22px; }
     }
+    &__error{
+        color: #B42318 !important;
+        a{ color: inherit; font-weight: 700; }
+    }
     &__acciones{
         display: flex;
         gap: 10px;

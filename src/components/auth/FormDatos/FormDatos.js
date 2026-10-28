@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import { motion, alToque } from './../../ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 import { useVerClave } from '../../ultil/VerClave';
+import { Accion } from '../Marco/MarcoAuth';
 
 const LOCAL_STORAGE_KEY = 'form_datos_cache';
 
@@ -207,7 +208,7 @@ const FormDatos = ({telefono}) => {
 
     return (
 
-        <form className="afDatos" onSubmit={handleSubmit(onSubmitHandler)}>
+        <form id="afFormDatos" className="afDatos" onSubmit={handleSubmit(onSubmitHandler)}>
             <Grid container spacing={2}>
                 {/* El nombre va en la boleta y es como saluda el panel. */}
                 <Grid item xs={12} sm={12} md={6}>
@@ -283,10 +284,12 @@ const FormDatos = ({telefono}) => {
                 }
 
                 <Grid item xs={12}>
-                    <motion.button type="submit" className="afBtn afBtn--mint"
-                        disabled={formRegLoad} {...alToque}>
-                        {formRegLoad ? 'Creando tu cuenta…' : 'Crear mi cuenta'}
-                    </motion.button>
+                    <Accion>
+                        <motion.button type="submit" form="afFormDatos" className="afBtn afBtn--mint"
+                            disabled={formRegLoad} {...alToque}>
+                            {formRegLoad ? 'Creando tu cuenta…' : 'Crear mi cuenta'}
+                        </motion.button>
+                    </Accion>
                 </Grid>
             </Grid>
 

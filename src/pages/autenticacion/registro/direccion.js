@@ -14,10 +14,11 @@ import {
     useAdvancedMarkerRef
 } from '@vis.gl/react-google-maps';
 
-import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
+import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
 import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
 import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
 import { useAuthContext } from '../../../context/authContext';
+import { esNativo } from '../../../nativo';
 import { API_URL, MAPS_KEY, MAPS_ID } from '../../../config';
 
 import './registro.scss';
@@ -188,17 +189,23 @@ const RegistroDireccionPage = () => {
     };
 
     return (
-        <MarcoAuth fase="direccion" paso={0}>
+        /* Despues del pago no hay a donde volver: el plan ya esta activo y lo
+           unico que falta es la direccion. */
+        <MarcoAuth fase="direccion" paso={0} sinVolver>
 
-            <h1 className="afAuth__titular">
-                <span className="t1">Falta lo último,</span>
-                ¿dónde te entregamos?
-            </h1>
+            {esNativo ?
+                <h1 className="afAuth__titular">Falta lo último, <em>¿dónde te entregamos?</em></h1>
+            :
+                <h1 className="afAuth__titular">
+                    <span className="t1">Falta lo último,</span>
+                    ¿dónde te entregamos?
+                </h1>
+            }
             <p className="afAuth__bajada">
                 Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.
             </p>
 
-            <form className={guardando ? 'regStepResp disableForms' : 'regStepResp'} onSubmit={guardar}>
+            <form id="afFormDireccion" className={guardando ? 'regStepResp disableForms' : 'regStepResp'} onSubmit={guardar}>
 
                 <div className="rsrMap">
                     <APIProvider apiKey={MAPS_KEY}>
@@ -396,11 +403,18 @@ const RegistroDireccionPage = () => {
                     </div>
                 }
 
-                <div className="btnBox">
-                    <button type="submit" className="btnPrimary btnIcon btnIconRight">
-                        <span>{guardando ? 'Guardando…' : 'Terminar'}</span>
-                    </button>
-                </div>
+                {esNativo
+                    ? <Accion>
+                        <button type="submit" form="afFormDireccion" className="afBtn afBtn--mint">
+                            {guardando ? 'Guardando…' : 'Guardar y entrar'}
+                        </button>
+                      </Accion>
+                    : <div className="btnBox">
+                        <button type="submit" className="btnPrimary btnIcon btnIconRight">
+                            <span>{guardando ? 'Guardando…' : 'Terminar'}</span>
+                        </button>
+                      </div>
+                }
 
             </form>
         </MarcoAuth>

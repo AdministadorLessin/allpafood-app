@@ -17,7 +17,7 @@ const esNativo = Capacitor.isNativePlatform();
  */
 
 const LLAVE_TOKEN = 'af_push_token';
-const VERSION_APP = '1.0.1';
+const VERSION_APP = '1.0.2';
 
 const sesion = () => {
   try { return window.localStorage.getItem('aftkn'); } catch (e) { return null; }

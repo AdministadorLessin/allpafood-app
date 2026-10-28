@@ -13,10 +13,11 @@ import {useAuthContext} from '../../../context/authContext';
 
 import { AnimatePresence } from "motion/react"
 import * as motion from "motion/react-client"
-import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
+import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
 import { Bloque, alToque } from './../../../components/ultil/Motion/Motion';
 import FormDatos from './../../../components/auth/FormDatos/FormDatos';
 import { API_URL } from '../../../config';
+import { esNativo } from '../../../nativo';
 
 const IcoError = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -208,6 +209,10 @@ const RegistroPage = (props) => {
             fase="cuenta"
             paso={paso}
             volver={paso === 1 ? () => updateFormStep(0) : undefined}
+            /* Con el numero ya confirmado la cuenta esta a medio crear: volver
+               desde "tus datos" dejaria al cliente en una pantalla que ya no
+               le sirve. */
+            sinVolver={paso === 2}
         >
             <AnimatePresence mode="wait">
                 <motion.div
@@ -221,16 +226,20 @@ const RegistroPage = (props) => {
 
                     { paso === 0 ?
                         <>
-                            <h1 className="afAuth__titular">
-                                <span className="t1">Empecemos por</span>
-                                tu número
-                            </h1>
+                            {esNativo ?
+                                <h1 className="afAuth__titular">Tu número y <em>listo</em></h1>
+                            :
+                                <h1 className="afAuth__titular">
+                                    <span className="t1">Empecemos por</span>
+                                    tu número
+                                </h1>
+                            }
                             <p className="afAuth__bajada">
                                 Te mandamos un código por WhatsApp para confirmar que eres tú.
                                 Es lo único que necesitas para empezar.
                             </p>
 
-                            <form onSubmit={handleSubmit(onSubmitHandler)}>
+                            <form id="afFormNumero" onSubmit={handleSubmit(onSubmitHandler)}>
                                 <div className="afCampo afCampo--grande">
                                     <TextField 
                                         id="fValidNumber"
@@ -242,7 +251,10 @@ const RegistroPage = (props) => {
                                         type='tel'
                                         inputMode="numeric"
                                         autoComplete="tel-national"
-                                        placeholder={'963 987 654'}
+                                        /* En el app, un ejemplo que no parezca un
+                                           numero ya escrito, y el +51 a la vista. */
+                                        placeholder={esNativo ? 'Tu celular' : '963 987 654'}
+                                        InputProps={esNativo ? { startAdornment: <span className="afNat__prefijo">+51</span> } : undefined}
                                         error={errors.fValidNumber ? true : false}
                                         {...register("fValidNumber", { onChange: handleChangeNumber })}
                                         value={numberVerify} 
@@ -263,22 +275,32 @@ const RegistroPage = (props) => {
                                     </div>
                                 }
 
-                                <motion.button type="submit" className="afBtn afBtn--mint" {...alToque}>
-                                    {loadingValid ? 'Enviando…' : 'Enviarme el código'}
-                                </motion.button>
                             </form>
 
-                            <p className="afAuth__pie">
-                                ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
-                            </p>
+                            <Accion>
+                                <motion.button type="submit" form="afFormNumero"
+                                    className="afBtn afBtn--mint" {...alToque}>
+                                    {loadingValid ? 'Enviando…' : 'Enviarme el código'}
+                                </motion.button>
+
+                                <p className="afAuth__pie">
+                                    ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
+                                </p>
+                            </Accion>
                         </>
 
                     : paso === 1 ?
                         <>
-                            <h1 className="afAuth__titular">
-                                <span className="t1">Te llegó un código a</span>
-                                {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
-                            </h1>
+                            {esNativo ?
+                                <h1 className="afAuth__titular">
+                                    Te llegó un código a <em>{numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}</em>
+                                </h1>
+                            :
+                                <h1 className="afAuth__titular">
+                                    <span className="t1">Te llegó un código a</span>
+                                    {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
+                                </h1>
+                            }
                             <p className="afAuth__bajada">
                                 Vale por 10 minutos. Escríbelo aquí y seguimos.
                             </p>
@@ -304,28 +326,34 @@ const RegistroPage = (props) => {
                                 </div>
                             }
 
-                            <motion.button type="button" onClick={sendCode}
-                                className="afBtn afBtn--mint" {...alToque}>
-                                {loadingValid ? 'Verificando…' : 'Verificar'}
-                            </motion.button>
+                            <Accion>
+                                <motion.button type="button" onClick={sendCode}
+                                    className="afBtn afBtn--mint" {...alToque}>
+                                    {loadingValid ? 'Verificando…' : 'Verificar'}
+                                </motion.button>
 
-                            <p className="afAuth__pie">
-                                {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
-                                <button type="button" onClick={reenviarCodigo}
-                                        disabled={reenviando || esperaReenvio > 0}>
-                                    {reenviando ? 'Reenviando…'
-                                        : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio}s`
-                                        : 'Reenviar el código'}
-                                </button>
-                            </p>
+                                <p className="afAuth__pie">
+                                    {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
+                                    <button type="button" onClick={reenviarCodigo}
+                                            disabled={reenviando || esperaReenvio > 0}>
+                                        {reenviando ? 'Reenviando…'
+                                            : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio}s`
+                                            : 'Reenviar el código'}
+                                    </button>
+                                </p>
+                            </Accion>
                         </>
 
                     :
                         <>
-                            <h1 className="afAuth__titular">
-                                <span className="t1">Número confirmado.</span>
-                                Ahora, tus datos
-                            </h1>
+                            {esNativo ?
+                                <h1 className="afAuth__titular">Número confirmado. <em>Ahora, tus datos</em></h1>
+                            :
+                                <h1 className="afAuth__titular">
+                                    <span className="t1">Número confirmado.</span>
+                                    Ahora, tus datos
+                                </h1>
+                            }
                             <p className="afAuth__bajada">
                                 Con esto creamos tu cuenta y podemos emitir tus comprobantes.
                             </p>

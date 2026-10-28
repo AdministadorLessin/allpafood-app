@@ -9,6 +9,8 @@ import { API_URL } from '../../../config';
    a mano y se habia quedado viejo: prometia "entre 11:00 y 2:00" cuando el
    reparto ya cerraba a la 1:30. */
 import { REPARTO } from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
+import { esNativo } from '../../../nativo';
+import EmpezarNativo from './EmpezarNativo';
 import './empezar.scss';
 
 /* Los distritos a los que se reparte hoy, tomados de las direcciones activas.
@@ -131,6 +133,27 @@ export default function EmpezarPage() {
     }));
 
   /* ------------------------------------------------------------ pantallas */
+
+  /* En el app instalado, las mismas preguntas y los mismos datos con
+     pantallas de app: boton fijo abajo, una sola barra de avance y tarjetas
+     en vez de formulario. La web sigue con las de abajo. */
+  if (esNativo) {
+    return (
+      <EmpezarNativo
+        paso={paso} setPaso={setPaso}
+        distritos={DISTRITOS} distrito={distrito} setDistrito={setDistrito}
+        fuera={fuera} setFuera={setFuera} whatsapp={WHATSAPP} reparto={REPARTO}
+        objetivos={OBJETIVOS} objetivo={objetivo} setObjetivo={setObjetivo}
+        objetivoElegido={objetivoElegido}
+        sexo={sexo} setSexo={setSexo}
+        edad={edad} setEdad={setEdad} peso={peso} setPeso={setPeso} talla={talla} setTalla={setTalla}
+        completo={completo} cargando={cargando} error={error} verMiPlan={verMiPlan}
+        plan={plan} esRecomendado={esRecomendado} recomendado={recomendado}
+        porComida={porComida} alternativas={alternativas} setMirando={setMirando}
+        semana={semana} continuar={continuar}
+      />
+    );
+  }
 
   if (fuera) {
     return (
