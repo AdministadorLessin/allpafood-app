@@ -491,6 +491,9 @@ input[type=number] {
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         overscroll-behavior: none;
+        /* Sin el zoom de doble toque: un toque rapido en un boton no debe
+           ampliar la pantalla. */
+        touch-action: manipulation;
     }
     input, textarea, [contenteditable="true"]{
         -webkit-user-select: text;

@@ -86,6 +86,13 @@ export const iniciarNativo = () => {
   document.documentElement.classList.add('es-nativo');
   iniciarAvisos();
 
+  /* Sin zoom con dos dedos dentro del app: un pellizco dejaba la pantalla
+     ampliada y movida, y ningun app se comporta asi. Tambien evita que el
+     iPhone haga zoom solo al tocar un campo de texto. En la web el zoom se
+     queda: ahi le sirve a quien ve con dificultad. */
+  document.querySelector('meta[name="viewport"]')?.setAttribute('content',
+    'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+
   /* Cada cambio de pantalla cambia el contenido de #root; se revisa una vez
      por cuadro, no en cada nodo que React toca. */
   let pendiente = false;
