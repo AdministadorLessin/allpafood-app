@@ -10,6 +10,7 @@
         <!-- Icono y color de los avisos push (si no, Android muestra un cuadrado gris). -->
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_allpa" />
         <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/allpa_verde" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="pedidos" />
 
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"

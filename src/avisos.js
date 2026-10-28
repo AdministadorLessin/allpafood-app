@@ -17,7 +17,7 @@ const esNativo = Capacitor.isNativePlatform();
  */
 
 const LLAVE_TOKEN = 'af_push_token';
-const VERSION_APP = '1.0.0';
+const VERSION_APP = '1.0.1';
 
 const sesion = () => {
   try { return window.localStorage.getItem('aftkn'); } catch (e) { return null; }
@@ -41,6 +41,21 @@ let escuchando = false;
 export const iniciarAvisos = () => {
   if (!esNativo || escuchando) return;
   escuchando = true;
+
+  /* Dos categorias en los ajustes de Android, para que quien no quiera
+     promociones pueda apagarlas sin dejar de saber cuando llega su comida.
+     Los avisos del servidor van por "pedidos" (es la categoria por defecto en
+     el AndroidManifest); "novedades" queda lista para los de marketing. */
+  PushNotifications.createChannel({
+    id: 'pedidos', name: 'Tus pedidos',
+    description: 'Cuando sale y llega tu comida, el menú de la semana y tu plan',
+    importance: 4, visibility: 1, vibration: true,
+  }).catch(() => {});
+  PushNotifications.createChannel({
+    id: 'novedades', name: 'Novedades y promociones',
+    description: 'Platos nuevos, promociones y recomendaciones',
+    importance: 3, visibility: 1,
+  }).catch(() => {});
 
   PushNotifications.addListener('registration', ({ value }) => enviarToken(value));
   PushNotifications.addListener('registrationError', (e) => console.warn('[avisos] sin token', e));
@@ -80,10 +95,24 @@ export const activarAvisos = async () => {
   }
 };
 
-/** Ya acepto antes: se vuelve a registrar para refrescar el token y la fecha. */
-export const refrescarAvisos = async () => {
-  if ((await estadoAvisos()) === 'granted') {
+/**
+ * Cada vez que entra al inicio.
+ *
+ * Con permiso: se vuelve a registrar para refrescar el token y la fecha.
+ * Sin permiso pero con un celular registrado: le quito los avisos desde los
+ * ajustes de Android. El servidor seguia creyendo que el push le llegaba y
+ * no le mandaba el WhatsApp, asi que no se enteraba de nada. Se da de baja
+ * el celular y el servidor vuelve a usar WhatsApp.
+ */
+export const refrescarAvisos = async (estadoConocido) => {
+  const estado = estadoConocido || await estadoAvisos();
+  if (estado === 'granted') {
     try { await PushNotifications.register(); } catch (e) { /* sin Firebase */ }
+    return;
+  }
+  if (estado === 'denied') {
+    olvidarCelular(sesion());
+    try { window.localStorage.removeItem(LLAVE_TOKEN); } catch (e) { /* nada */ }
   }
 };
 

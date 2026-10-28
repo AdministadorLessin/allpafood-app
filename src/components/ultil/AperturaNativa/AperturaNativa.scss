@@ -42,7 +42,7 @@ $curva: cubic-bezier(.2, .8, .2, 1);
         font-size: 30px; font-weight: 600; letter-spacing: -.02em;
     }
     &__letra{
-        display: inline-block; opacity: 0; filter: blur(12px); transform: translateY(10px);
+        display: inline-block; opacity: 0; transform: translateY(10px);
         animation: afApLetra .7s $curva forwards;
     }
 }
@@ -51,7 +51,7 @@ $curva: cubic-bezier(.2, .8, .2, 1);
 @keyframes afApRespira{ from{ transform: scale(1); opacity: .5; } to{ transform: scale(1.18); opacity: .3; } }
 @keyframes afApTrazo{ to{ stroke-dashoffset: 0; } }
 @keyframes afApLlena{ to{ fill-opacity: 1; stroke-opacity: 0; } }
-@keyframes afApLetra{ to{ opacity: 1; filter: blur(0); transform: none; } }
+@keyframes afApLetra{ to{ opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce){
     .afApertura *{ animation-duration: .01ms !important; animation-delay: 0s !important; }

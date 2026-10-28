@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import './IngresoNativo.scss';
 import plato from '../../../assets/img/ingreso-plato.jpg';
+import platoBorroso from '../../../assets/img/ingreso-plato-blur.jpg';
 import Recuperar from './Recuperar';
 
 /*
@@ -70,6 +71,48 @@ export default function IngresoNativo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /* Al abrir o cerrar el teclado, Android cambia el alto del app de un
+     cuadro al otro y la hoja saltaba media pantalla de golpe. Aqui se la
+     deja un instante donde estaba y se la desliza a su lugar nuevo, como si
+     la empujara el teclado. */
+  const refHoja = useRef(null);
+  const hojaAbierta = useRef(hoja);
+  hojaAbierta.current = hoja;
+  /* Android cambia el alto en dos pasos: primero lo agranda un poco (se va
+     la barra de navegacion) y enseguida lo achica (llega el teclado). Animar
+     cada paso hacia que la hoja bajara y subiera: un rebote. Por eso la hoja
+     se queda quieta mientras dure la rafaga de cambios y recien cuando el
+     alto se asienta hace un solo recorrido hasta su lugar final. */
+  useEffect(() => {
+    let alto = window.innerHeight;
+    let altoInicial = null;
+    let asentar = null;
+    let fin = null;
+    const alCambiarAlto = () => {
+      const el = refHoja.current;
+      if (!el || !hojaAbierta.current) { alto = window.innerHeight; return; }
+      if (altoInicial === null) altoInicial = alto;
+      alto = window.innerHeight;
+      clearTimeout(asentar);
+      clearTimeout(fin);
+      /* Mientras tanto se la deja donde estaba al empezar. */
+      el.style.transition = 'none';
+      el.style.transform = `translateY(${altoInicial - alto}px)`;
+      asentar = setTimeout(() => {
+        altoInicial = null;
+        el.getBoundingClientRect();
+        el.style.transition = 'transform .3s cubic-bezier(.2,.9,.2,1)';
+        el.style.transform = '';
+        fin = setTimeout(() => { el.style.transition = ''; }, 320);
+      }, 90);
+    };
+    window.addEventListener('resize', alCambiarAlto);
+    return () => {
+      window.removeEventListener('resize', alCambiarAlto);
+      clearTimeout(asentar); clearTimeout(fin);
+    };
+  }, []);
+
   /* El boton atras de Android cierra la hoja antes que salir del app. */
   useEffect(() => {
     if (!hoja) return undefined;
@@ -78,19 +121,37 @@ export default function IngresoNativo({
     return () => window.removeEventListener('af-atras', alAtras);
   }, [hoja, enviando]);
 
+  /* La foto se mide una sola vez. Antes ocupaba el alto de la pantalla en
+     vivo, y al abrir el teclado (o al cambiar las barras de Android cuando
+     sube la hoja) ese alto cambiaba: la foto se reacomodaba y daba un salto.
+     Solo se vuelve a medir si cambia el ancho, o sea si se gira el celular. */
+  const [altoFoto, setAltoFoto] = useState(() => window.innerHeight);
+  useEffect(() => {
+    let ancho = window.innerWidth;
+    const alGirar = () => {
+      if (window.innerWidth === ancho) return;
+      ancho = window.innerWidth;
+      setAltoFoto(window.innerHeight);
+    };
+    window.addEventListener('resize', alGirar);
+    return () => window.removeEventListener('resize', alGirar);
+  }, []);
+
   const clases = ['afIngreso', `afIngreso--${fase}`];
   if (hoja) clases.push('afIngreso--hoja');
 
   return (
     <main className={clases.join(' ')}>
       {/* ===== Bienvenida ===== */}
-      <div className="afIngreso__bienvenida">
+      <div className="afIngreso__bienvenida" style={{ height: altoFoto }}>
+        {/* El desenfoque hacia abajo es la misma foto ya desenfocada, que se
+            funde con una mascara. Antes eran tres capas que desenfocaban en
+            vivo lo que tenian detras: en un Android de gama media el ingreso
+            entero iba a saltos, sobre todo al abrir el teclado. */}
         <div className="afIngreso__foto">
           <img src={plato} alt="Bowl de Allpa Food con verduras, quinua y salsa verde" />
+          <img src={platoBorroso} alt="" aria-hidden="true" className="afIngreso__borroso" />
         </div>
-        <div className="afIngreso__blur afIngreso__blur--1" />
-        <div className="afIngreso__blur afIngreso__blur--2" />
-        <div className="afIngreso__blur afIngreso__blur--3" />
         <div className="afIngreso__tinte" />
 
         <div className="afIngreso__pie">
@@ -119,7 +180,7 @@ export default function IngresoNativo({
       <button type="button" aria-label="Cerrar" className="afIngreso__velo"
               onClick={() => { if (!enviando) setHoja(false); }} tabIndex={hoja ? 0 : -1} />
 
-      <section className="afIngreso__hoja" role="dialog" aria-label="Ingresar a tu plan" aria-hidden={!hoja}>
+      <section ref={refHoja} className="afIngreso__hoja" role="dialog" aria-label="Ingresar a tu plan" aria-hidden={!hoja}>
         <div className="afIngreso__agarre" />
 
         {modo === 'recuperar' ? (

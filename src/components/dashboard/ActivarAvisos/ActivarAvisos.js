@@ -32,8 +32,10 @@ export default function ActivarAvisos() {
     let vivo = true;
     estadoAvisos().then((estado) => {
       if (!vivo) return;
-      if (estado === 'granted') refrescarAvisos();
-      else if (estado === 'prompt' && !pospuesta()) setVisible(true);
+      /* Con permiso refresca el registro; sin el, da de baja el celular para
+         que el servidor vuelva a avisarle por WhatsApp. */
+      refrescarAvisos(estado);
+      if (estado === 'prompt' && !pospuesta()) setVisible(true);
     });
     return () => { vivo = false; };
   }, []);

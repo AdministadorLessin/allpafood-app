@@ -51,9 +51,20 @@ const pintarBarras = () => {
     : (document.querySelector('.afAuth') ? BLANCO : PANEL);
   const clave = colores.arriba + colores.abajo;
   if (clave === ultimo) return;
+  const anterior = ultimo;
   ultimo = clave;
+  clearTimeout(barrasDiferidas);
+  /* Abrir o cerrar la hoja de ingreso: los colores cambian cuando la hoja ya
+     llego. Cambiarlos obliga a Android a repintar la ventana entera, y hacerlo
+     en el primer cuadro de la animacion la hacia arrancar a tirones. */
+  const esLaHoja = (c) => c === INGRESO.arriba + INGRESO.abajo || c === INGRESO_HOJA.arriba + INGRESO_HOJA.abajo;
+  if (esLaHoja(anterior) && esLaHoja(clave)) {
+    barrasDiferidas = setTimeout(() => Barras.colores(colores).catch(() => {}), 520);
+    return;
+  }
   Barras.colores(colores).catch(() => {});
 };
+let barrasDiferidas = null;
 
 export const iniciarNativo = () => {
   if (!esNativo) return;
