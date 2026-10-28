@@ -13,7 +13,7 @@ const MenuWeek = ({data,reproOrder,getMenus}) => {
     return (
         <div className="inlineFlex dashMweekCont">
             <div className="inlineFlex dmwaTerm">
-                <Link to={'https://allpafood.com/terminos-y-condiciones/'} target={'_blank'}> <OpenInNewIcon /> Términos y condiciones</Link>
+                <Link to={'https://allpafood.com/terminos'} target={'_blank'}> <OpenInNewIcon /> Términos y condiciones</Link>
                 <Link to={'https://allpafood.com/politicas-de-privacidad/'} target={'_blank'}> <OpenInNewIcon /> Politicas de privacidad</Link>
             </div>
             {data && data.length ?

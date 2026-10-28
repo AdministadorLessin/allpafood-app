@@ -49,7 +49,7 @@ const PlanUser = ({data}) => {
                         <div className="dpubNote">
                             <p>Puedes usar tu plan hasta el {plan.expirationDate ? moment(plan.expirationDate).format('D [de] MMMM') : 'vencimiento'}.</p>
                         </div>
-                        {plan.consumption.orders.consumed === plan.consumption.orders.total ? 
+                        {plan.consumption?.orders && plan.consumption.orders.consumed === plan.consumption.orders.total ? 
                             <ul>
                                 <li>
                                     <small>Desde:</small>
@@ -92,7 +92,7 @@ const PlanUser = ({data}) => {
                                 </li>
                                 <li>
                                     <small>Envíos:</small>
-                                    <p>{plan.consumption.orders.consumed}/{plan.consumption.orders.total}</p>
+                                    <p>{plan.consumption?.orders?.consumed ?? 0}/{plan.consumption?.orders?.total ?? 0}</p>
                                 </li>
                             </ul>
                         }

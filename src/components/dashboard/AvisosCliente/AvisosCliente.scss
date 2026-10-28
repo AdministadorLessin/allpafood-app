@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Avisos del cliente.
+
+   Dos caras con la misma estructura: la normal —devolvimos envios, un dato de
+   la cuenta— y la de feriado, que avisa que ese dia no se reparte. La
+   diferencia no es decoracion: el cliente tiene que distinguir de un vistazo
+   un aviso de saldo de uno que le cambia el dia.
+   ========================================================================== */
+
+.afAviso{
+    position: fixed; inset: 0; z-index: 1400;
+    background: rgba(22,33,27,.55);
+    display: flex; align-items: flex-end; justify-content: center;
+    backdrop-filter: blur(2px);
+
+    @media (min-width: 640px){
+        align-items: center;
+        padding: 24px;
+    }
+
+    &__caja{
+        width: 100%; max-width: 440px;
+        max-height: 92vh; overflow-y: auto;
+        background: var(--af-paper);
+        border-radius: 24px 24px 0 0;
+        @media (min-width: 640px){ border-radius: 24px; }
+    }
+
+    &__top{
+        text-align: center;
+        padding: 26px 24px 22px;
+        background:
+            radial-gradient(120% 160% at 85% 4%, rgba(60,251,159,.28) 0%, rgba(60,251,159,0) 60%),
+            linear-gradient(150deg, #F0FBF4 0%, #E2F3E9 100%);
+        border-radius: 24px 24px 0 0;
+    }
+
+    &__iso{
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 48px; height: 48px; border-radius: 16px;
+        background: rgba(255,255,255,.7);
+        color: var(--af-accent);
+        margin-bottom: 12px;
+        svg{ width: 24px; height: 24px; }
+    }
+
+    &__tit{
+        margin: 0 0 6px;
+        font-size: var(--af-t-xl);
+        font-weight: 800;
+        letter-spacing: var(--af-track-titular);
+        color: var(--af-ink);
+        text-wrap: balance;
+    }
+
+    &__baja{
+        margin: 0; font-size: var(--af-t-s);
+        color: var(--af-muted); line-height: 1.45;
+    }
+
+    /* La barra de navegacion flota pegada al borde de abajo, justo donde
+       termina la hoja. La hoja se alarga para pasar por encima de ella: si no,
+       el ultimo boton queda escrito sobre la barra. */
+    &__cuerpo{
+        padding: 20px 20px 26px;
+        @media (max-width: 639px){ padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    }
+
+    &__otro{
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: var(--af-accent-soft);
+        font-size: var(--af-t-s);
+        color: var(--af-ink);
+        line-height: 1.45;
+    }
+
+    &__btn{
+        display: block; width: 100%;
+        font-family: inherit; font-size: var(--af-t-m); font-weight: 700;
+        color: var(--af-mint-ink); background: var(--af-mint);
+        border: 0; border-radius: var(--af-r-pill);
+        padding: 13px 16px; cursor: pointer;
+    }
+
+    &__btn--suave{
+        margin-top: 10px;
+        color: var(--af-muted); background: none;
+        font-size: var(--af-t-s); font-weight: 600;
+        text-decoration: underline;
+        padding: 8px;
+    }
+
+    /* ---- Feriado ------------------------------------------------------- */
+
+    &--feriado &__top{
+        padding: 28px 24px 24px;
+        background:
+            radial-gradient(130% 150% at 15% 0%, rgba(60,251,159,.42) 0%, rgba(60,251,159,0) 58%),
+            linear-gradient(155deg, #E8F7EE 0%, #D5EEE0 100%);
+    }
+
+    &__escena{
+        width: 112px; height: 104px;
+        margin: 0 auto 14px;
+        svg{ width: 100%; height: 100%; display: block; }
+    }
+
+    &__chip{
+        display: inline-block;
+        margin-bottom: 10px;
+        padding: 5px 12px;
+        border-radius: var(--af-r-pill);
+        background: rgba(24,58,42,.9);
+        color: #EAFEF3;
+        font-size: var(--af-t-xs);
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    &__nota{
+        display: flex; align-items: flex-start; gap: 10px;
+        margin: 0 0 16px;
+        padding: 13px 14px;
+        border-radius: 16px;
+        background: var(--af-accent-soft);
+        color: var(--af-ink);
+        font-size: var(--af-t-s);
+        line-height: 1.4;
+        text-align: left;
+    }
+    &__punto{
+        flex: 0 0 auto;
+        width: 8px; height: 8px; margin-top: 6px;
+        border-radius: 50%;
+        background: var(--af-accent);
+    }
+}

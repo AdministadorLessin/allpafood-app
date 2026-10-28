@@ -77,6 +77,28 @@
         &:hover{ background: var(--af-mint, #D8FBE8); }
     }
 
+    /* En escritorio el centro entra por aqui, y es un boton: hay que quitarle
+       lo que el navegador le pone de fabrica. */
+    &__item--centro{
+        width: 100%;
+        border: 0;
+        background: none;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    &__punto{
+        margin-left: auto;
+        font-style: normal;
+        min-width: 18px; height: 18px;
+        padding: 0 5px;
+        border-radius: var(--af-r-pill);
+        background: #D8622F; color: #fff;
+        font-size: 11px; font-weight: 800; line-height: 18px;
+        text-align: center;
+    }
+
     &__ic{ width: 20px; height: 20px; flex: 0 0 auto; }
 
     &__yo{

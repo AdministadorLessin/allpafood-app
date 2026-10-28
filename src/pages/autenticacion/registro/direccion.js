@@ -384,7 +384,7 @@ const RegistroDireccionPage = () => {
                     <input type="checkbox" checked={aceptaTerminos}
                            onChange={(e) => setAceptaTerminos(e.target.checked)} />
                     <span>
-                        Acepto los <a href="https://allpafood.com/terminos-y-condiciones/"
+                        Acepto los <a href="https://allpafood.com/terminos"
                                       target="_blank" rel="noreferrer">términos y condiciones</a> y
                         las condiciones de entrega.
                     </span>

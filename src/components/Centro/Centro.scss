@@ -1,0 +1,314 @@
+/* ==========================================================================
+   El centro: avisos y ayuda en una sola hoja.
+
+   La hoja es una capa de vidrio: el contenido de atras se intuye a traves de
+   ella en vez de cortarse en seco. No hay boton flotante — se entra desde la
+   barra de abajo, que es donde el cliente ya busca las secciones.
+   ========================================================================== */
+
+.afCentro{
+
+    &__velo{
+        position: fixed; inset: 0; z-index: 1300;
+        background: rgba(14,26,19,.46);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+    }
+
+    &__hoja{
+        position: fixed; left: 0; right: 0; bottom: 0;
+        z-index: 1301;
+        max-height: 86vh;
+        display: flex; flex-direction: column;
+        border-radius: 26px 26px 0 0;
+        background: rgba(252,252,250,.86);
+        -webkit-backdrop-filter: blur(28px) saturate(180%);
+        backdrop-filter: blur(28px) saturate(180%);
+        border-top: 1px solid rgba(255,255,255,.7);
+        box-shadow: 0 -14px 50px -18px rgba(16,31,24,.45);
+        touch-action: none;
+
+        @media (min-width: 640px){
+            left: 50%; right: auto;
+            width: 440px;
+            transform: translateX(-50%);
+        }
+    }
+
+    &__asa{
+        flex: 0 0 auto;
+        padding: 10px 0 4px;
+        cursor: grab;
+        span{
+            display: block;
+            width: 38px; height: 5px;
+            border-radius: var(--af-r-pill);
+            background: var(--af-line);
+            margin: 0 auto;
+        }
+    }
+
+    /* --- Selector de pestaña --- */
+    &__seg{
+        flex: 0 0 auto;
+        display: flex;
+        gap: 2px;
+        margin: 8px 18px 4px;
+        padding: 3px;
+        border-radius: var(--af-r-pill);
+        background: rgba(16,31,24,.06);
+
+        button{
+            position: relative;
+            flex: 1;
+            border: 0; background: none;
+            font-family: inherit; font-size: var(--af-t-s); font-weight: 700;
+            letter-spacing: -.012em;
+            color: var(--af-muted);
+            padding: 8px 0;
+            border-radius: var(--af-r-pill);
+            cursor: pointer;
+
+            &.is-on{ color: var(--af-ink); }
+
+            /* Solo la etiqueta. Con "> span" el selector alcanzaba tambien a
+               la pastilla y le quitaba su posicion absoluta. */
+            .afCentro__segTxt{
+                position: relative; z-index: 1;
+                display: inline-flex; align-items: center; gap: 6px;
+            }
+            i{
+                font-style: normal;
+                min-width: 18px; height: 18px;
+                padding: 0 5px;
+                border-radius: var(--af-r-pill);
+                background: #D8622F; color: #fff;
+                font-size: 11px; font-weight: 800; line-height: 18px;
+            }
+        }
+    }
+
+    /* La pastilla se desliza entre las dos pestañas en vez de aparecer de
+       golpe en la otra: el movimiento dice que es el mismo objeto. */
+    &__segPastilla{
+        position: absolute; inset: 0;
+        border-radius: var(--af-r-pill);
+        background: var(--af-paper);
+        box-shadow: 0 2px 6px -2px rgba(16,31,24,.28);
+    }
+
+    &__cuerpo{
+        padding: 10px 18px calc(24px + env(safe-area-inset-bottom, 0px));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+
+        h2{
+            margin: 0 0 2px;
+            font-size: var(--af-t-l);
+            font-weight: 800;
+            letter-spacing: -.022em;
+            color: var(--af-ink);
+        }
+    }
+
+    &__baja{
+        margin: 0 0 14px;
+        font-size: var(--af-t-xs);
+        color: var(--af-muted);
+    }
+
+    /* --- Un aviso: una linea --- */
+    &__av{
+        background: var(--af-paper);
+        border: 1px solid var(--af-line);
+        border-radius: 17px;
+        margin-bottom: 9px;
+        overflow: hidden;
+    }
+
+    &__avTop{
+        display: flex; align-items: center; gap: 12px;
+        width: 100%; text-align: left;
+        background: none; border: 0;
+        padding: 13px;
+        font-family: inherit; color: inherit;
+        cursor: pointer;
+    }
+
+    &__avIco{
+        width: 33px; height: 33px; flex: 0 0 auto;
+        border-radius: 11px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--af-accent-soft);
+        color: var(--af-accent);
+        svg{ width: 17px; height: 17px; }
+    }
+
+    &__avTxt{
+        min-width: 0; flex: 1;
+        b{
+            display: block;
+            font-size: var(--af-t-s); font-weight: 600;
+            letter-spacing: -.012em; line-height: 1.35;
+            color: var(--af-ink);
+        }
+        small{
+            display: block;
+            font-size: var(--af-t-xs); color: var(--af-muted);
+            margin-top: 1px;
+            /* Una linea y nada mas: la lista se lee de un vistazo. */
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+    }
+
+    &__avIr{
+        background: none; border: 0; padding: 0;
+        font-family: inherit; font-size: var(--af-t-xs); font-weight: 700;
+        color: var(--af-accent); cursor: pointer;
+    }
+
+    /* El tono viaja en el icono, no en el fondo: cuatro tarjetas de colores
+       distintos se leen como un semaforo y ninguna resalta. */
+    &__av--alerta &__avIco{ background: #FBE8DF; color: #B4491C; }
+    &__av--ruta   &__avIco{ background: var(--af-accent-soft); color: var(--af-accent); }
+    &__av--aviso  &__avIco{ background: rgba(16,31,24,.07); color: var(--af-ink); }
+    &__av--bien   &__avIco{ background: #DFF8EC; color: #0F7A4C; }
+
+    &__vacio{
+        text-align: center;
+        padding: 22px 10px 8px;
+
+        b{ display: block; font-size: var(--af-t-m); font-weight: 800; letter-spacing: -.02em; color: var(--af-ink); }
+        p{ margin: 4px 0 16px; font-size: var(--af-t-xs); color: var(--af-muted); }
+    }
+
+    &__vacioIco{
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 52px; height: 52px; margin-bottom: 10px;
+        border-radius: 50%;
+        background: #DFF8EC; color: #0F7A4C;
+        svg{ width: 26px; height: 26px; }
+    }
+
+    /* --- Temas de ayuda --- */
+    &__fila{
+        display: flex; align-items: center; gap: 12px;
+        width: 100%; text-align: left;
+        background: var(--af-paper);
+        border: 1px solid var(--af-line);
+        border-radius: 17px;
+        padding: 13px;
+        margin-bottom: 9px;
+        font-family: inherit; color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+
+        b{ display: block; font-size: var(--af-t-s); font-weight: 600; letter-spacing: -.012em; }
+        small{ display: block; font-size: var(--af-t-xs); color: var(--af-muted); margin-top: 1px; }
+    }
+
+    &__ico{
+        width: 33px; height: 33px; flex: 0 0 auto;
+        border-radius: 11px;
+        background: var(--af-accent-soft);
+        color: var(--af-accent);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 17px; height: 17px; }
+    }
+
+    &__chev{ margin-left: auto; color: var(--af-muted); font-size: 18px; line-height: 1; }
+
+    &__volver{
+        background: none; border: 0; padding: 0 0 10px;
+        font-family: inherit; font-size: var(--af-t-xs); font-weight: 600;
+        color: var(--af-accent); cursor: pointer;
+    }
+
+    &__qa{
+        border-bottom: 1px solid var(--af-line);
+        &:last-of-type{ border-bottom: none; }
+
+        > button{
+            position: relative;
+            width: 100%; text-align: left;
+            background: none; border: 0;
+            font-family: inherit; font-size: var(--af-t-s); font-weight: 600;
+            letter-spacing: -.012em; line-height: 1.4;
+            color: var(--af-ink);
+            padding: 14px 26px 14px 0;
+            cursor: pointer;
+        }
+    }
+
+    &__signo{
+        position: relative;
+        flex: 0 0 auto;
+        width: 11px; height: 11px;
+        color: var(--af-accent);
+
+        &::before, &::after{
+            content: ''; position: absolute;
+            background: currentColor; border-radius: 2px;
+            transition: transform .34s cubic-bezier(.22,1,.36,1), opacity .34s;
+        }
+        &::before{ left: 0; top: 4.5px; width: 11px; height: 2px; }
+        &::after{ left: 4.5px; top: 0; width: 2px; height: 11px; }
+    }
+    /* En la pregunta el signo va absoluto a la derecha; en el aviso es una
+       columna mas de la fila. */
+    &__qa &__signo{ position: absolute; right: 2px; top: 50%; margin-top: -5.5px; }
+    &__qa.is-abierta &__signo::after,
+    &__signo.is-abierto::after{ transform: rotate(90deg); opacity: 0; }
+
+    &__resp{
+        overflow: hidden;
+        > div{ padding: 0 13px 13px; }
+        p{
+            margin: 0 0 10px;
+            font-size: var(--af-t-xs);
+            line-height: 1.62;
+            color: var(--af-muted);
+            &:last-child{ margin-bottom: 0; }
+            &.es-clave{ color: var(--af-ink); font-weight: 600; }
+        }
+    }
+    &__qa &__resp > div{ padding: 0 0 12px; }
+
+    &__cola{
+        margin-top: 16px; padding-top: 15px;
+        border-top: 1px solid var(--af-line);
+        text-align: center;
+        p{ margin: 0 0 10px; font-size: var(--af-t-xs); color: var(--af-muted); }
+    }
+
+    &__cta{
+        display: block; width: 100%;
+        background: var(--af-mint); color: var(--af-mint-ink);
+        border: 0; border-radius: var(--af-r-pill);
+        font-family: inherit; font-size: var(--af-t-s); font-weight: 700;
+        letter-spacing: -.01em;
+        padding: 13px; text-align: center; text-decoration: none;
+        cursor: pointer;
+    }
+
+    &__legal{
+        margin: 12px 0 0;
+        text-align: center;
+        font-size: var(--af-t-xs);
+        a{ color: var(--af-muted); text-decoration: underline; text-underline-offset: 2px; }
+    }
+}
+
+/* Quien pidio menos transparencia la ve solida, no esmerilada. */
+@media (prefers-reduced-transparency: reduce){
+    .afCentro__hoja{
+        background: var(--af-paper);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .afCentro__signo::before, .afCentro__signo::after{ transition: none; }
+}

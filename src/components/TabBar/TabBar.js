@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
 import './TabBar.scss';
+import { useCentro } from '../Centro/CentroContext';
 
 /**
  * Reemplaza el menu hamburguesa. Una app se navega sin gestos: las cuatro
@@ -32,12 +33,19 @@ const Icono = ({ nombre }) => {
   if (nombre === 'plan') return (
     <svg {...comun}><rect x="2.5" y="5" width="19" height="14" rx="3.2"/><path d="M2.5 10h19M6.5 15h4"/></svg>
   );
-  return (
+  if (nombre === 'user') return (
     <svg {...comun}><circle cx="12" cy="8" r="3.6"/><path d="M4.6 20.4c0-3.7 3.4-5.6 7.4-5.6s7.4 1.9 7.4 5.6"/></svg>
+  );
+  return (
+    <svg {...comun}><path d="M18 9.5a6 6 0 1 0-12 0c0 4.2-1.3 5.6-1.9 6.2a.8.8 0 0 0 .6 1.3h14.6a.8.8 0 0 0 .6-1.3c-.6-.6-1.9-2-1.9-6.2Z"/><path d="M10.2 20.1a2.1 2.1 0 0 0 3.6 0"/></svg>
   );
 };
 
-const TabBar = () => (
+const TabBar = () => {
+
+  const { abrir, sinLeer, abierto } = useCentro();
+
+  return (
   <nav className="afTabs" aria-label="Navegación principal">
     {TABS.map((t) => (
       <NavLink
@@ -55,7 +63,24 @@ const TabBar = () => (
         </span>
       </NavLink>
     ))}
+
+    {/* Avisos y ayuda no son una pantalla: abren una hoja. Pero viven aqui,
+        con las secciones, porque un boton flotando encima del contenido se lee
+        como algo pegado al app y no como parte de el. */}
+    <button
+      type="button"
+      className={abierto ? 'afTab afTab--on afTab--centro' : 'afTab afTab--centro'}
+      onClick={() => abrir()}
+      aria-label={sinLeer > 0 ? `Avisos y ayuda, ${sinLeer} sin leer` : 'Avisos y ayuda'}
+    >
+      <span className="afTab__caja">
+        <Icono nombre="campana" />
+        <span className="afTab__txt">Avisos</span>
+        {sinLeer > 0 && !abierto && <span className="afTab__punto">{sinLeer}</span>}
+      </span>
+    </button>
   </nav>
-);
+  );
+};
 
 export default TabBar;

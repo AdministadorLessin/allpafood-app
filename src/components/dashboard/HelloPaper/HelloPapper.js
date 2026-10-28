@@ -48,7 +48,7 @@ const HelloPaper = ({data}) => {
               <p>Aquí ves tu semana y tu plan.</p>
             </div>
             <figure>
-              {userData && userData.plan && userData.plan.consumption && parseFloat(userData.plan.consumption.orders.consumed) >= 15 ?
+              {userData && userData.plan && userData.plan.consumption?.orders && parseFloat(userData.plan.consumption.orders.consumed) >= 15 ?
                 <img src={ caritaTriste} alt="" />
               :
                 <img src={caritaFelis} alt="" />

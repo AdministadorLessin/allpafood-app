@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { primerDiaElegible, tiempoRestante, semanaDelCliente } from './../StatusBanner/estadoPlan';
-import { REPARTO } from './../PedidoDeHoy/PedidoDeHoy';
+import { primerDiaElegible, tiempoRestante, semanaDelCliente } from '../dashboard/StatusBanner/estadoPlan';
+import { REPARTO } from '../dashboard/PedidoDeHoy/PedidoDeHoy';
 
 /**
  * De donde salen los avisos.
@@ -31,6 +31,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       texto: aviso.mensaje
         ? aviso.mensaje
         : `Estamos entregando hasta las ${aviso.nuevaHora}. Tu pedido sigue en ruta.`,
+      corto: aviso && aviso.nuevaHora ? `Entregamos hasta las ${aviso.nuevaHora}` : 'Sigue en ruta',
       cuando: 'Hoy',
       ruta: '/',
       accion: 'Ver mi pedido',
@@ -50,6 +51,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       titulo: 'Tu almuerzo salió a ruta',
       // Sin punto tras la hora: la constante ya termina en "p.m." y quedaban dos.
       texto: `Llega entre las ${REPARTO.desde} y la ${REPARTO.hasta} No hace falta que estés pendiente.`,
+      corto: `Llega entre las ${REPARTO.desde} y la ${REPARTO.hasta}`,
       cuando: 'Hoy',
       ruta: '/',
       accion: 'Seguir mi pedido',
@@ -62,6 +64,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
       tono: 'ruta',
       titulo: 'Entregado',
       texto: 'Tu almuerzo de hoy ya llegó. Que lo disfrutes.',
+      corto: 'Que lo disfrutes',
       cuando: 'Hoy',
       ruta: '/',
       accion: 'Ver el detalle',
@@ -88,6 +91,9 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
           ? `Para recibir el ${primero.format('dddd')} tienes hasta hoy a las 10:00 p.m.` +
             ` Quedan ${queda.horas} h ${String(queda.minutos).padStart(2, '0')} min.`
           : `Para el ${primero.format('dddd')} tienes hasta el ${primero.clone().subtract(1, 'day').format('dddd')} a las 10:00 p.m.`,
+        corto: cierraHoy
+          ? `Cierra hoy a las 10:00 p.m.`
+          : `Para el ${primero.format('dddd')}`,
         cuando: 'Esta semana',
         ruta: '/menu',
         accion: 'Elegir mis días',
@@ -109,6 +115,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
         tono: 'alerta',
         titulo: restantes === 1 ? 'Te queda 1 envío' : `Te quedan ${restantes} envíos`,
         texto: 'Renueva antes de que se acaben para no cortar la semana.',
+        corto: 'Renueva para no cortar la semana',
         cuando: 'Tu plan',
         ruta: '/planes',
         accion: 'Renovar mi plan',
@@ -123,6 +130,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
         texto: restantes > 0
           ? `Todavía tienes ${restantes} ${restantes === 1 ? 'envío' : 'envíos'} sin usar. Si renuevas antes, se suman a tu plan nuevo.`
           : `Vence el ${vence.format('D [de] MMMM')}.`,
+        corto: restantes > 0 ? `Te quedan ${restantes} sin usar` : `Vence el ${vence.format('D [de] MMMM')}`,
         cuando: 'Tu plan',
         ruta: '/mi-plan',
         accion: 'Ver mi plan',
@@ -135,6 +143,7 @@ export function avisosDelCliente({ plan, ordenes, aviso, ahora = moment() }) {
         tono: 'bien',
         titulo: 'Tienes otro plan esperando',
         texto: `${creditos} almuerzos más que arrancan solos cuando termines el actual.`,
+        corto: `${creditos} almuerzos listos para arrancar`,
         cuando: 'Tu plan',
         ruta: '/mi-plan',
         accion: 'Ver mi plan',

@@ -181,15 +181,24 @@ const ReprogramarMenu = ({openReprogramar, setOpenReprogramar,data}) => {
                 </div>
                 {datePlan && datePlan.plan &&
                     <div className="displayFlex rMenuExpiracion">
-                        <div className="rMenuExpiracionItem">
-                            <figure>
-                                <img src={icoDisponible} alt="" />
-                            </figure>
-                            <div className="txt">
-                                <small>Envíos:</small>
-                                <h5>{datePlan.plan.consumption.orders.consumed} de {datePlan.plan.consumption.orders.total}</h5>
+                        {/* El conteo de envios solo si vino.
+                            Este calendario se monta en el armazon del panel, o sea en
+                            TODAS las pantallas. Leia consumption.orders sin comprobar
+                            que consumption existiera, y a quien tenia la sesion sin ese
+                            dato —el que acaba de comprar, el que todavia no tiene plan—
+                            se le caia el app entero: inicio, planes, mi plan y perfil.
+                            No podia ni llegar a comprar. */}
+                        {datePlan.plan.consumption?.orders &&
+                            <div className="rMenuExpiracionItem">
+                                <figure>
+                                    <img src={icoDisponible} alt="" />
+                                </figure>
+                                <div className="txt">
+                                    <small>Envíos:</small>
+                                    <h5>{datePlan.plan.consumption.orders.consumed} de {datePlan.plan.consumption.orders.total}</h5>
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div className="rMenuExpiracionItem">
                             <figure>
                                 <img src={icoExpiracion} alt="" />

@@ -28,6 +28,7 @@ import RegistroDireccionPage from './pages/autenticacion/registro/direccion';
 import CambiarClavePage from './pages/autenticacion/clave/cambiar';
 
 import ProtectedRoutes from './components/ultil/ProtectedRoutes/ProtectedRoutes';
+import { CentroProvider } from './components/Centro/CentroContext';
 
 import PantallaError from './components/ultil/PantallaError';
 import AperturaNativa from './components/ultil/AperturaNativa/AperturaNativa';
@@ -43,6 +44,7 @@ function App() {
       <AuthContextProvider>
         <HelmetProvider>
             <BrowserRouter >
+              <CentroProvider>
                 <Routes>
                   <Route path='' element={<ProtectedRoutes />}>
                     <Route path='/' element={<DashboadHome />} />
@@ -83,6 +85,7 @@ function App() {
                       sin un boton ni un mensaje, y ahi se acababa su visita. */}
                   <Route path='*' element={ <Navigate to="/" replace /> } />
                 </Routes>
+              </CentroProvider>
             </BrowserRouter>
           
         </HelmetProvider>

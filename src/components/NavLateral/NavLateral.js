@@ -12,6 +12,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import './NavLateral.scss';
+import { useCentro } from '../Centro/CentroContext';
 import logo from '../../assets/img/logo_allpafood.png';
 import { motion, alToque } from '../ultil/Motion/Motion';
 
@@ -46,12 +47,12 @@ const SECCIONES = [
   ]},
   { grupo: 'Más', items: [
     { a: '/salud-y-bienestar', texto: 'Salud y bienestar', icono: 'salud' },
-    { a: '/preguntas-frecuentes', texto: 'Preguntas frecuentes', icono: 'ayuda' },
   ]},
 ];
 
 const NavLateral = () => {
   const navigate = useNavigate();
+  const { abrir, sinLeer } = useCentro();
 
   /* El avatar y el nombre salen de lo guardado al entrar. Si viniera a medias
      —pasa con quien se dio de alta desde el panel— se muestra la inicial. */
@@ -83,6 +84,17 @@ const NavLateral = () => {
             ))}
           </div>
         ))}
+
+        {/* En escritorio no hay barra de abajo, asi que el centro entra por
+            aqui. Lleva el punto igual que en el celular. */}
+        <div className="afNav__grupo">
+          <p className="afNav__grupoT">Soporte</p>
+          <button type="button" className="afNav__item afNav__item--centro" onClick={() => abrir()}>
+            <Ico n="ayuda" />
+            <span>Avisos y ayuda</span>
+            {sinLeer > 0 && <i className="afNav__punto">{sinLeer}</i>}
+          </button>
+        </div>
       </nav>
 
       {/* Quien eres, y el camino a tu cuenta. Va abajo y anclado: es lo que

@@ -4,6 +4,7 @@ import TabBar from '../TabBar/TabBar';
 import NavLateral from '../NavLateral/NavLateral';
 import CargaAllpa from '../ultil/CargaAllpa/CargaAllpa';
 import ReprogramarMenu from '../ReprogramarMenu/ReprogramarMenu';
+import Centro from '../Centro/Centro';
 
 import './LayoutDashboard.scss';
 
@@ -50,6 +51,9 @@ const LayoutDasboard = ({children,claseStyle}) => {
             </div>
 
             <ReprogramarMenu setOpenReprogramar={setOpenReprogramar} openReprogramar={openReprogramar} />
+
+            {/* Avisos y ayuda, en todas las pantallas del panel. */}
+            <Centro />
             
             <DashLoadState />
 

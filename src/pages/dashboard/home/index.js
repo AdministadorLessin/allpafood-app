@@ -13,7 +13,7 @@ import { Cascada, Bloque } from './../../../components/ultil/Motion/Motion';
 import AccesosRapidos from './../../../components/dashboard/AccesosRapidos/AccesosRapidos';
 import PanelKpis from './../../../components/dashboard/PanelKpis/PanelKpis';
 import PedidoDeHoy from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
-import Campana from './../../../components/dashboard/Campana/Campana';
+import { useCentro } from './../../../components/Centro/CentroContext';
 import icoObjetivo from '../../../assets/img/ico_objetivo.svg';
 import icoFecha from '../../../assets/img/icon_fecha.svg';
 import Bienvenida, { bienvenidaYaVista } from '../../../components/dashboard/Bienvenida/Bienvenida';
@@ -305,6 +305,14 @@ const DashboadHome = (props) => {
     return () => window.removeEventListener('scroll', alScroll);
   }, []);
 
+  /* Los avisos salen de estos tres datos, y esta es la unica pantalla que los
+     pide. Se publican al centro para que el boton de la barra siga sirviendo
+     cuando el cliente se va a "Mi menu" o a su cuenta. */
+  const { setDatos } = useCentro();
+  useEffect(() => {
+    setDatos({ plan, ordenes: menuList, aviso: avisoEntrega });
+  }, [plan, menuList, avisoEntrega]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const estado = planChecked ? estadoDelPanel({ plan, ordenes: menuList, creditos: plan && plan.credits }) : null;
 
   return (
@@ -340,9 +348,6 @@ const DashboadHome = (props) => {
           </span>
           <span className="afPanel__topDer">
             <span className="afChipFecha">{fechaDeHoy}</span>
-            {/* Solo aparece si hay algo que decir. Es el canal que descarga la
-                difusion de WhatsApp de las 11. */}
-            <Campana plan={plan} ordenes={menuList} aviso={avisoEntrega} />
           </span>
         </Bloque>
 

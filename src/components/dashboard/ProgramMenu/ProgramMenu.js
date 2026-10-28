@@ -476,7 +476,7 @@ const ProgramMenu = ({data,sendOrder,setOrderPass,lastDateProgram}) => {
 
   return (
     <div className="inlineBlock dashProgramMenuWeek ">
-      {dataPlan && dataPlan.plan && dataPlan.plan.consumption && dataPlan.plan.consumption.orders.consumed === dataPlan.plan.consumption.orders.total && dataPlan.credits  &&
+      {dataPlan && dataPlan.plan && dataPlan.plan.consumption?.orders && dataPlan.plan.consumption.orders.consumed === dataPlan.plan.consumption.orders.total && dataPlan.credits  &&
         <div className="dashProgramMenuWeekDisable" >
           <div className="inlineFlex note">
             <figure>
