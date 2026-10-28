@@ -896,7 +896,7 @@
     position: sticky; top: 0; z-index: 20;
     display: flex; align-items: center; gap: 12px;
     margin: 0 -20px 22px;
-    padding: calc(env(safe-area-inset-top, 0px) + 12px) 20px 10px;
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) calc(20px + env(safe-area-inset-right, 0px)) 10px calc(20px + env(safe-area-inset-left, 0px));
     background: rgba(251,253,250,.94);
 }
 .afNat__volver{
