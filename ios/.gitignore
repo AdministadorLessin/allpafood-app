@@ -11,3 +11,7 @@ capacitor-cordova-ios-plugins
 # Generated Config files
 App/App/capacitor.config.json
 App/App/config.xml
+
+# La configuracion de Firebase del iPhone: se copia desde ~/Documents/AllpaFood-firma
+# antes de armar el app. El repo es publico, no va aqui.
+App/App/GoogleService-Info.plist
