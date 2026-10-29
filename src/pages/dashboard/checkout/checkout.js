@@ -46,7 +46,7 @@ import {useAuthContext} from '../../../context/authContext';
 import { useNavigate } from "react-router-dom";
 import PagoListo from './../../../components/checkout/PagoListo/PagoListo';
 import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
-import { esNativo } from '../../../nativo';
+import { esNativo, vibrar } from '../../../nativo';
 import CheckoutPaymentYape from './../../../components/checkout/Payments/Yape';
 import CheckoutPaymentCard from './../../../components/checkout/Payments/CreditCard';
 
@@ -552,16 +552,136 @@ const CheckoutPage = (props) => {
 
     return (
         <Marco>
+            {esNativo ? (
+            /* El pago dentro del app. Mismos datos, mismos adicionales y los
+               mismos formularios de cobro (tarjeta con los campos seguros de
+               Mercado Pago, y Yape) que la web; cambia el orden y el diseno:
+               una columna, de arriba abajo, como se lee en un telefono. */
+            <div className="pagN">
+                <h1 className="afAuth__titular">Confirma y <em>paga</em></h1>
+
+                {cartItems && cartItems[0] && (
+                    <section className="pagN__plan">
+                        <div className="pagN__planTop">
+                            <span>
+                                <small>Tu plan</small>
+                                <b>{cartItems[0].description}</b>
+                            </span>
+                            <button type="button" className="pagN__cambiar" onClick={() => checkEmptyCart()}>Cambiar plan</button>
+                        </div>
+                        {Array.isArray(cartItems[0].descriptionList) && cartItems[0].descriptionList.length > 0 && (
+                            <div className="pagN__incluye">
+                                {cartItems[0].descriptionList.map((d) => <span key={d}>{d}</span>)}
+                            </div>
+                        )}
+                        <p className="pagN__planPrecio">
+                            <b>S/ {Number(cartItems[0].price).toFixed(2)}</b>
+                            {Number(cartItems[0].previousPrice) > Number(cartItems[0].price) &&
+                                <s>S/ {Number(cartItems[0].previousPrice).toFixed(2)}</s>}
+                        </p>
+                    </section>
+                )}
+
+                <p className="pagN__seccion">Agrega a tu plan</p>
+                <section className="pagN__lista">
+                    {aditionalList.map((item) => {
+                        const puesto = cartAdicionales.some((x) => x.id === item.id);
+                        const info = ADICIONAL[item.type] || {};
+                        const unidades = Math.round(item.monthlyPrice / item.unitPrice);
+                        return (
+                            <button type="button" key={item.id}
+                                className={'pagN__ad pagN__ad--' + (info.tono || 'menta') + (puesto ? ' is-on' : '')}
+                                onClick={() => { vibrar.toque(); puesto ? deleteItemAdToCart(item) : addItemAdToCart(item); }}>
+                                <span className="pagN__adIco"><IcoAd tipo={item.type} /></span>
+                                <span className="pagN__adTxt">
+                                    <b>{item.name}</b>
+                                    <small>{info.arg} · {unidades} al mes</small>
+                                </span>
+                                <span className="pagN__adPrecio">+ S/ {item.monthlyPrice}</span>
+                                <span className="pagN__adCheck" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
+                                         strokeLinecap="round" strokeLinejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                                </span>
+                            </button>
+                        );
+                    })}
+                </section>
+
+                <section className="pagN__total">
+                    <span className="pagN__totalEt">Total a pagar</span>
+                    <p className="pagN__totalN"><em>S/</em><Contador valor={totalPayment + totalPaymentAd} decimales={2} /></p>
+                    {((subTotalPayment + subTotalPaymentAd) - (totalPayment + totalPaymentAd)) > 0 &&
+                        <span className="pagN__ahorro">
+                            Ahorras S/ {((subTotalPayment + subTotalPaymentAd) - (totalPayment + totalPaymentAd)).toFixed(2)}
+                        </span>
+                    }
+                    <ul className="pagN__desglose">
+                        <li><span>Precio de lista</span><span>S/ {(subTotalPayment + subTotalPaymentAd).toFixed(2)}</span></li>
+                        <li className="is-verde"><span>Descuento</span><span>&minus; S/ {((subTotalPayment + subTotalPaymentAd) - (totalPayment + totalPaymentAd)).toFixed(2)}</span></li>
+                        <li><span>Delivery</span><span>Gratis</span></li>
+                    </ul>
+                </section>
+
+                <p className="pagN__seccion">¿Cómo quieres pagar?</p>
+                <section className="pagN__metodos">
+                    <button type="button" className={'pagN__metodo' + (paymentMetod === 'card' ? ' is-on' : '')}
+                        onClick={() => { vibrar.toque(); changePayment('card'); }}>
+                        <span className="pagN__radio" aria-hidden="true" />
+                        <b>Tarjeta</b>
+                        <span className="pagN__logos">
+                            <img src={icoVisa} alt="Visa" /><img src={icoMasterCard} alt="Mastercard" />
+                            <img src={icoAmericanExpress} alt="American Express" /><img src={icoDiner} alt="Diners" />
+                        </span>
+                    </button>
+                    <button type="button" className={'pagN__metodo' + (paymentMetod === 'yape' ? ' is-on' : '')}
+                        onClick={() => { vibrar.toque(); changePayment('yape'); }}>
+                        <span className="pagN__radio" aria-hidden="true" />
+                        <b>Yape</b>
+                        <span className="pagN__logos"><img src={icoYape} alt="Yape" /></span>
+                    </button>
+                </section>
+
+                <AnimatePresence mode="wait">
+                    {paymentMetod && (
+                        <motion.section key={paymentMetod} className="pagN__form"
+                            initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -10, opacity: 0 }} transition={{ duration: 0.2 }}>
+                            {paymentMetod === 'card' &&
+                                <CheckoutPaymentCard
+                                    paymentMetod={paymentMetod}
+                                    setShowLoaderPayment={setShowLoaderPayment}
+                                />
+                            }
+                            {paymentMetod === 'yape' &&
+                                <CheckoutPaymentYape
+                                    yapeSubmitForm={onSubmitHandlerYape}
+                                    handleOpenMp={handleOpenMp}
+                                    handleCloseMp={handleCloseMp}
+                                    openMp={openMp}
+                                    serverFail={serverFail}
+                                    correoGuardado={planInfo?.profile?.email || ''}
+                                    errorCorreo={errorCorreo}
+                                    loadYape={loadYape}
+                                    paymentMethod={false}
+                                />
+                            }
+                        </motion.section>
+                    )}
+                </AnimatePresence>
+
+                <p className="pagN__seguro">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                         strokeLinejoin="round" aria-hidden="true"><path d="M7 11h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    Pago seguro con Mercado Pago, sin salir del app.
+                </p>
+            </div>
+            ) : (<>
             {/* La pantalla no decia en ningun momento donde estaba el cliente:
                 abria con "Resumen de compra:" y ya. */}
-            {esNativo ?
-                <h1 className="afAuth__titular afCheckout__titularNat">Confirma y <em>paga</em></h1>
-            :
-                <h1 className="afCheckout__titular">
-                    <span className="t1">Último paso,</span>
-                    confirma y paga
-                </h1>
-            }
+            <h1 className="afCheckout__titular">
+                <span className="t1">Último paso,</span>
+                confirma y paga
+            </h1>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={12} md={8}>
                     <Grid container spacing={2}>
@@ -945,6 +1065,7 @@ const CheckoutPage = (props) => {
                     </Grid>
                 </Grid>
             </Grid>
+            </>)}
             
             {showLoaderPayment && (
                 <PagoListo

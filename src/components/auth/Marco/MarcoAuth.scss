@@ -986,7 +986,7 @@
    grilla de la web) la llevaba a 560px en un telefono de 412 y las tarjetas
    se salian por la derecha. */
 .afAuth--nat{
-    overflow-x: hidden;
+    overflow-x: clip;
     .afAuth__col{ min-width: 0; width: 100%; }
 }
 /* El encabezado tapa por completo lo que pasa por debajo al bajar la
