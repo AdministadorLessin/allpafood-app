@@ -898,8 +898,9 @@
    ========================================================================== */
 .afAuth--nat{
     padding: 0 20px calc(170px + env(safe-area-inset-bottom, 0px));
+    /* Sin background-attachment: fixed: en el iPhone obliga a repintar el
+       fondo en cada movimiento del scroll. */
     background: linear-gradient(180deg, #FBFDFA 0%, #F2F9F4 60%, #E3F5EA 100%);
-    background-attachment: fixed;
 }
 .afNat__top{
     position: sticky; top: 0; z-index: 20;

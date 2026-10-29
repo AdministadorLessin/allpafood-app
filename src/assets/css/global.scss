@@ -549,6 +549,21 @@ input[type=number] {
     }
     .afPanel--inicio{ padding-top: 78px; }
 
+    /* Sin desenfoque en vivo en lo que esta en pantalla mientras se hace
+       scroll. En el iPhone cada blur se recalcula en cada cuadro: la barra de
+       abajo (blur de 22px sobre todo lo que pasa detras) y las etiquetas de
+       las tarjetas le quitaban fuerza al telefono y el encabezado iba a
+       saltitos. Colores solidos casi iguales, sin costo. */
+    .afTabs{
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: rgba(18, 30, 24, .96);
+    }
+    .afTarjeta__pildora{
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
     /* La animacion de entrada de cada pantalla deja un transform puesto, y
        en el iPhone lo que se pega arriba dentro de una capa transformada
        tiembla al hacer scroll. La entrada queda solo con el fundido. */
