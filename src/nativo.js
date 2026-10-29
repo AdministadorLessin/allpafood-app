@@ -96,6 +96,20 @@ export const iniciarNativo = () => {
   document.documentElement.classList.add('es-nativo');
   iniciarAvisos();
 
+  /* Solo en las versiones de prueba (REACT_APP_DEMO=1): anota en la consola
+     que elemento recibio cada toque, para encontrar lo que se come los toques
+     en el iPhone. Nunca va en Play ni en el App Store. */
+  if (process.env.REACT_APP_DEMO === '1') {
+    document.addEventListener('touchend', (e) => {
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const quien = (x) => x ? `${x.tagName.toLowerCase()}.${String(x.className || '').split(' ').slice(0, 2).join('.')}` : '-';
+      // eslint-disable-next-line no-console
+      console.log('[toque]', Math.round(t.clientX), Math.round(t.clientY), window.location.pathname,
+        quien(el), '<', quien(el?.parentElement), '<', quien(el?.parentElement?.parentElement));
+    }, true);
+  }
+
   /* Sin zoom con dos dedos dentro del app: un pellizco dejaba la pantalla
      ampliada y movida, y ningun app se comporta asi. Tambien evita que el
      iPhone haga zoom solo al tocar un campo de texto. En la web el zoom se

@@ -526,7 +526,29 @@ input[type=number] {
        franja del color del fondo tapa lo que pasa por detras de la hora. En
        Android estos valores son 0: ahi la barra de la hora va aparte. */
     .mainLayout{ padding-top: env(safe-area-inset-top, 0px); }
-    .afPanel__top{ top: env(safe-area-inset-top, 0px); }
+
+    /* El saludo con la fecha, pegado arriba como la barra de un app de
+       iPhone: llega hasta el borde, debajo de la hora y la isla, y al bajar
+       se vuelve una franja solida. Sin desenfoque en vivo: en el iPhone el
+       blur se recalculaba en cada cuadro del scroll y el encabezado
+       temblaba. */
+    .afPanel__top{
+        top: 0;
+        margin-top: calc(-1 * env(safe-area-inset-top, 0px));
+        padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+        transition: background .2s ease, box-shadow .2s ease;
+    }
+    .afPanel__top--pegado{
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: rgba(247, 250, 244, .97);
+        border-radius: 0;
+    }
+
+    /* La animacion de entrada de cada pantalla deja un transform puesto, y
+       en el iPhone lo que se pega arriba dentro de una capa transformada
+       tiembla al hacer scroll. La entrada queda solo con el fundido. */
+    .mainLayoutBox{ transform: none !important; }
     .pageLayout::before{
         content: '';
         position: fixed; left: 0; right: 0; top: 0; z-index: 80;
