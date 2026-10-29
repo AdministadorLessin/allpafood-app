@@ -20,8 +20,10 @@ $verde: #177A4C;
         -webkit-background-clip: text; background-clip: text;
         color: transparent;
     }
-    svg{ width: 100%; height: 100%; }
 }
+/* Solo los iconos propios: las tarjetas de siempre que van dentro (el aviso
+   de renovar, Para ti) traen los suyos con su tamaño. */
+.inN__cuad, .inN__campana, .inN__rutaPunto, .inN__plazo, .inN__btn{ svg{ width: 100%; height: 100%; } }
 
 .inN__brillo{
     position: absolute; z-index: 0; pointer-events: none; border-radius: 50%;
@@ -78,7 +80,7 @@ $verde: #177A4C;
     i{ width: 7px; height: 7px; border-radius: 50%; background: $menta; animation: inNLatido 2.4s ease-in-out infinite; }
 }
 .inN__hoyH{
-    margin: 12px 0 0; font-size: 25px; line-height: 1.12; font-weight: 700; letter-spacing: -.03em; color: #fff;
+    flex: 1; min-width: 0; margin: 0; font-size: 25px; line-height: 1.12; font-weight: 700; letter-spacing: -.03em; color: #fff;
     em{ background: none; -webkit-background-clip: initial; background-clip: initial; color: $menta; }
 }
 .inN__hoyPlato{
@@ -216,6 +218,55 @@ $verde: #177A4C;
 /* El pedido de hoy de siempre (retrasos, no entregado) con las esquinas
    del inicio nuevo. */
 .inN .afHoyPedido{ border-radius: 28px; }
+
+
+/* --- La olla y la moto del pedido de hoy --- */
+.inN__hoyCuerpo{ margin-top: 10px; display: flex; align-items: center; gap: 10px; }
+.inN__anim{
+    flex: 0 0 auto; width: 76px; height: 76px; overflow: visible;
+    fill: none; stroke-linecap: round; stroke-linejoin: round;
+    g, path, circle, rect{ transform-box: fill-box; }
+}
+.inN__vapor{
+    stroke: rgba(255,255,255,.75); stroke-width: 2.6;
+    animation: inNVapor 2.4s ease-in-out infinite;
+    &--2{ animation-delay: .8s; }
+    &--3{ animation-delay: 1.6s; }
+}
+.inN__tapa{ transform-origin: 50% 100%; animation: inNTapa 1.4s ease-in-out infinite; }
+.inN__tapaLinea{ stroke: $menta; stroke-width: 4; }
+.inN__tapaPomo{ fill: $menta; }
+.inN__olla{ fill: $menta; stroke: none; }
+.inN__asa{ stroke: $menta; stroke-width: 4; }
+.inN__llama{
+    fill: #FF9F45; transform-origin: 50% 100%;
+    animation: inNLlama .45s ease-in-out infinite alternate;
+    &--2{ animation-delay: .2s; fill: #FFC15A; }
+}
+.inN__viento{ stroke: rgba(255,255,255,.5); stroke-width: 2.6; animation: inNViento .9s linear infinite; }
+.inN__moto{ animation: inNBache .5s ease-in-out infinite alternate; }
+.inN__rueda{ stroke: $menta; stroke-width: 4; }
+.inN__cuadro{ stroke: #fff; stroke-width: 3.2; }
+.inN__caja{ fill: $menta; }
+
+@keyframes inNVapor{
+    0%{ opacity: 0; transform: translateY(6px); }
+    35%{ opacity: .9; }
+    100%{ opacity: 0; transform: translateY(-10px); }
+}
+@keyframes inNTapa{
+    0%, 60%, 100%{ transform: none; }
+    70%{ transform: translateY(-2px) rotate(-4deg); }
+    80%{ transform: translateY(-1px) rotate(3deg); }
+    90%{ transform: translateY(-2px) rotate(-2deg); }
+}
+@keyframes inNLlama{ from{ transform: scaleY(.8); } to{ transform: scaleY(1.12); } }
+@keyframes inNViento{ from{ transform: translateX(8px); opacity: 0; } 30%{ opacity: 1; } to{ transform: translateX(-10px); opacity: 0; } }
+@keyframes inNBache{ from{ transform: translateY(0); } to{ transform: translateY(-1.5px); } }
+@media (prefers-reduced-motion: reduce){
+    .inN__vapor, .inN__tapa, .inN__llama, .inN__viento, .inN__moto{ animation: none; }
+    .inN__vapor{ opacity: .7; }
+}
 
 @keyframes inNLatido{ 0%, 100%{ opacity: 1; } 50%{ opacity: .5; } }
 @keyframes inNAparece{ from{ opacity: 0; transform: translateY(6px); } to{ opacity: 1; transform: none; } }

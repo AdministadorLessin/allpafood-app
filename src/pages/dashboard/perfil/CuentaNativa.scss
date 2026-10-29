@@ -8,8 +8,10 @@ $verde: #177A4C;
 
 .cuN{
     padding: 8px 2px 0; color: $tinta;
-    svg{ width: 100%; height: 100%; }
 }
+/* Solo los iconos propios: un "svg" suelto tambien agrandaba el icono de
+   Cerrar sesion hasta llenar la pantalla. */
+.cuN__ico, .cuN__ir, .cuN__ava i{ svg{ width: 100%; height: 100%; } }
 .cuN__h{
     margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.035em; color: $tinta;
     em{

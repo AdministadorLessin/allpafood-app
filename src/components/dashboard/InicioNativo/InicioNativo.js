@@ -35,6 +35,7 @@ const Ico = ({ d, w = 2 }) => (
 const OLLA = ['M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z', 'M2 10h20', 'M9 6c0-1 1-2 3-2s3 1 3 2'];
 const MOTO = ['M6 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M9 17h6l-3-8h3M6 14l3-5'];
 const CHECK = 'M5 12l5 5 9-10';
+const PLATO = ['M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z', 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z'];
 const MAS = 'M12 5v14M5 12h14';
 const RELOJ = ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 7v5l3 2'];
 const CAMPANA = ['M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7', 'M10 20a2 2 0 0 0 4 0'];
@@ -58,6 +59,39 @@ const platosDe = (orden) =>
   (orden?.items || []).map((i) => i?.menu?.name).filter(Boolean).join(' · ');
 
 const mayuscula = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* La olla que hierve mientras la cocina arma el pedido, y la moto cuando ya
+   salio. Solo se mueven transform y opacity: el telefono lo anima sin volver
+   a pintar, y no le quita fluidez al scroll. */
+const OllaCocinando = () => (
+  <svg className="inN__anim" viewBox="0 0 72 72" role="img" aria-label="Tu almuerzo se está cocinando">
+    <g className="inN__vapor inN__vapor--1"><path d="M27 22c-3-3.5 3-6 0-10" /></g>
+    <g className="inN__vapor inN__vapor--2"><path d="M36 20c-3-3.5 3-6 0-10" /></g>
+    <g className="inN__vapor inN__vapor--3"><path d="M45 22c-3-3.5 3-6 0-10" /></g>
+    <g className="inN__tapa">
+      <path className="inN__tapaLinea" d="M17 31.5h38" />
+      <circle className="inN__tapaPomo" cx="36" cy="27.5" r="2.6" />
+    </g>
+    <path className="inN__olla" d="M15 35h42v12a10 10 0 0 1-10 10H25a10 10 0 0 1-10-10z" />
+    <path className="inN__asa" d="M15 39h-4M57 39h4" />
+    <g className="inN__llama inN__llama--1"><path d="M30 67c-2.5 0-4-2-3-4.5l3-4.5 3 4.5c1 2.5-.5 4.5-3 4.5z" /></g>
+    <g className="inN__llama inN__llama--2"><path d="M42 67c-2.5 0-4-2-3-4.5l3-4.5 3 4.5c1 2.5-.5 4.5-3 4.5z" /></g>
+  </svg>
+);
+
+const MotoEnCamino = () => (
+  <svg className="inN__anim" viewBox="0 0 72 72" role="img" aria-label="Tu almuerzo va en camino">
+    <g className="inN__viento">
+      <path d="M4 30h12M8 38h10M2 46h12" />
+    </g>
+    <g className="inN__moto">
+      <circle className="inN__rueda" cx="24" cy="50" r="7" />
+      <circle className="inN__rueda" cx="54" cy="50" r="7" />
+      <path className="inN__cuadro" d="M24 50l8-14h12l6 14M38 36l-4-8h-6M44 36h8l4 6" />
+      <rect className="inN__caja" x="22" y="24" width="14" height="12" rx="3" />
+    </g>
+  </svg>
+);
 
 /** El pedido de hoy, compacto. Los casos dificiles (retraso, no entregado,
     cancelado, ya entregado) siguen en PedidoDeHoy, que ya los explica bien. */
@@ -86,10 +120,13 @@ function HoyNativo({ ordenes, aviso }) {
         <span className="inN__hoyEt">TU PEDIDO DE HOY</span>
         <span className="inN__hoyEstado"><i />{estado === 'I' ? 'En camino' : 'En preparación'}</span>
       </div>
-      <h2 className="inN__hoyH">Llega antes de la <em>{REPARTO.hasta}</em></h2>
+      <div className="inN__hoyCuerpo">
+        <h2 className="inN__hoyH">Llega antes de la <em>{REPARTO.hasta}</em></h2>
+        {estado === 'I' ? <MotoEnCamino /> : <OllaCocinando />}
+      </div>
       {items.length > 0 &&
         <div className="inN__hoyPlato">
-          <span className="inN__cuad inN__cuad--menta"><Ico d={OLLA} /></span>
+          <span className="inN__cuad inN__cuad--menta"><Ico d={PLATO} /></span>
           <span>
             <b>{items[0]}</b>
             {items.length > 1 && <small>Con {items.slice(1).join(', ').toLowerCase()}</small>}
