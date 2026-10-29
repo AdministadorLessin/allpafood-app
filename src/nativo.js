@@ -108,6 +108,18 @@ export const iniciarNativo = () => {
       console.log('[toque]', Math.round(t.clientX), Math.round(t.clientY), window.location.pathname,
         quien(el), '<', quien(el?.parentElement), '<', quien(el?.parentElement?.parentElement));
     }, true);
+
+    /* Y cada 4 segundos, cuantas capas con desenfoque hay en pantalla (lo que
+       hacia temblar el encabezado al hacer scroll). */
+    setInterval(() => {
+      const con = [...document.querySelectorAll('body *')].filter((x) => {
+        const c = getComputedStyle(x);
+        const f = c.webkitBackdropFilter || c.backdropFilter;
+        return f && f !== 'none' && c.visibility !== 'hidden' && c.display !== 'none';
+      }).map((x) => `${x.tagName.toLowerCase()}.${String(x.className || '').split(' ')[0]}`);
+      // eslint-disable-next-line no-console
+      console.log('[desenfoques]', window.location.pathname, con.length, con.join(' '));
+    }, 4000);
   }
 
   /* Sin zoom con dos dedos dentro del app: un pellizco dejaba la pantalla

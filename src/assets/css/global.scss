@@ -564,6 +564,31 @@ input[type=number] {
         backdrop-filter: none !important;
     }
 
+    /* La capa del "cargando" esta siempre montada, invisible, cubriendo la
+       pantalla entera con desenfoque. Aunque no se ve, el iPhone recalculaba
+       ese desenfoque sobre todo lo que pasaba por detras en cada cuadro del
+       scroll, y el encabezado iba a saltitos. Oculta no existe; el desenfoque
+       vuelve solo cuando se muestra. */
+    .dashLoading:not(.dashLoadingAct){
+        visibility: hidden;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    /* Los latidos que llaman la atencion (el dia por elegir, el paso actual,
+       el boton del aviso) animaban la sombra: eso se vuelve a pintar en cada
+       cuadro, siempre, incluso mientras se hace scroll. Aqui laten con la
+       opacidad, que el telefono mueve sin volver a pintar. */
+    .afDia--elegir,
+    .afBanner--accion .afBanner__accion,
+    .afBanner--urgente .afBanner__accion,
+    .afPaso__marca--actual{
+        animation: afLatidoNat 2.6s ease-in-out infinite;
+        will-change: opacity;
+    }
+    /* Fondo quieto: la pantalla del panel no mueve el body. */
+    body{ background-attachment: scroll; }
+
     /* La animacion de entrada de cada pantalla deja un transform puesto, y
        en el iPhone lo que se pega arriba dentro de una capa transformada
        tiembla al hacer scroll. La entrada queda solo con el fundido. */
@@ -575,4 +600,14 @@ input[type=number] {
         background: #F7FAF4;
         pointer-events: none;
     }
+}
+
+@keyframes afLatidoNat{
+    0%, 100%{ opacity: 1; }
+    50%     { opacity: .62; }
+}
+@media (prefers-reduced-motion: reduce){
+    .es-nativo .afDia--elegir,
+    .es-nativo .afBanner__accion,
+    .es-nativo .afPaso__marca--actual{ animation: none; }
 }
