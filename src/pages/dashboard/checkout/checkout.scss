@@ -1485,3 +1485,8 @@ $pVerde: #177A4C;
     font-size: 12.5px; color: $pMuted;
     svg{ width: 16px; height: 16px; color: $pVerde; flex: 0 0 auto; }
 }
+.pagN__demo{
+    width: 100%; margin-top: 14px; padding: 12px; border-radius: 14px;
+    border: 1.5px dashed #C26A12; background: #FFF6E9; color: #8A4B0B;
+    font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+}

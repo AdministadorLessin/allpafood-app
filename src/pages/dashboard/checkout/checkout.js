@@ -669,6 +669,16 @@ const CheckoutPage = (props) => {
                     )}
                 </AnimatePresence>
 
+                {/* Solo en las versiones de prueba que se instalan desde la Mac
+                    (REACT_APP_DEMO=1 al compilar). Muestra lo que sigue al pago
+                    sin cobrar ni crear ninguna venta. Nunca va en Play ni en el
+                    App Store. */}
+                {process.env.REACT_APP_DEMO === '1' &&
+                    <button type="button" className="pagN__demo" onClick={() => { try { window.localStorage.setItem('af_alta', '1'); } catch (e) { /* nada */ } setShowLoaderPayment(true); }}>
+                        Ver cómo sigue (demo, sin cobrar)
+                    </button>
+                }
+
                 <p className="pagN__seguro">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
                          strokeLinejoin="round" aria-hidden="true"><path d="M7 11h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
