@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 /**
  * Direccion del API.
  *
@@ -42,7 +44,23 @@ export default API_URL;
  * El mapId va aparte porque pertenece al mismo proyecto de Google: si algun
  * dia se cambia la llave, este tambien cambia.
  */
+/*
+ * El app de iPhone no puede usar esa llave. Esa llave solo acepta sitios
+ * https://, y en el iPhone el app se presenta como capacitor://app.allpafood.com
+ * (Apple no deja que un app use https). Google respondia
+ * RefererNotAllowedMapError y la pantalla del mapa se caia. Android si la usa:
+ * ahi el app se presenta como https://app.allpafood.com.
+ *
+ * El iPhone lleva su propia llave, limitada a Maps, Places y Geocoding y con
+ * tope diario. No esta en el repo (es publico): se pasa en
+ * REACT_APP_MAPS_KEY_IOS al compilar el app, desde la carpeta de la firma. Sin
+ * ella, el iPhone cae en la llave de la web.
+ */
+const LLAVE_IOS = process.env.REACT_APP_MAPS_KEY_IOS;
+
 export const MAPS_KEY =
-  process.env.REACT_APP_MAPS_KEY || 'AIzaSyBtKeD-JuzJdX7HvLrxzBPkuTPrB7EgtUk';
+  (LLAVE_IOS && Capacitor.getPlatform() === 'ios')
+    ? LLAVE_IOS
+    : (process.env.REACT_APP_MAPS_KEY || 'AIzaSyBtKeD-JuzJdX7HvLrxzBPkuTPrB7EgtUk');
 
 export const MAPS_ID = process.env.REACT_APP_MAPS_ID || 'e151d2a33166c8baa4ff73ee';
