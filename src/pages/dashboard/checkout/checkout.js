@@ -120,10 +120,15 @@ const IcoAd = ({ tipo }) => {
    navegacion del panel: el cliente todavia no tiene nada que navegar. Para
    quien renueva desde el app, el mismo marco sin la barra de pasos. */
 const MarcoPagoApp = ({ children }) => {
+    const navigate = useNavigate();
     let enAlta = false;
     try { enAlta = window.localStorage.getItem('af_alta') === '1'; } catch (e) { enAlta = false; }
+    /* Atras lleva a la lista de planes, no a la pantalla anterior: esa era el
+       registro, que ya no sirve con la cuenta creada, y sin la barra de abajo
+       el cliente quedaba atrapado en el pago. Desde los planes puede cambiar
+       de plan o ir a su cuenta. */
     return (
-        <MarcoAuth fase={enAlta ? 'pago' : undefined}>
+        <MarcoAuth fase={enAlta ? 'pago' : undefined} volver={() => navigate('/planes')}>
             <div className="afCheckout afCheckout--nat">{children}</div>
         </MarcoAuth>
     );
