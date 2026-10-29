@@ -593,11 +593,19 @@ input[type=number] {
        en el iPhone lo que se pega arriba dentro de una capa transformada
        tiembla al hacer scroll. La entrada queda solo con el fundido. */
     .mainLayoutBox{ transform: none !important; }
+    /* La franja de arriba, detras de la hora y la isla. Antes era solida y el
+       contenido se cortaba en seco contra ella; ahora es solida solo donde
+       va la hora y debajo se desvanece en 36px, asi lo que sube se difumina.
+       Es un degradado quieto, no un desenfoque: no le cuesta nada al scroll. */
     .pageLayout::before{
         content: '';
         position: fixed; left: 0; right: 0; top: 0; z-index: 80;
-        height: env(safe-area-inset-top, 0px);
-        background: #F7FAF4;
+        height: calc(env(safe-area-inset-top, 0px) + 36px);
+        background: linear-gradient(180deg,
+            #F7FAF4 0,
+            #F7FAF4 env(safe-area-inset-top, 0px),
+            rgba(247, 250, 244, .85) calc(env(safe-area-inset-top, 0px) + 12px),
+            rgba(247, 250, 244, 0) 100%);
         pointer-events: none;
     }
 }
