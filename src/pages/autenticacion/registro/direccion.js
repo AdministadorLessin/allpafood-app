@@ -64,6 +64,18 @@ const RegistroDireccionPage = () => {
     });
     const [azucar, setAzucar] = useState(true);
 
+    /* Si no esta cuando llega el motorizado, que pueda dejarlo en recepcion a
+       su nombre sin llamar ni esperar. Va dentro de la referencia porque es lo
+       que el motorizado ya lee en su ruta, junto a la direccion. Marcado de
+       entrada: casi todos los clientes reciben en una oficina. */
+    const [enRecepcion, setEnRecepcion] = useState(true);
+    const nombreCliente = (() => {
+        try {
+            const p = JSON.parse(window.localStorage.getItem('inf'))?.profile;
+            return [p?.name, p?.lastname].filter(Boolean).join(' ').trim();
+        } catch (e) { return ''; }
+    })();
+
     /* En el alta del app, lo que no come y el azucar se preguntan en la
        pantalla siguiente, "Para tu cocina", junto con cuanto se mueve. Aqui
        queda solo la direccion. */
@@ -164,7 +176,9 @@ const RegistroDireccionPage = () => {
         axios.post(`${API_URL}delivery/create/point`, {
             name: 'Mi dirección',
             address: direccionCompleta,
-            description: referencia,
+            description: enRecepcion
+                ? `${referencia}. Si no está, dejar en recepción a nombre de ${nombreCliente || 'el cliente'}`
+                : referencia,
             district: distritoFinal,
             location: { latitude: centro.lat, longitude: centro.lng }
         }, cabecera).then((resp) => {
@@ -337,6 +351,16 @@ const RegistroDireccionPage = () => {
                     />
                 </div>
 
+                <button type="button" role="switch" aria-checked={enRecepcion}
+                        className={enRecepcion ? 'afRecepcion is-on' : 'afRecepcion'}
+                        onClick={() => setEnRecepcion(!enRecepcion)}>
+                    <span className="afRecepcion__txt">
+                        <b>Si no estoy, déjenlo en recepción</b>
+                        <small>A nombre de {nombreCliente || 'quien hizo el pedido'}. Así el motorizado no espera.</small>
+                    </span>
+                    <span className="afRecepcion__switch" aria-hidden="true"><i /></span>
+                </button>
+
                 {/* Alergias y azucar. Se pueden saltar: son para que cocina sepa
                     que NO mandarte, no un plato hecho a medida. */}
                 {!enAltaApp && (
@@ -415,7 +439,7 @@ const RegistroDireccionPage = () => {
                 {esNativo
                     ? <Accion>
                         <button type="submit" form="afFormDireccion" className="afBtn afBtn--mint">
-                            {guardando ? 'Guardando…' : 'Guardar y entrar'}
+                            {guardando ? 'Guardando…' : (enAltaApp ? 'Continuar' : 'Guardar y entrar')}
                         </button>
                       </Accion>
                     : <div className="btnBox">

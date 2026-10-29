@@ -776,3 +776,22 @@
         color: var(--af-muted, #61706A);
     }
 }
+
+/* "Si no estoy, dejenlo en recepcion": un interruptor como los del iPhone. */
+.afRecepcion{
+    width: 100%; display: flex; align-items: center; gap: 14px;
+    margin: 4px 0 16px; padding: 14px 16px; border-radius: 18px;
+    background: #fff; border: 1px solid rgba(22,33,27,.08);
+    font-family: inherit; text-align: left; color: #16211B; cursor: pointer;
+    &__txt{ flex: 1; min-width: 0;
+        b{ display: block; font-size: 14px; }
+        small{ display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: #66736C; }
+    }
+    &__switch{
+        flex: 0 0 auto; width: 51px; height: 31px; border-radius: 999px;
+        background: rgba(22,33,27,.16); position: relative; transition: background .2s ease;
+        i{ position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%;
+           background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18); transition: transform .2s cubic-bezier(.2,.9,.2,1); }
+    }
+    &.is-on &__switch{ background: #34C759; i{ transform: translateX(20px); } }
+}

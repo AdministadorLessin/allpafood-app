@@ -23,21 +23,21 @@ import './Cocina.scss';
  * a las que dio al empezar (preregistro), para no pisar ninguna.
  */
 
-const RESTRICCIONES = ['Sin lactosa', 'Sin gluten', 'Vegetariano', 'Sin cerdo', 'Sin mariscos', 'Sin picante'];
+/* Solo alergias, y en pocas palabras. Las opciones de dieta (sin gluten, sin
+   lactosa, vegetariano) no se ofrecen y daban a entender que si; y un campo
+   libre largo invitaba a escribir un pedido a medida, cuando los platos son
+   los del menu del dia. */
+const MAX_ALERGIA = 60;
 
-/* Los mismos codigos que el cuestionario viejo: de ellos sale el calculo de
+/* Quien compra es gente de oficina sin tiempo para cocinar, no atletas.
+   Los mismos codigos que el cuestionario viejo, de los que sale el calculo de
    calorias. */
 const RUTINAS = [
-  { v: 'A', t: 'Sedentario', d: 'Paso el día sentado y casi no camino' },
-  { v: 'B', t: 'Trabajo de oficina', d: 'Sentado la mayor parte del día, camino algo' },
-  { v: 'C', t: 'Trabajo activo', d: 'De pie o moviéndome buena parte del día' },
-  { v: 'D', t: 'Entreno fuerte', d: 'Gimnasio o deporte 5 veces por semana' },
-  { v: 'E', t: 'Atleta profesional', d: 'Entreno todos los días, a veces dos veces' },
-  { v: 'F', t: 'Atleta de resistencia', d: 'Fondo, ciclismo o triatlón' },
+  { v: 'A', t: 'Casi todo el día sentado', d: 'Me muevo poco' },
+  { v: 'B', t: 'Oficina', d: 'Sentado, camino algo' },
+  { v: 'C', t: 'Me muevo bastante', d: 'De pie buena parte del día' },
+  { v: 'D', t: 'Hago deporte', d: 'Tres veces por semana o más' },
 ];
-const DIAS = [0, 1, 2, 3, 4, 5, 6, 7];
-const HORAS = [{ v: 0.5, t: '½ h' }, { v: 1, t: '1 h' }, { v: 1.5, t: '1½ h' }, { v: 2, t: '2 h o más' }];
-const INTENSIDAD = [{ v: 'L', t: 'Leve' }, { v: 'M', t: 'Moderada' }, { v: 'F', t: 'Fuerte' }];
 
 const Ico = ({ d }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -46,7 +46,6 @@ const Ico = ({ d }) => (
   </svg>
 );
 const OLLA = ['M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z', 'M2 10h20', 'M9 6c0-1 1-2 3-2s3 1 3 2', 'M12 4V2'];
-const CHECK = 'M5 12.5l4.5 4.5L19 7.5';
 
 const terminarAlta = () => {
   try {
@@ -59,21 +58,12 @@ export default function CocinaPage() {
   const navigate = useNavigate();
   const { token } = useAuthContext();
 
-  const [marcadas, setMarcadas] = useState([]);
-  const [otra, setOtra] = useState('');
+  const [tieneAlergia, setTieneAlergia] = useState(false);
+  const [alergia, setAlergia] = useState('');
   const [azucar, setAzucar] = useState(true);
-  const [rutina, setRutina] = useState('');
-  const [dias, setDias] = useState(null);
-  const [horas, setHoras] = useState(null);
-  const [intensidad, setIntensidad] = useState('');
+  const [rutina, setRutina] = useState('B');
   const [guardando, setGuardando] = useState(false);
 
-  const entrena = dias > 0;
-
-  const alternar = (r) => {
-    vibrar.toque();
-    setMarcadas((m) => (m.includes(r) ? m.filter((x) => x !== r) : [...m, r]));
-  };
   const elegir = (set, v) => { vibrar.toque(); set(v); };
 
   const entrar = () => {
@@ -85,7 +75,8 @@ export default function CocinaPage() {
   const guardar = () => {
     setGuardando(true);
     const cabecera = { headers: { Authorization: `Bearer ${token}` } };
-    const restricciones = [...marcadas, otra.trim()].filter(Boolean).join(', ');
+    const restricciones = tieneAlergia ? alergia.trim().slice(0, MAX_ALERGIA) : '';
+    const deporte = rutina === 'D';
 
     let previo = null;
     try { previo = JSON.parse(window.localStorage.getItem('preregistro')); } catch (e) { previo = null; }
@@ -104,10 +95,10 @@ export default function CocinaPage() {
             weight: parseFloat(previo.peso),
             sugar: azucar,
             alimentsRestrictions: restricciones,
-            routine: rutina || 'C',
-            trainingDays: dias ?? 0,
-            trainingHours: entrena ? (horas ?? 1) : 0,
-            trainingLevel: entrena ? (intensidad || 'M') : 'L',
+            routine: rutina,
+            trainingDays: deporte ? 3 : 0,
+            trainingHours: deporte ? 1 : 0,
+            trainingLevel: deporte ? 'M' : 'L',
             strengthTraining: false,
           },
         }, cabecera)
@@ -125,22 +116,25 @@ export default function CocinaPage() {
                   transition={{ duration: 0.3, ease: [0.2, 0.9, 0.2, 1] }}>
         <div className="empN__ico"><Ico d={OLLA} /></div>
         <h1 className="empN__h">Para tu <em>cocina</em></h1>
-        <p className="empN__b">Con esto armamos tus platos a tu medida. Te toma un minuto.</p>
+        <p className="empN__b">Dos cosas rápidas para que tu almuerzo te llegue bien.</p>
 
-        <p className="empN__q">¿Hay algo que no comes?</p>
-        <div className="empN__chips cocN__chips">
-          {RESTRICCIONES.map((r) => (
-            <button type="button" key={r}
-              className={`empN__chip${marcadas.includes(r) ? ' is-on' : ''}`} onClick={() => alternar(r)}>
-              {marcadas.includes(r) && <span className="empN__chipCheck"><Ico d={CHECK} /></span>}
-              {r}
-            </button>
+        <p className="empN__q">¿Tienes alguna alergia?</p>
+        <div className="empN__lados" role="radiogroup" aria-label="¿Tienes alguna alergia?">
+          {[[false, 'No'], [true, 'Sí']].map(([v, t]) => (
+            <button type="button" key={t} role="radio" aria-checked={tieneAlergia === v}
+              className={tieneAlergia === v ? 'is-on' : undefined} onClick={() => elegir(setTieneAlergia, v)}>{t}</button>
           ))}
         </div>
-        <label className="cocN__otra">
-          <input type="text" value={otra} onChange={(e) => setOtra(e.target.value)}
-                 placeholder="Otra alergia o restricción" aria-label="Otra alergia o restricción" />
-        </label>
+        {tieneAlergia && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+            <label className="cocN__otra">
+              <input type="text" value={alergia} maxLength={MAX_ALERGIA} autoFocus
+                     onChange={(e) => setAlergia(e.target.value)}
+                     placeholder="Ej. maní, mariscos" aria-label="Tu alergia" />
+            </label>
+            <p className="cocN__nota">Solo alergias. Los platos son los del menú del día y no se preparan a pedido.</p>
+          </motion.div>
+        )}
 
         <p className="empN__q">Tu refresco</p>
         <div className="empN__lados" role="radiogroup" aria-label="Tu refresco">
@@ -160,32 +154,6 @@ export default function CocinaPage() {
           ))}
         </div>
 
-        <p className="empN__q">¿Cuántos días entrenas a la semana?</p>
-        <div className="cocN__dias" role="radiogroup" aria-label="Días de entrenamiento">
-          {DIAS.map((d) => (
-            <button type="button" key={d} role="radio" aria-checked={dias === d}
-              className={dias === d ? 'is-on' : undefined} onClick={() => elegir(setDias, d)}>{d}</button>
-          ))}
-        </div>
-
-        {entrena && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-            <p className="empN__q">¿Cuánto dura cada entreno?</p>
-            <div className="cocN__dias cocN__dias--4">
-              {HORAS.map((h) => (
-                <button type="button" key={h.v} className={horas === h.v ? 'is-on' : undefined}
-                  onClick={() => elegir(setHoras, h.v)}>{h.t}</button>
-              ))}
-            </div>
-            <p className="empN__q">¿Qué tan intenso?</p>
-            <div className="cocN__dias cocN__dias--3">
-              {INTENSIDAD.map((x) => (
-                <button type="button" key={x.v} className={intensidad === x.v ? 'is-on' : undefined}
-                  onClick={() => elegir(setIntensidad, x.v)}>{x.t}</button>
-              ))}
-            </div>
-          </motion.div>
-        )}
       </motion.div>
 
       <Accion>
