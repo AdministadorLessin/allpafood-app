@@ -107,6 +107,10 @@ export default function EmpezarPage() {
         edad: soloDigitos(edad),
         peso: soloDigitos(peso),
         talla: soloDigitos(talla),
+        /* El plan que eligio con "Lo quiero". En el app, despues de crear la
+           cuenta pasa directo al pago con este plan, en vez de volver a la
+           lista de planes a elegirlo otra vez. */
+        planId: plan?.id ?? null,
       }));
     } catch (e) { /* si el navegador no deja guardar, el registro pregunta de nuevo */ }
     navigate('/registro');

@@ -25,6 +25,7 @@ import MiPlanPage from './pages/dashboard/miplan/miplan';
 import AuthContextProvider from './context/authContext';
 import RegistroPageProfile from './pages/autenticacion/registro/profile';
 import RegistroDireccionPage from './pages/autenticacion/registro/direccion';
+import RegistroCocinaPage from './pages/autenticacion/registro/Cocina';
 import CambiarClavePage from './pages/autenticacion/clave/cambiar';
 
 import ProtectedRoutes from './components/ultil/ProtectedRoutes/ProtectedRoutes';
@@ -66,6 +67,7 @@ function App() {
                     <Route path='/mi-plan' element={ <MiPlanPage /> } />
                     <Route path='/registro/perfil' element={ <RegistroPageProfile /> } />
                     <Route path='/registro/direccion' element={ <RegistroDireccionPage /> } />
+                    <Route path='/registro/cocina' element={ <RegistroCocinaPage /> } />
                     <Route path='/cambiar-clave' element={ <CambiarClavePage /> } />
                   </Route>
                   { 

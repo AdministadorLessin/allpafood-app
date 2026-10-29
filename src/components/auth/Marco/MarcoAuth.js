@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './MarcoAuth.scss';
 import isotipo from '../../../assets/img/isotipo_allpafood.png';
 import { Cascada, Bloque } from './../../ultil/Motion/Motion';
-import { esNativo } from '../../../nativo';
+import { esNativo, vibrar } from '../../../nativo';
 
 /* Las cuatro fases reales entre "quiero probar" y "ya tengo mi plan". Estan
    aqui, en un solo sitio, porque hasta ahora cada pantalla del embudo era una
@@ -69,15 +69,17 @@ const Progreso = ({ fase, paso }) => {
  * mismo degradado y la misma escala que el panel, para que la app se sienta
  * una sola cosa desde la primera pantalla.
  */
-/* Dentro del app, el registro cuenta los ocho pasos donde el cliente hace
-   algo —zona, objetivo, plan, numero, codigo, datos, pago y direccion— en una
-   sola barra. Las fases de arriba siguen siendo las de la web. */
-const PASOS_APP = 8;
+/* Dentro del app, el registro cuenta los nueve pasos donde el cliente hace
+   algo —zona, objetivo, plan, numero, codigo, datos, pago, direccion y "para
+   tu cocina"— en una sola barra. Las fases de arriba siguen siendo las de la
+   web. */
+const PASOS_APP = 9;
 const pasoEnApp = (fase, paso) => (
   fase === 'empezar' ? paso + 1
   : fase === 'cuenta' ? paso + 4
   : fase === 'pago' ? 7
   : fase === 'direccion' ? 8
+  : fase === 'cocina' ? 9
   : null
 );
 
@@ -92,7 +94,7 @@ const pasoEnApp = (fase, paso) => (
  */
 export const Accion = ({ children }) => (
   esNativo
-    ? createPortal(<div className="afNatPie">{children}</div>, document.body)
+    ? createPortal(<div className="afNatPie" onClickCapture={() => vibrar.toque()}>{children}</div>, document.body)
     : <>{children}</>
 );
 
@@ -116,8 +118,27 @@ const MarcoNativo = ({ fase, paso, children, volver, sinVolver }) => {
     return () => window.removeEventListener('af-atras', alAtras);
   }, []);
 
+  /* Deslizar desde el borde izquierdo hacia la derecha vuelve atras, como en
+     cualquier app de iPhone. Solo cuenta si el dedo empieza pegado al borde
+     y el gesto es claramente horizontal, para no confundirlo con bajar la
+     pantalla. */
+  const gesto = useRef(null);
+  const alTocar = (e) => {
+    const t = e.touches[0];
+    gesto.current = (!sinVolver && t.clientX < 24) ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const alSoltar = (e) => {
+    const g = gesto.current;
+    gesto.current = null;
+    if (!g) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - g.x;
+    const dy = Math.abs(t.clientY - g.y);
+    if (dx > 70 && dy < 50) { vibrar.toque(); atras(); }
+  };
+
   return (
-    <main className="afAuth afAuth--nat">
+    <main className="afAuth afAuth--nat" onTouchStart={alTocar} onTouchEnd={alSoltar}>
       <header className="afNat__top">
         {!sinVolver &&
           <button type="button" className="afNat__volver" onClick={atras} aria-label="Volver">

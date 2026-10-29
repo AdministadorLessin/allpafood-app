@@ -45,6 +45,8 @@ import {useAuthContext} from '../../../context/authContext';
 
 import { useNavigate } from "react-router-dom";
 import PagoListo from './../../../components/checkout/PagoListo/PagoListo';
+import MarcoAuth from './../../../components/auth/Marco/MarcoAuth';
+import { esNativo } from '../../../nativo';
 import CheckoutPaymentYape from './../../../components/checkout/Payments/Yape';
 import CheckoutPaymentCard from './../../../components/checkout/Payments/CreditCard';
 
@@ -112,6 +114,24 @@ const IcoAd = ({ tipo }) => {
     if (tipo === 'starters')  return <svg {...c}><path d="M3.4 11.4h17.2a8.6 8.6 0 0 1-8.6 7.4 8.6 8.6 0 0 1-8.6-7.4z"/><path d="M9 8.2c0-1.4 1.4-1.6 1.4-3M13 8.2c0-1.4 1.4-1.6 1.4-3"/></svg>;
     return <svg {...c}><path d="M6.8 8.2v7.6M4.2 9.8v4.4M17.2 8.2v7.6M19.8 9.8v4.4M6.8 12h10.4"/></svg>;
 };
+
+/* En el app el pago va en el mismo marco que el registro —flecha atras y,
+   si viene de crear la cuenta, la barra en el paso 7 de 8— y sin la barra de
+   navegacion del panel: el cliente todavia no tiene nada que navegar. Para
+   quien renueva desde el app, el mismo marco sin la barra de pasos. */
+const MarcoPagoApp = ({ children }) => {
+    let enAlta = false;
+    try { enAlta = window.localStorage.getItem('af_alta') === '1'; } catch (e) { enAlta = false; }
+    return (
+        <MarcoAuth fase={enAlta ? 'pago' : undefined}>
+            <div className="afCheckout afCheckout--nat">{children}</div>
+        </MarcoAuth>
+    );
+};
+const MarcoPagoWeb = ({ children }) => (
+    <LayoutDasboard claseStyle={'afCheckout'}>{children}</LayoutDasboard>
+);
+const Marco = esNativo ? MarcoPagoApp : MarcoPagoWeb;
 
 const CheckoutPage = (props) => {
 
@@ -526,13 +546,17 @@ const CheckoutPage = (props) => {
     },[])
 
     return (
-        <LayoutDasboard claseStyle={'afCheckout'}>
+        <Marco>
             {/* La pantalla no decia en ningun momento donde estaba el cliente:
                 abria con "Resumen de compra:" y ya. */}
-            <h1 className="afCheckout__titular">
-                <span className="t1">Último paso,</span>
-                confirma y paga
-            </h1>
+            {esNativo ?
+                <h1 className="afAuth__titular afCheckout__titularNat">Confirma y <em>paga</em></h1>
+            :
+                <h1 className="afCheckout__titular">
+                    <span className="t1">Último paso,</span>
+                    confirma y paga
+                </h1>
+            }
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={12} md={8}>
                     <Grid container spacing={2}>
@@ -924,7 +948,7 @@ const CheckoutPage = (props) => {
                     adicionales={cartAdicionales.length}
                 />
             )}
-        </LayoutDasboard>
+        </Marco>
     )
 };
 

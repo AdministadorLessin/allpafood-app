@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 
 import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
 import platoFoto from '../../../assets/img/ingreso-plato.jpg';
+import { vibrar } from '../../../nativo';
 import './EmpezarNativo.scss';
 
 /**
@@ -141,14 +142,14 @@ export default function EmpezarNativo(p) {
             {lista.map((d) => (
               <button type="button" key={d}
                 className={`empN__chip${p.distrito === d ? ' is-on' : ''}`}
-                onClick={() => p.setDistrito(d)}>
+                onClick={() => { vibrar.toque(); p.setDistrito(d); }}>
                 {p.distrito === d && <span className="empN__chipCheck"><Ico d={D.check} /></span>}
                 {d}
               </button>
             ))}
             <button type="button"
               className={`empN__chip empN__chip--otro${p.distrito === 'otro' ? ' is-on' : ''}`}
-              onClick={() => p.setDistrito('otro')}>Otro distrito</button>
+              onClick={() => { vibrar.toque(); p.setDistrito('otro'); }}>Otro distrito</button>
           </div>
         </Paso>
 
@@ -185,7 +186,7 @@ export default function EmpezarNativo(p) {
             {p.objetivos.map((o) => (
               <button type="button" key={o.id}
                 className={`empN__meta empN__meta--${o.id}${p.objetivo === o.id ? ' is-on' : ''}`}
-                onClick={() => p.setObjetivo(o.id)}>
+                onClick={() => { vibrar.toque(); p.setObjetivo(o.id); }}>
                 {p.objetivo === o.id && <span className="empN__metaCheck"><Ico d={D.check} /></span>}
                 <span className="empN__metaIco"><Ico d={D[o.id]} /></span>
                 <span>{o.titulo}</span>
@@ -198,7 +199,7 @@ export default function EmpezarNativo(p) {
           <div className="empN__lados" role="radiogroup" aria-label="Sexo de nacimiento">
             {[['F', 'Mujer'], ['M', 'Hombre']].map(([v, t]) => (
               <button type="button" key={v} role="radio" aria-checked={p.sexo === v}
-                className={p.sexo === v ? 'is-on' : undefined} onClick={() => p.setSexo(v)}>{t}</button>
+                className={p.sexo === v ? 'is-on' : undefined} onClick={() => { vibrar.toque(); p.setSexo(v); }}>{t}</button>
             ))}
           </div>
 
@@ -277,7 +278,7 @@ export default function EmpezarNativo(p) {
             <p className="empN__seccion">Otros planes</p>
             <div className="empN__otros">
               {p.alternativas.map((o) => (
-                <button type="button" key={o.id} className="empN__otro" onClick={() => p.setMirando(o.id)}>
+                <button type="button" key={o.id} className="empN__otro" onClick={() => { vibrar.toque(); p.setMirando(o.id); }}>
                   <span className="empN__otroTxt">
                     <b>{o.description}{o.id === p.recomendado && <em>Recomendado</em>}</b>
                     <small>{resumen(o)} · S/ {o.porComida.toFixed(2)} por comida</small>

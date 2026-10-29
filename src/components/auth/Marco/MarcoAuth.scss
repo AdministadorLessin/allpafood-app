@@ -980,3 +980,15 @@
     padding-left: 18px;
     input{ text-align: left; padding-left: 0; }
 }
+
+/* La columna nunca mas ancha que la pantalla. Como hijo de un flex, por
+   defecto se estiraba hasta el ancho minimo de su contenido: el pago (con la
+   grilla de la web) la llevaba a 560px en un telefono de 412 y las tarjetas
+   se salian por la derecha. */
+.afAuth--nat{
+    overflow-x: hidden;
+    .afAuth__col{ min-width: 0; width: 100%; }
+}
+/* El encabezado tapa por completo lo que pasa por debajo al bajar la
+   pantalla; algunas tarjetas del pago tienen su propio z-index. */
+.afNat__top{ z-index: 50; background: #FBFDFA; }

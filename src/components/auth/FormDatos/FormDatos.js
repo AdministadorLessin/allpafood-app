@@ -20,13 +20,14 @@ import { motion, alToque } from './../../ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 import { useVerClave } from '../../ultil/VerClave';
 import { Accion } from '../Marco/MarcoAuth';
+import { esNativo } from '../../../nativo';
 
 const LOCAL_STORAGE_KEY = 'form_datos_cache';
 
 const FormDatos = ({telefono}) => {
     const verClave = useVerClave();
 
-    const { token, handleUpdateToken } = useAuthContext();
+    const { token, handleUpdateToken, addItemToCart } = useAuthContext();
     let navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
@@ -171,6 +172,33 @@ const FormDatos = ({telefono}) => {
         });
     };
 
+    /* En el app, el cliente ya eligio su plan con "Lo quiero" antes de dar su
+       numero: pasa directo al pago con ese plan. Antes lo mandaba a la lista
+       de planes a elegirlo otra vez. El plan se pide de nuevo al servidor, ya
+       con sesion, por si el precio cambio o la cuenta tiene precio de
+       empresa. Si algo falla, la lista de planes de siempre. La direccion se
+       pide despues de pagar, en su propia pantalla. */
+    const irAPagar = () => {
+        let planId = null;
+        try { planId = JSON.parse(window.localStorage.getItem('preregistro'))?.planId ?? null; } catch (e) { planId = null; }
+        if (!esNativo || !planId) return navigate('/planes');
+
+        return axios.get(`${API_URL}private/catalog/subscription-plans/recommended`,
+            { headers: { Authorization: `Bearer ${token}` } })
+            .then((r) => {
+                const lista = r.data?.data?.plans || [];
+                const plan = lista.find((p) => p && p.id === planId);
+                if (!plan) return navigate('/planes');
+                addItemToCart(plan);
+                /* Marca que esta en medio del alta: el pago y la direccion
+                   muestran la barra de pasos, y al final viene "Para tu
+                   cocina". Se borra al terminar. */
+                try { window.localStorage.setItem('af_alta', '1'); } catch (e) { /* sin espacio */ }
+                navigate('/checkout');
+            })
+            .catch(() => navigate('/planes'));
+    };
+
     const sendData = (data) => {
         setFormRegLoad(true);
         axios.post(`${API_URL}register/user`,
@@ -191,10 +219,8 @@ const FormDatos = ({telefono}) => {
             window.localStorage.setItem('valfact',0);
 
             guardarCuestionario(data)
+                .then(() => irAPagar())
                 .finally(() => {
-                    /* Derecho a elegir su plan. La direccion se pide despues
-                       de pagar, en su propia pantalla. */
-                    navigate("/planes");
                     setFormRegLoad(false);
                     setErrorData();
                 });

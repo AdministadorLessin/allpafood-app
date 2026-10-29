@@ -1,0 +1,55 @@
+/* "Para tu cocina": usa las piezas del registro del app (EmpezarNativo.scss)
+   y suma la rutina, los dias de entreno y el campo de otra alergia. */
+
+$tinta: #16211B;
+$muted: #55655C;
+
+.cocN__chips{ margin-top: 0; }
+
+.cocN__otra{
+    display: flex; margin-top: 10px; height: 46px; border-radius: 14px;
+    background: #fff; border: 1px solid rgba(22,33,27,.08); padding: 0 14px;
+    input{
+        flex: 1; min-width: 0; border: 0; background: transparent; outline: 0;
+        font-family: inherit; font-size: 16px; color: $tinta;
+        &::placeholder{ color: #66736C; }
+    }
+    &:focus-within{ border-color: #12C97B; box-shadow: 0 0 0 4px rgba(60,251,159,.18); }
+}
+
+.cocN__rutinas{
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+}
+.cocN__rutina{
+    text-align: left; padding: 12px 12px 11px; border-radius: 16px;
+    background: #fff; border: 1px solid rgba(22,33,27,.08);
+    font-family: inherit; color: $tinta; cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .12s ease;
+    &:active{ transform: scale(.97); }
+    b{ display: block; font-size: 13.5px; line-height: 1.25; }
+    small{ display: block; margin-top: 3px; font-size: 11.5px; line-height: 1.3; color: #66736C; }
+    &.is-on{
+        background: $tinta; border-color: $tinta; color: #fff;
+        box-shadow: 0 10px 22px rgba(22,33,27,.22);
+        small{ color: rgba(255,255,255,.72); }
+    }
+}
+
+/* Una fila de pildoras iguales, como el selector numerico del iPhone. */
+.cocN__dias{
+    padding: 4px; border-radius: 16px; background: rgba(22,33,27,.06);
+    display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px;
+    &--4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    &--3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    button{
+        height: 40px; border: 0; border-radius: 12px; background: transparent;
+        font-family: inherit; font-size: 14px; font-weight: 600; color: $muted;
+        cursor: pointer; transition: background .18s ease, color .18s ease;
+        &.is-on{ background: #fff; color: $tinta; box-shadow: 0 4px 12px rgba(22,35,29,.10); }
+    }
+}
+
+.cocN__saltar{
+    border: 0; background: none; padding: 6px 10px;
+    font-family: inherit; font-size: 13.5px; font-weight: 600; color: $muted; cursor: pointer;
+}

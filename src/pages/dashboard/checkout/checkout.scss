@@ -1290,3 +1290,23 @@
         span{ color: var(--af-mint-ink); }
     }
 }
+
+/* ==========================================================================
+   El pago dentro del app: va en el marco del registro (MarcoAuth). La grilla
+   de la web se apila en una sola columna del ancho de la pantalla, y las
+   tarjetas toman el estilo del resto del alta.
+   ========================================================================== */
+.afCheckout--nat{
+    width: 100%; min-width: 0;
+    .afCheckout__titularNat{ margin-bottom: 18px; }
+    .MuiGrid-container{ width: 100% !important; margin: 0 !important; }
+    .MuiGrid-item{
+        max-width: 100% !important; flex-basis: 100% !important;
+        padding: 0 !important; margin-bottom: 14px;
+    }
+    .paperItem{
+        width: 100%; max-width: 100%; box-sizing: border-box;
+        border-radius: 22px;
+        box-shadow: 0 12px 30px rgba(22,35,29,.07);
+    }
+}

@@ -2,6 +2,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { iniciarAvisos } from './avisos';
 
 /**
@@ -13,6 +14,15 @@ import { iniciarAvisos } from './avisos';
 export const esNativo = Capacitor.isNativePlatform();
 
 const Barras = registerPlugin('Barras');
+
+/* La vibracion suave que da el telefono al elegir algo: es de lo que mas
+   delata a un app de verdad frente a una pagina. Un toque al elegir una
+   opcion; otro distinto cuando algo sale bien (el pago, la cuenta lista). En
+   la web no hace nada. */
+export const vibrar = {
+  toque: () => { if (esNativo) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); },
+  exito: () => { if (esNativo) Haptics.notification({ type: NotificationType.Success }).catch(() => {}); },
+};
 const esIphone = Capacitor.getPlatform() === 'ios';
 
 /* Android pinta las dos franjas del color que se le pide (el plugin Barras,

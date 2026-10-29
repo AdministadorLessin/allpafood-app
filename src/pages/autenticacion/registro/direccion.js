@@ -63,6 +63,13 @@ const RegistroDireccionPage = () => {
         alergias: ''
     });
     const [azucar, setAzucar] = useState(true);
+
+    /* En el alta del app, lo que no come y el azucar se preguntan en la
+       pantalla siguiente, "Para tu cocina", junto con cuanto se mueve. Aqui
+       queda solo la direccion. */
+    const enAltaApp = esNativo && (() => {
+        try { return window.localStorage.getItem('af_alta') === '1'; } catch (e) { return false; }
+    })();
     const [aceptaTerminos, setAceptaTerminos] = useState(false);
 
     const [guardando, setGuardando] = useState(false);
@@ -169,7 +176,7 @@ const RegistroDireccionPage = () => {
                 ? axios.patch(`${API_URL}delivery/update/point?deliveryPointId=${id}`, {}, cabecera)
                 : Promise.resolve();
 
-            return marcarActiva.catch(() => {}).then(() =>
+            return marcarActiva.catch(() => {}).then(() => enAltaApp ? null :
                 axios.patch(`${API_URL}profile/data/preferences`, {
                     alimentsRestrictions: campos.alergias.trim(),
                     sugar: azucar
@@ -177,7 +184,7 @@ const RegistroDireccionPage = () => {
             );
 
         }).then(() => {
-            navigate('/menu', { replace: true });
+            navigate(enAltaApp ? '/registro/cocina' : '/menu', { replace: true });
         }).catch((err) => {
             setGuardando(false);
             setError(
@@ -332,6 +339,7 @@ const RegistroDireccionPage = () => {
 
                 {/* Alergias y azucar. Se pueden saltar: son para que cocina sepa
                     que NO mandarte, no un plato hecho a medida. */}
+                {!enAltaApp && (
                 <div className="afExtras">
                     <p className="afExtras__t">¿Algo que no puedas comer?</p>
                     <p className="afExtras__d">
@@ -371,6 +379,7 @@ const RegistroDireccionPage = () => {
                         </button>
                     </div>
                 </div>
+                )}
 
                 {/* Las reglas de la entrega, dichas antes y no cuando ya hay un
                     problema. Que el motorizado espera ocho minutos no es un

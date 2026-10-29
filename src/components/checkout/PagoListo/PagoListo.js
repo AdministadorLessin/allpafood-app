@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import './PagoListo.scss';
 import { motion, alToque } from './../../ultil/Motion/Motion';
 import IcoIsotipoSvg from './../../ultil/iconSvg/icoIsotipoSvg';
+import { vibrar } from '../../../nativo';
 
 /* Cuanto esperamos antes de dar por activado el plan. El servidor aplica los
    beneficios justo despues de confirmar el cobro; salir antes lleva al cliente
@@ -24,7 +25,7 @@ const PagoListo = ({ total, plan, adicionales = 0 }) => {
   const [listo, setListo] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setListo(true), MS_ACTIVANDO);
+    const t = setTimeout(() => { setListo(true); vibrar.exito(); }, MS_ACTIVANDO);
     return () => clearTimeout(t);
   }, []);
 
