@@ -132,17 +132,17 @@ function HoyNativo({ ordenes, aviso }) {
             {items.length > 1 && <small>Con {items.slice(1).join(', ').toLowerCase()}</small>}
           </span>
         </div>}
-      <div className="inN__ruta" aria-hidden="true">
+      {/* Cada paso es una columna: el circulo y su nombre centrados uno sobre
+          otro, y la linea va de centro a centro. Antes el texto iba en otra
+          fila y no quedaba debajo de su circulo. */}
+      <ol className="inN__ruta">
         {[OLLA, MOTO, CHECK].map((d, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className={`inN__rutaLinea${i <= indice ? ' is-on' : ''}`} />}
-            <span className={`inN__rutaPunto${i <= indice ? ' is-on' : ''}`}><Ico d={d} w={2.4} /></span>
-          </React.Fragment>
+          <li key={pasos[i]} className={`inN__paso${i <= indice ? ' is-on' : ''}${i === indice ? ' is-actual' : ''}`}>
+            <span className="inN__rutaPunto"><Ico d={d} w={2.4} /></span>
+            <span className="inN__pasoTxt">{pasos[i]}</span>
+          </li>
         ))}
-      </div>
-      <div className="inN__rutaTxt">
-        {pasos.map((p, i) => <span key={p} className={i === indice ? 'is-on' : undefined}>{p}</span>)}
-      </div>
+      </ol>
     </section>
   );
 }
