@@ -498,7 +498,10 @@ const PlaceAutocomplete = ({ onPlaceSelect }) => {
 
     return (
         <div className="autocomplete-container">
-            <input ref={inputRef} />
+            {/* Sin texto de ayuda el cliente no sabia que se podia escribir
+                aqui. */}
+            <input ref={inputRef} placeholder="Escribe tu dirección" aria-label="Escribe tu dirección"
+                   autoComplete="off" />
         </div>
     );
 };

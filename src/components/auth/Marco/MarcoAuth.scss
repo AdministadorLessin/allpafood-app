@@ -662,7 +662,10 @@
         left: 10px;
         right: 10px;
         max-width: 500px;
-        z-index: 4;
+        /* Por encima del pin del mapa: antes el pin se dibujaba sobre el
+           campo y tapaba lo que se escribia. */
+        z-index: 30;
+        .autocomplete-container{ position: relative; }
         input{
             width: 100%;
             height: 46px;
@@ -670,12 +673,18 @@
             border: 0;
             box-shadow: 0 4px 14px -4px rgba(16,31,24,.35);
             outline: none;
-            padding: 0 18px;
+            /* El campo trae su pin verde a la izquierda: el texto empieza
+               despues de el, no encima. */
+            padding: 0 18px 0 46px;
             color: var(--af-ink);
-            font-size: 15px;
+            /* 16px: con menos, el iPhone hace zoom al tocar el campo. */
+            font-size: 16px;
             font-family: var(--poppins);
+            background: #fff;
+            &::placeholder{ color: #66736C; }
         }
     }
+
     .rsrMapNotCobertura{
         position: absolute;
         left: 10px;
@@ -992,3 +1001,11 @@
 /* El encabezado tapa por completo lo que pasa por debajo al bajar la
    pantalla; algunas tarjetas del pago tienen su propio z-index. */
 .afNat__top{ z-index: 50; background: #FBFDFA; }
+
+/* El espacio de abajo para que lo ultimo de la pantalla (los terminos, por
+   ejemplo) se pueda subir por encima del boton fijo. La regla general de
+   .es-nativo .afAuth (global.scss) lo dejaba en 28px y ganaba por ser mas
+   especifica: el boton tapaba el final de las pantallas largas. */
+.es-nativo .afAuth--nat{
+    padding-bottom: calc(190px + env(safe-area-inset-bottom, 0px));
+}
