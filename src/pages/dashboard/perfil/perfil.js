@@ -23,6 +23,8 @@ import CerrarSesion from './../../../components/perfil/CerrarSesion/CerrarSesion
 import EliminarCuenta from './../../../components/perfil/EliminarCuenta/EliminarCuenta';
 import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
+import { esNativo, vibrar } from '../../../nativo';
+import CuentaNativa from './CuentaNativa';
 
 const PerfilPage = (props) => {
 
@@ -67,7 +69,7 @@ const PerfilPage = (props) => {
         email: (planInfoT.log || '').includes('@') ? planInfoT.log : '',
         image:resultTmp.image
       })
-      setImgProfile(planInfoT.profile.image);
+      setImgProfile(resultTmp.image);
 
       planInfoT.profile.image = resultTmp.image;
       handleUpdateToken(token,planInfoT);
@@ -144,6 +146,31 @@ const PerfilPage = (props) => {
 
   return (
     <LayoutDasboard claseStyle={false}>
+      {esNativo ? (
+        <CuentaNativa
+          person={person}
+          nombre={nombre}
+          telefono={celular(privacity?.phoneNumber || contacto)}
+          plan={planInfo?.plan}
+          delivery={delivery}
+          imagen={imgProfile}
+          abrir={changeSwitch}
+          elegirAvatar={(n) => {
+            if (!person || String(n) === String(imgProfile)) return;
+            vibrar.toque();
+            setImgProfile(n);
+            axios.put(`${API_URL}profile/data/personal`, {
+              name: person.name,
+              lastname: person.lastname,
+              gender: person.gender,
+              registerDate: person.registeDate ? person.registeDate : '2025-04-04',
+              image: n,
+            }, { headers: { Authorization: `Bearer ${token}` } })
+              .then(() => getInfo())
+              .catch(() => setImgProfile(person.image));
+          }}
+        />
+      ) : (
       <Cascada className="afPanel afPanel--cuenta">
 
         <Bloque><h1 className="afPanel__titular">Mi cuenta</h1></Bloque>
@@ -283,6 +310,7 @@ const PerfilPage = (props) => {
         <Bloque><EliminarCuenta /></Bloque>
 
       </Cascada>
+      )}
 
       <Modal
         open={openEperson}

@@ -20,6 +20,8 @@ import Bienvenida, { bienvenidaYaVista } from '../../../components/dashboard/Bie
 import AvisosCliente from '../../../components/dashboard/AvisosCliente/AvisosCliente';
 import Tarjetas from '../../../components/dashboard/Tarjetas/Tarjetas';
 import ActivarAvisos from '../../../components/dashboard/ActivarAvisos/ActivarAvisos';
+import InicioNativo from '../../../components/dashboard/InicioNativo/InicioNativo';
+import { esNativo } from '../../../nativo';
 
 // Charts
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
@@ -333,6 +335,19 @@ const DashboadHome = (props) => {
           decia por donde empezar. */}
       {/* La cascada entra de abajo hacia arriba en el orden de lectura: quien
           llega ve primero que tiene que hacer y despues el detalle. */}
+      {/* En el app instalado, el inicio con el lenguaje del registro. */}
+      {esNativo ? (
+        <InicioNativo
+          perfil={helloCard?.profile}
+          plan={plan}
+          ordenes={menuList}
+          aviso={avisoEntrega}
+          metricas={metricsDay}
+          objetivo={objetMEtrics}
+          cargando={!planChecked}
+          estado={estado}
+        />
+      ) : (
       <Cascada className="afPanel afPanel--inicio">
 
         {/* Nombre y fecha en una linea, como encabezado. Antes ocupaban una
@@ -423,6 +438,7 @@ const DashboadHome = (props) => {
             el boton del banner o tocando un dia de la tira. */}
 
       </Cascada>
+      )}
 
       {/* Despues de la bienvenida, nunca encima: dos hojas a la vez no se leen. */}
       <AvisosCliente oculto={mostrarBienvenida || planInfo?.role === 'DELIVERY'} />

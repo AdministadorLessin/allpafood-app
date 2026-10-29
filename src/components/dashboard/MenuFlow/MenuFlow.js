@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import FotoPlato from '../../ultil/FotoPlato';
 import axios from 'axios';
 import { REPARTO } from '../PedidoDeHoy/PedidoDeHoy';
@@ -11,7 +11,7 @@ import { HORA_LIMITE, HORA_LIMITE_TEXTO, tiempoRestante } from './../StatusBanne
 import { Cascada, Bloque, BarraAnimada, motion, alToque } from './../../ultil/Motion/Motion';
 import FranjaEmpresa from './../../empresa/FranjaEmpresa/FranjaEmpresa';
 import { API_URL } from '../../../config';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const baseUrl = `${API_URL}`;
 
@@ -593,6 +593,21 @@ const MenuFlow = ({ plan, alTerminar }) => {
           }
         </Bloque>
   );
+
+  /* Desde el inicio del app se toca un dia y "Elegir mi plato del viernes":
+     llega con ese dia y se abre directo en sus platos, sin pasar por la
+     lista de la semana. Una sola vez: al volver se ve la semana. */
+  const location = useLocation();
+  const diaPedido = location.state?.dia;
+  const diaYaAbierto = useRef(false);
+  useEffect(() => {
+    if (!diaPedido || diaYaAbierto.current || dias === null) return;
+    diaYaAbierto.current = true;
+    if (dias.some((d) => d.localDate === diaPedido)) {
+      setDiaActivo(diaPedido);
+      setPaso(2);
+    }
+  }, [dias, diaPedido]);
 
   if (dias === null) {
     return (
