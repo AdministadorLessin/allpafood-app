@@ -293,13 +293,23 @@ const DashboadHome = (props) => {
   // desbordaba en pantallas angostas.
   const fechaDeHoy = moment().format('ddd D MMM');
 
-  // El encabezado se vuelve vidrio cuando el contenido pasa por detras. Antes
-  // de eso queda plano: el desenfoque permanente pesa y no significa nada.
-  const [pegado, setPegado] = useState(false);
+  // El encabezado se vuelve solido cuando el contenido pasa por detras. Antes
+  // de eso queda plano.
+  //
+  // Se cambia la clase directo en el elemento y solo cuando cruza el borde.
+  // Antes era un estado de React: cada evento de scroll volvia a dibujar el
+  // inicio entero, muchas veces por segundo, y en el iPhone el encabezado
+  // temblaba porque el telefono no alcanzaba.
   useEffect(() => {
     // El documento entero es el que hace scroll: los contenedores del layout
     // solo crecen. Antes se escuchaba .mainLayoutBox, que nunca dispara.
-    const alScroll = () => setPegado(window.scrollY > 12);
+    let ultimo = null;
+    const alScroll = () => {
+      const pegado = window.scrollY > 12;
+      if (pegado === ultimo) return;
+      ultimo = pegado;
+      document.querySelector('.afPanel__top')?.classList.toggle('afPanel__top--pegado', pegado);
+    };
     alScroll();
     window.addEventListener('scroll', alScroll, { passive: true });
     return () => window.removeEventListener('scroll', alScroll);
@@ -328,7 +338,7 @@ const DashboadHome = (props) => {
         {/* Nombre y fecha en una linea, como encabezado. Antes ocupaban una
             tarjeta de 190px con una ilustracion, en el lugar donde ahora va lo
             que el cliente tiene que hacer. */}
-        <Bloque className={`afPanel__top${pegado ? ' afPanel__top--pegado' : ''}`}>
+        <Bloque className="afPanel__top">
           <span className="afChipUser">
             <span className="afChipUser__ava">
               {/* Antes la condicion era "!== undefined": un perfil sin avatar
