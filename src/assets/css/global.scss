@@ -527,15 +527,18 @@ input[type=number] {
        Android estos valores son 0: ahi la barra de la hora va aparte. */
     .mainLayout{ padding-top: env(safe-area-inset-top, 0px); }
 
-    /* El saludo con la fecha, pegado arriba como la barra de un app de
-       iPhone: llega hasta el borde, debajo de la hora y la isla, y al bajar
-       se vuelve una franja solida. Sin desenfoque en vivo: en el iPhone el
-       blur se recalculaba en cada cuadro del scroll y el encabezado
-       temblaba. */
+    /* El saludo con la fecha, fijo arriba como la barra de un app de iPhone:
+       llega hasta el borde, debajo de la hora y la isla, y el contenido pasa
+       por debajo. Antes era "sticky" y temblaba en el iPhone con el scroll con
+       impulso; un elemento fijo no se mueve. Al bajar se vuelve una franja
+       solida, sin desenfoque en vivo (el blur se recalculaba en cada cuadro).
+       La pantalla de inicio deja arriba el alto del encabezado. */
     .afPanel__top{
-        top: 0;
-        margin-top: calc(-1 * env(safe-area-inset-top, 0px));
-        padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 85;
+        margin: 0;
+        padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
         transition: background .2s ease, box-shadow .2s ease;
     }
     .afPanel__top--pegado{
@@ -544,6 +547,7 @@ input[type=number] {
         background: rgba(247, 250, 244, .97);
         border-radius: 0;
     }
+    .afPanel--inicio{ padding-top: 78px; }
 
     /* La animacion de entrada de cada pantalla deja un transform puesto, y
        en el iPhone lo que se pega arriba dentro de una capa transformada
