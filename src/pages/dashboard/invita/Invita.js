@@ -15,9 +15,10 @@ import './Invita.scss';
  * comparte.
  */
 
-/* A donde manda el mensaje. Cuando el app tenga su pagina de descarga con las
-   dos tiendas, cambia solo esta linea. */
-const ENLACE_APP = 'https://allpafood.com';
+/* A donde manda el mensaje. Por ahora la ficha del App Store; cuando Android
+   salga a produccion conviene una pagina con las dos tiendas, y se cambia
+   solo esta linea. */
+const ENLACE_APP = 'https://apps.apple.com/pe/app/allpa-food-comida-saludable/id6828184246';
 
 const Ico = ({ d, w = 2 }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w}
