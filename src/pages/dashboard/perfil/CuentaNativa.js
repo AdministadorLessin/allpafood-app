@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
+import moment from 'moment';
+import 'moment/locale/es';
 
 import './CuentaNativa.scss';
 import CerrarSesion from '../../../components/perfil/CerrarSesion/CerrarSesion';
@@ -59,8 +61,11 @@ const Fila = ({ ico, tono, titulo, sub, a, href, onClick }) => {
 
 export default function CuentaNativa({ person, nombre, telefono, plan, delivery, imagen, abrir, elegirAvatar }) {
   const tieneImagen = imagen !== undefined && imagen !== null && imagen !== '';
+  /* Con moment y no con new Date: new Date('2026-11-30') lo lee como
+     medianoche en UTC, que en Lima todavia es el 29, y aqui salia un dia
+     antes que en el inicio. */
   const vence = plan?.expirationDate
-    ? new Date(plan.expirationDate).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }).replace('.', '')
+    ? moment(plan.expirationDate).format('D MMM').replace('.', '')
     : null;
   const direccion = delivery?.address ? String(delivery.address).split(',')[0] : null;
 

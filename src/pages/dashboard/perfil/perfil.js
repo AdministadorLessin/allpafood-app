@@ -71,7 +71,15 @@ const PerfilPage = (props) => {
       })
       setImgProfile(resultTmp.image);
 
-      planInfoT.profile.image = resultTmp.image;
+      /* El inicio saluda con el perfil guardado al entrar. Si aqui solo se
+         actualizaba la foto, quien cambiaba su nombre seguia viendo el viejo
+         en "Hola, ..." hasta cerrar sesion. */
+      planInfoT.profile = {
+        ...planInfoT.profile,
+        name: resultTmp.name,
+        lastname: resultTmp.lastname,
+        image: resultTmp.image,
+      };
       handleUpdateToken(token,planInfoT);
 
     }).catch((error)=>{
