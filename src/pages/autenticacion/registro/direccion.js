@@ -38,6 +38,28 @@ import './registro.scss';
  * Las alergias y el azucar se preguntan aqui tambien, pero se pueden saltar.
  * NO es cocina personalizada: es lo que el cliente no puede comer.
  */
+/* La calle y el numero de lo que se eligio en el buscador. */
+const calleDelBuscador = (lugar) => {
+    if (!lugar) return '';
+    const piezas = lugar.address_components || [];
+    const via = piezas.find((c) => c.types.includes('route'));
+    const num = piezas.find((c) => c.types.includes('street_number'));
+    if (via) return num ? `${via.long_name} ${num.long_name}` : via.long_name;
+    /* Sin piezas, el primer tramo de la direccion escrita ("Jiron X 776"). */
+    return String(lugar.formatted_address || lugar.name || '').split(',')[0].trim();
+};
+
+/* El distrito de lo elegido en el buscador, con el mismo criterio que el del
+   mapa: "Lima" a secas no es un distrito. */
+const distritoDelBuscador = (lugar) => {
+    const piezas = lugar?.address_components || [];
+    for (const tipo of ['administrative_area_level_3', 'sublocality_level_1', 'locality']) {
+        const c = piezas.find((x) => x.types.includes(tipo));
+        if (c && !c.long_name.toLowerCase().includes('lima')) return c.long_name;
+    }
+    return '';
+};
+
 /* Con `visita`, la misma pantalla sirve a quien todavia no es cliente: marca
    su punto, ve si llegamos y se guarda en el telefono. Cuando compra, este
    paso lo encuentra ya marcado. */
@@ -102,7 +124,7 @@ const RegistroDireccionPage = ({ visita = false }) => {
         setCampos((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleLocationChange = (latLng) => {
+    const handleLocationChange = (latLng, lugar) => {
         if (!latLng) return;
 
         const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
@@ -110,7 +132,21 @@ const RegistroDireccionPage = ({ visita = false }) => {
 
         setCentro({ lat, lng });
         setMarcado(true);
-        buscarDistrito({ lat, lng });
+
+        /* Si la direccion vino del buscador, ya la tenemos escrita: es la que
+           el cliente eligio. Antes se tiraba y se le volvia a preguntar a
+           Google por el punto; cuando esa consulta no respondia, el campo
+           quedaba vacio aunque arriba se leyera la direccion completa. */
+        const deBuscador = calleDelBuscador(lugar);
+        if (deBuscador && !calleTocada) setCalleDelMapa(deBuscador);
+        const distritoBuscado = distritoDelBuscador(lugar);
+        if (distritoBuscado) {
+            setDistritoNoDetectado(false);
+            setDistrito(distritoBuscado);
+            setCampos((prev) => ({ ...prev, distrito: distritoBuscado }));
+        }
+
+        buscarDistrito({ lat, lng }, { conservarCalle: !!deBuscador });
 
         if (window.google?.maps?.geometry?.poly) {
             const zona = new window.google.maps.Polygon({ paths: coverCities });
@@ -122,7 +158,7 @@ const RegistroDireccionPage = ({ visita = false }) => {
 
     /* Mismo criterio que /ubicaciones: Google devuelve "Lima" en muchas
        avenidas principales, y en ese caso el distrito se pide a mano. */
-    const buscarDistrito = ({ lat, lng }) => {
+    const buscarDistrito = ({ lat, lng }, { conservarCalle = false } = {}) => {
         if (!window.google?.maps?.Geocoder) return;
 
         new window.google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
@@ -146,7 +182,7 @@ const RegistroDireccionPage = ({ visita = false }) => {
                numero de departamento, imposibles de buscar para el motorizado. */
             const conCalle = results.find((r) =>
                 r.address_components.some((c) => c.types.includes('route')));
-            if (conCalle && !calleTocada) {
+            if (conCalle && !calleTocada && !conservarCalle) {
                 const via = conCalle.address_components.find((c) => c.types.includes('route'));
                 const num = conCalle.address_components.find((c) => c.types.includes('street_number'));
                 setCalleDelMapa(num ? `${via.long_name} ${num.long_name}` : via.long_name);
@@ -310,6 +346,19 @@ const RegistroDireccionPage = ({ visita = false }) => {
                     }
                 </div>
 
+                {visita && marcado && (enCobertura
+                    ? <p className="vis__dirOk">
+                        <b>Sí llegamos a este punto</b>
+                        De lunes a viernes, entre las 10:30 y la 1:30 p.m. Guardamos esta dirección
+                        para cuando actives tu plan, así no la marcas otra vez.
+                      </p>
+                    : <p className="vis__dirNo">
+                        <b>Todavía no llegamos a ese punto</b>
+                        Prueba con otro dentro de la zona verde, o{' '}
+                        <a href="https://wa.me/51955797697?text=Hola%2C%20quiero%20Allpa%20Food%20en%20mi%20zona"
+                           target="_blank" rel="noreferrer">escríbenos</a> y te avisamos apenas abramos ahí.
+                      </p>)}
+
                 {/* Editable, no solo para mirar. Es el registro: por aqui pasan
                     todos los clientes nuevos, y la direccion que quede aqui es
                     la que va a leer el motorizado durante meses. El mapa
@@ -334,19 +383,6 @@ const RegistroDireccionPage = ({ visita = false }) => {
                         </small>
                     </div>
                 }
-
-                {visita && marcado && (enCobertura
-                    ? <p className="vis__dirOk">
-                        <b>Sí llegamos a este punto</b>
-                        De lunes a viernes, entre las 10:30 y la 1:30 p.m. Guardamos esta dirección
-                        para cuando actives tu plan, así no la marcas otra vez.
-                      </p>
-                    : <p className="vis__dirNo">
-                        <b>Todavía no llegamos a ese punto</b>
-                        Prueba con otro dentro de la zona verde, o{' '}
-                        <a href="https://wa.me/51955797697?text=Hola%2C%20quiero%20Allpa%20Food%20en%20mi%20zona"
-                           target="_blank" rel="noreferrer">escríbenos</a> y te avisamos apenas abramos ahí.
-                      </p>)}
 
                 {!visita && <>
                 {(distritoNoDetectado || !distrito) &&
@@ -505,7 +541,7 @@ const MapHandler = ({ place, marker, onLocationChange }) => {
         if (!location) return;
 
         marker.position = location;
-        onLocationChange(location);
+        onLocationChange(location, place);
 
         if (place.geometry?.viewport) {
             map.fitBounds(place.geometry.viewport);
@@ -526,7 +562,7 @@ const PlaceAutocomplete = ({ onPlaceSelect }) => {
     useEffect(() => {
         if (!places || !inputRef.current) return;
         setPlaceAutocomplete(new places.Autocomplete(inputRef.current, {
-            fields: ["geometry", "name", "formatted_address"],
+            fields: ["geometry", "name", "formatted_address", "address_components"],
         }));
     }, [places]);
 
