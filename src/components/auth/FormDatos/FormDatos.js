@@ -101,10 +101,12 @@ const FormDatos = ({telefono}) => {
 
     const claveEscrita = formValues.fdclave || '';
     const reglasClave = [
-        { txt: 'Al menos 8 caracteres',   ok: claveEscrita.length >= 8 },
-        { txt: 'Mayúsculas y minúsculas', ok: /[a-z]/.test(claveEscrita) && /[A-Z]/.test(claveEscrita) },
-        { txt: 'Un número',               ok: /[0-9]/.test(claveEscrita) },
-        { txt: 'Un símbolo (!@#$…)',      ok: /[!@#$%^&*]/.test(claveEscrita) },
+        /* Solo lo que de verdad se exige al guardar. La lista pedia ademas
+           mayusculas y un simbolo que el formulario nunca reviso: cuatro
+           condiciones para una clave asustaban sin proteger nada. */
+        { txt: 'Al menos 8 caracteres', ok: claveEscrita.length >= 8 },
+        { txt: 'Una letra',             ok: /[a-zA-Z]/.test(claveEscrita) },
+        { txt: 'Un número',             ok: /[0-9]/.test(claveEscrita) },
     ];
 
     useEffect(() => {

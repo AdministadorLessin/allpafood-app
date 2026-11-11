@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
-import platoFoto from '../../../assets/img/ingreso-plato.jpg';
+import platoFoto from '../../../assets/img/plan-plato.jpg';
 import { vibrar } from '../../../nativo';
 import './EmpezarNativo.scss';
 

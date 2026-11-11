@@ -187,12 +187,15 @@ $verde: #177A4C;
     }
 }
 .empN__planFoto{
-    position: absolute; right: -60px; top: -30px;
-    width: 230px; height: 230px; object-fit: cover; border-radius: 50%;
+    /* Mas chica y mas arriba que antes: con 230px se metia debajo del precio
+       y de "por comida". */
+    position: absolute; right: -34px; top: -38px;
+    width: 176px; height: 176px; object-fit: cover; border-radius: 50%;
+    box-shadow: 0 0 0 6px rgba(255,255,255,.06);
 }
 .empN__planVelo{
     position: absolute; inset: 0;
-    background: linear-gradient(90deg, rgba(14,23,19,.94) 0%, rgba(14,23,19,.6) 58%, rgba(14,23,19,.1) 100%);
+    background: linear-gradient(90deg, rgba(14,23,19,.9) 0%, rgba(14,23,19,.35) 62%, rgba(14,23,19,0) 100%);
 }
 .empN__planTxt{ position: relative; z-index: 1; padding: 22px 22px 0; }
 .empN__etq{
