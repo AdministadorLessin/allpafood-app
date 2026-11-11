@@ -33,6 +33,7 @@ import MenuWeek from './../../../components/dashboard/MenuWeek/MenuWeek';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
+import { avatarDeVisita, olvidarAvatarDeVisita } from '../../../visita';
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -137,7 +138,36 @@ const DashboadHome = (props) => {
 
   useEffect(() => {
     if (!helloCard || bienvenidaYaVista(token)) return;
-    if (!helloCard.profile?.image) setMostrarBienvenida(true);
+    if (helloCard.profile?.image) return;
+
+    /* Si eligio su avatar mientras miraba el app de visita, se lo ponemos a
+       su cuenta en vez de preguntarselo otra vez. */
+    const elegido = avatarDeVisita();
+    if (elegido === null) return setMostrarBienvenida(true);
+
+    const cab = { headers: { Authorization: `Bearer ${token}` } };
+    axios.get(`${API_URL}profile/data/personal`, cab)
+      .then((r) => {
+        const actual = r.data?.data ?? {};
+        return axios.put(`${API_URL}profile/data/personal`, {
+          name: actual.name,
+          lastname: actual.lastname,
+          gender: actual.gender,
+          registerDate: actual.registerDate || '2025-04-04',
+          image: String(elegido),
+        }, cab);
+      })
+      .then(() => {
+        olvidarAvatarDeVisita();
+        try {
+          const inf = JSON.parse(window.localStorage.getItem('inf')) || {};
+          if (inf.profile) inf.profile.image = String(elegido);
+          handleUpdateToken(token, inf);
+          setHelloCard(inf);
+        } catch (e) { /* se vera en la proxima carga */ }
+      })
+      .catch(() => setMostrarBienvenida(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [helloCard, token]);
   // Marca que /dashboard/plan ya respondio. Sin esto el efecto de redireccion
   // corre al montar con el planActive viejo de localStorage y saca al cliente

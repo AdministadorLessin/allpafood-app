@@ -1,0 +1,123 @@
+/* El modo visita. Las pantallas se arman con las piezas del Inicio (.inN) y
+   de Mi cuenta (.cuN); aqui va solo lo propio: el aviso de que es un ejemplo,
+   los platos para probar, los candados y el boton de comprar. */
+
+$tinta: #16211B;
+$muted: #55655C;
+$menta: #3CFB9F;
+$menta2: #12C97B;
+$verde: #177A4C;
+
+/* Sitio para el boton de comprar, que va fijo encima de la barra de abajo. */
+.vis .mainLayoutBox{ padding-bottom: 170px !important; }
+
+.vis__ava{
+    position: relative;
+    span{ display: flex; align-items: center; justify-content: center; background: #EAFBF3; color: $verde;
+          svg{ width: 24px; height: 24px; } }
+    i{
+        position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%;
+        border: 2px solid #fff; box-sizing: border-box; background: $tinta; color: $menta;
+        font-style: normal; font-size: 15px; font-weight: 700; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+}
+
+.vis__aviso{
+    display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 12px;
+    border-radius: 14px; background: #FFF1DE; color: #6B4A1E; font-size: 12.5px; line-height: 1.35;
+    svg{ width: 15px; height: 15px; flex: 0 0 auto; }
+}
+
+.vis__hoyNota{ position: relative; margin: 14px 0 0; font-size: 12.5px; line-height: 1.45; color: rgba(255,255,255,.7); }
+
+.vis__platos{ margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.vis__vacio{ margin: 0; padding: 18px 12px; border-radius: 18px; background: #F6F9F7; text-align: center;
+             font-size: 13px; color: $muted; }
+.vis__plato{
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px 10px 10px;
+    border-radius: 22px; border: 2px solid #F6F9F7; background: #F6F9F7; box-sizing: border-box;
+    font: inherit; color: $tinta; text-align: left; cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .12s ease;
+    &:active{ transform: scale(.985); }
+    &.is-on{ background: #fff; border-color: $tinta; box-shadow: 0 14px 30px rgba(22,33,27,.16); }
+}
+.vis__platoIco{
+    width: 60px; height: 60px; border-radius: 16px; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 24px; height: 24px; }
+    &--0{ background: linear-gradient(135deg, #DDF7E9, #B9EED2); color: $verde; }
+    &--1{ background: linear-gradient(135deg, #FFEBD2, #FFD3A6); color: #C26A12; }
+    &--2{ background: linear-gradient(135deg, #E2EEFB, #C5DCF5); color: #2A5F9E; }
+}
+.vis__platoTxt{ flex: 1; min-width: 0; b{ display: block; font-size: 14px; line-height: 1.3; } }
+.vis__chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.vis__chip{
+    font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
+    &--crema{ background: #FFF1DE; color: #8A4B0F; }
+    &--cielo{ background: #E4EFFA; color: #2A5F9E; }
+}
+.vis__radio{
+    width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto; box-sizing: border-box;
+    border: 2px solid #C9D3CD; background: #fff; color: $tinta;
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 14px; height: 14px; }
+    .is-on &{ border: 0; background: $menta; }
+}
+.vis__nota{ margin: 12px 2px 0; font-size: 12.5px; line-height: 1.45; color: $muted; }
+
+.vis__plan{
+    margin-top: 16px;
+    .inN__chip{ background: #F2F5F3; color: $muted; }
+    b{ display: block; margin-top: 12px; font-size: 20px; line-height: 1.2; letter-spacing: -.025em; }
+    p{ margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: $muted; }
+}
+.vis__btnTinta{
+    margin-top: 14px; width: 100%; height: 48px; border: 0; border-radius: 16px;
+    background: $tinta; color: #fff; font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    transition: transform .12s ease;
+    &:active{ transform: scale(.97); }
+}
+
+.vis__sinPlan{
+    display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600;
+    background: #F2F5F3; color: $muted; padding: 5px 12px; border-radius: 999px;
+}
+.vis__candado{
+    display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
+    font-size: 11.5px; font-weight: 600; color: $muted; background: #F2F5F3;
+    padding: 4px 9px; border-radius: 999px;
+    svg{ width: 11px; height: 11px; }
+}
+.vis__cerrada{ cursor: default; }
+.vis__entrar{
+    margin: 22px 0 0; text-align: center; font-size: 14px; color: $muted;
+    a{ color: $verde; font-weight: 600; text-decoration: none; padding: 12px 4px; }
+}
+
+/* El boton de comprar, fijo encima de la barra de abajo. Va en el body para
+   que ningun contenedor animado lo mueva (igual que .afNatPie). */
+.vis__pie{
+    position: fixed; left: 0; right: 0; z-index: 80;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    padding: 22px 16px 12px;
+    background: linear-gradient(180deg, rgba(247,250,244,0) 0%, rgba(247,250,244,.96) 40%, #F7FAF4 100%);
+    pointer-events: none;
+}
+.vis__comprar{
+    pointer-events: auto;
+    display: block; width: 100%; max-width: 560px; margin: 0 auto; height: 54px; border: 0; border-radius: 18px;
+    background: $menta; color: $tinta; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 12px 28px rgba(60,251,159,.45);
+    transition: transform .12s ease;
+    &:active{ transform: scale(.97); }
+}
+
+/* La direccion de visita usa la pantalla del registro; solo cambia su nota. */
+.vis__dirOk, .vis__dirNo{
+    margin: 12px 0 0; padding: 14px; border-radius: 22px; font-size: 13px; line-height: 1.5;
+    b{ display: block; font-size: 15.5px; letter-spacing: -.01em; margin-bottom: 4px; color: $tinta; }
+    a{ color: inherit; font-weight: 600; }
+}
+.vis__dirOk{ background: #EAFBF3; color: #3D5247; }
+.vis__dirNo{ background: #FFF1DE; color: #6B4A1E; }

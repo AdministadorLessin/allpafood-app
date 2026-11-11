@@ -99,6 +99,16 @@ $curva: cubic-bezier(.2, .8, .2, 1);
                   &:disabled{ opacity: .85; } }
     }
 
+    /* La tercera puerta: entrar a mirar sin cuenta. Es un enlace y no un
+       boton mas, para no competir con los dos de arriba. */
+    &__mirar{
+        min-height: 44px; margin-top: -4px; padding: 0 12px;
+        display: inline-flex; align-items: center;
+        font-size: 15px; font-weight: 600; color: #FFFFFF;
+        text-decoration: underline; text-underline-offset: 4px;
+        text-decoration-color: rgba(255,255,255,.45);
+    }
+
     /* ---------------- Velo y hoja ---------------- */
     &__velo{
         position: absolute; inset: 0; border: 0; padding: 0;

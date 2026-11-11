@@ -19,6 +19,8 @@ import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
 import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
 import { useAuthContext } from '../../../context/authContext';
 import { esNativo } from '../../../nativo';
+import { direccionDeVisita, guardarDireccionDeVisita, olvidarDireccionDeVisita } from '../../../visita';
+import '../../visita/Visita.scss';
 import { API_URL, MAPS_KEY, MAPS_ID } from '../../../config';
 
 import './registro.scss';
@@ -36,7 +38,10 @@ import './registro.scss';
  * Las alergias y el azucar se preguntan aqui tambien, pero se pueden saltar.
  * NO es cocina personalizada: es lo que el cliente no puede comer.
  */
-const RegistroDireccionPage = () => {
+/* Con `visita`, la misma pantalla sirve a quien todavia no es cliente: marca
+   su punto, ve si llegamos y se guarda en el telefono. Cuando compra, este
+   paso lo encuentra ya marcado. */
+const RegistroDireccionPage = ({ visita = false }) => {
 
     const navigate = useNavigate();
     const { token, coverCities } = useAuthContext();
@@ -44,16 +49,21 @@ const RegistroDireccionPage = () => {
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [markerRef, marker] = useAdvancedMarkerRef();
 
-    const [centro, setCentro] = useState({ lat: -12.080827968350965, lng: -77.0281646638726 });
-    const [marcado, setMarcado] = useState(false);
-    const [enCobertura, setEnCobertura] = useState(true);
+    /* Lo que marco estando de visita, si lo hizo. */
+    const previa = useRef(direccionDeVisita()).current;
 
-    const [calleDelMapa, setCalleDelMapa] = useState(null);
+    const [centro, setCentro] = useState(previa?.lat
+        ? { lat: previa.lat, lng: previa.lng }
+        : { lat: -12.080827968350965, lng: -77.0281646638726 });
+    const [marcado, setMarcado] = useState(!!previa?.lat);
+    const [enCobertura, setEnCobertura] = useState(previa ? previa.enCobertura !== false : true);
+
+    const [calleDelMapa, setCalleDelMapa] = useState(previa?.calle || null);
 
     /* Si el cliente ya corrigio la direccion, mover el pin unos metros no se
        la puede volver a pisar. */
     const [calleTocada, setCalleTocada] = useState(false);
-    const [distrito, setDistrito] = useState('');
+    const [distrito, setDistrito] = useState(previa?.distrito || '');
     const [distritoNoDetectado, setDistritoNoDetectado] = useState(false);
 
     const [campos, setCampos] = useState({
@@ -158,6 +168,15 @@ const RegistroDireccionPage = () => {
         const referencia = campos.referencia.trim();
 
         if (!marcado) return setError('Marca en el mapa el punto donde te entregamos.');
+
+        /* De visita no hay cuenta donde guardar: queda en el telefono. */
+        if (visita) {
+            guardarDireccionDeVisita({
+                lat: centro.lat, lng: centro.lng, calle: calleDelMapa || '',
+                distrito: distrito || campos.distrito.trim(), enCobertura,
+            });
+            return navigate('/visita/cuenta');
+        }
         if (!distritoFinal) return setError('Marca tu punto en el mapa o escribe tu distrito.');
         if (!detalle) return setError('Indica el número, piso o departamento.');
         if (!referencia) return setError('Una referencia ayuda al repartidor a encontrarte.');
@@ -198,6 +217,7 @@ const RegistroDireccionPage = () => {
             );
 
         }).then(() => {
+            olvidarDireccionDeVisita();
             navigate(enAltaApp ? '/registro/cocina' : '/menu', { replace: true });
         }).catch((err) => {
             setGuardando(false);
@@ -212,9 +232,12 @@ const RegistroDireccionPage = () => {
     return (
         /* Despues del pago no hay a donde volver: el plan ya esta activo y lo
            unico que falta es la direccion. */
-        <MarcoAuth fase="direccion" paso={0} sinVolver>
+        <MarcoAuth fase={visita ? 'visita' : 'direccion'} paso={0} sinVolver={!visita}
+                   volver={visita ? () => navigate('/visita/cuenta') : undefined}>
 
-            {esNativo ?
+            {visita ?
+                <h1 className="afAuth__titular">¿Dónde te <em>entregaríamos?</em></h1>
+            : esNativo ?
                 <h1 className="afAuth__titular">Falta lo último, <em>¿dónde te entregamos?</em></h1>
             :
                 <h1 className="afAuth__titular">
@@ -223,7 +246,9 @@ const RegistroDireccionPage = () => {
                 </h1>
             }
             <p className="afAuth__bajada">
-                Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.
+                {visita
+                    ? 'Marca tu casa u oficina. Te decimos al instante si llegamos a ese punto.'
+                    : 'Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.'}
             </p>
 
             <form id="afFormDireccion" className={guardando ? 'regStepResp disableForms' : 'regStepResp'} onSubmit={guardar}>
@@ -233,7 +258,7 @@ const RegistroDireccionPage = () => {
                         <Map
                             mapId={MAPS_ID}
                             className={'rsrMapUbiPageMapApiStyle'}
-                            defaultZoom={11}
+                            defaultZoom={previa?.lat ? 16 : 11}
                             defaultCenter={centro}
                             gestureHandling={"cooperative"}
                             disableDefaultUI={true}
@@ -275,7 +300,7 @@ const RegistroDireccionPage = () => {
 
                     {/* Aqui el cliente ya pago, asi que no basta con decirle
                         que no llegamos: hay que darle la salida. */}
-                    {!enCobertura &&
+                    {!enCobertura && !visita &&
                         <div className="rsrMapNotCobertura">
                             <p>
                                 Todavía no llegamos a ese punto. Marca otro dentro de la zona
@@ -310,6 +335,20 @@ const RegistroDireccionPage = () => {
                     </div>
                 }
 
+                {visita && marcado && (enCobertura
+                    ? <p className="vis__dirOk">
+                        <b>Sí llegamos a este punto</b>
+                        De lunes a viernes, entre las 10:30 y la 1:30 p.m. Guardamos esta dirección
+                        para cuando actives tu plan, así no la marcas otra vez.
+                      </p>
+                    : <p className="vis__dirNo">
+                        <b>Todavía no llegamos a ese punto</b>
+                        Prueba con otro dentro de la zona verde, o{' '}
+                        <a href="https://wa.me/51955797697?text=Hola%2C%20quiero%20Allpa%20Food%20en%20mi%20zona"
+                           target="_blank" rel="noreferrer">escríbenos</a> y te avisamos apenas abramos ahí.
+                      </p>)}
+
+                {!visita && <>
                 {(distritoNoDetectado || !distrito) &&
                     <div className="afCampo">
                         <TextField
@@ -429,6 +468,7 @@ const RegistroDireccionPage = () => {
                         las condiciones de entrega.
                     </span>
                 </label>
+                </>}
 
                 {error &&
                     <div className="regErrorField">
@@ -439,12 +479,13 @@ const RegistroDireccionPage = () => {
                 {esNativo
                     ? <Accion>
                         <button type="submit" form="afFormDireccion" className="afBtn afBtn--mint">
-                            {guardando ? 'Guardando…' : (enAltaApp ? 'Continuar' : 'Guardar y entrar')}
+                            {visita ? 'Guardar esta dirección'
+                                : guardando ? 'Guardando…' : (enAltaApp ? 'Continuar' : 'Guardar y entrar')}
                         </button>
                       </Accion>
                     : <div className="btnBox">
                         <button type="submit" className="btnPrimary btnIcon btnIconRight">
-                            <span>{guardando ? 'Guardando…' : 'Terminar'}</span>
+                            <span>{visita ? 'Guardar esta dirección' : guardando ? 'Guardando…' : 'Terminar'}</span>
                         </button>
                       </div>
                 }

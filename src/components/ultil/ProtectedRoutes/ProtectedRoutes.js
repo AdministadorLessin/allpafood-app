@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from '../../../config';
 import { cerrarSesionPorVencimiento } from '../sesion';
 import { useAuthContext } from '../../../context/authContext';
+import { esNativo } from '../../../nativo';
+import { esVisita, salirDeVisita } from '../../../visita';
 
 /* Pantallas de plata. Al colaborador de una empresa no le corresponde ninguna:
    su almuerzo lo paga su empleador y no hay nada que comprar ni renovar. */
@@ -55,9 +57,13 @@ const ProtectedRoutes = ({
     },[]);
 
     if(!loadApp){
-        
-        return <Navigate to={redirectPath} replace />
+        /* Quien entro a mirar sin cuenta vuelve a su visita, no a la
+           bienvenida: asi al reabrir el app sigue donde estaba. */
+        return <Navigate to={esNativo && esVisita() ? '/visita' : redirectPath} replace />
     }
+
+    /* Ya tiene cuenta: la visita se termina. */
+    salirDeVisita();
 
     /* Esconder el enlace no alcanza: la direccion se escribe a mano y ahi
        estaria el checkout. Se corta aqui y se le manda a lo suyo, elegir. */

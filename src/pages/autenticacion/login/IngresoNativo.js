@@ -173,6 +173,10 @@ export default function IngresoNativo({
                 style={{ animationDelay: '.4s' }}>
             Soy nuevo, ver planes
           </Link>
+          {/* Mirar el app por dentro sin registrarse. */}
+          <Link to="/visita" className="afIngreso__entra afIngreso__mirar" style={{ animationDelay: '.46s' }}>
+            Mirar el menú de la semana
+          </Link>
         </div>
       </div>
 

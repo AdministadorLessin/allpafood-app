@@ -26,7 +26,7 @@ import {
  * En la web el inicio sigue siendo el de siempre (home/index.js).
  */
 
-const Ico = ({ d, w = 2 }) => (
+export const Ico = ({ d, w = 2 }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w}
        strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {[].concat(d).map((x) => <path key={x} d={x} />)}
@@ -79,7 +79,7 @@ const OllaCocinando = () => (
   </svg>
 );
 
-const MotoEnCamino = () => (
+export const MotoEnCamino = () => (
   <svg className="inN__anim" viewBox="0 0 72 72" role="img" aria-label="Tu almuerzo va en camino">
     <g className="inN__viento">
       <path d="M4 30h12M8 38h10M2 46h12" />

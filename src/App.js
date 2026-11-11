@@ -17,6 +17,7 @@ import UbicacionesPage from './pages/dashboard/ubicaciones/ubicaciones';
 import LoginPage from './pages/autenticacion/login/login';
 import RegistroPage from './pages/autenticacion/registro/registro';
 import EmpezarPage from './pages/autenticacion/empezar/empezar';
+import { VisitaInicio, VisitaCuenta } from './pages/visita/Visita';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
@@ -79,6 +80,13 @@ function App() {
                       de pedir un solo dato de cuenta. Va fuera del area
                       protegida: quien todavia no existe tiene que poder verla. */}
                   <Route path='/empezar' element={ <EmpezarPage /> } />
+
+                  {/* El app por dentro para quien todavia no es cliente: mira
+                      el menu, elige su avatar y prueba su direccion sin crear
+                      una cuenta. La direccion usa la pantalla del registro. */}
+                  <Route path='/visita' element={ <VisitaInicio /> } />
+                  <Route path='/visita/cuenta' element={ <VisitaCuenta /> } />
+                  <Route path='/visita/direccion' element={ <RegistroDireccionPage visita /> } />
 
                   {/* Cualquier otra direccion. Sin esto, una URL que no existe
                       —un enlace de WhatsApp que llego con un caracter de mas,
