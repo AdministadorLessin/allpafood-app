@@ -89,9 +89,9 @@ const RegistroDireccionPage = ({ visita = false }) => {
     const [distritoNoDetectado, setDistritoNoDetectado] = useState(false);
 
     const [campos, setCampos] = useState({
-        distrito: '',
-        detalle: '',
-        referencia: '',
+        distrito: previa?.distrito || '',
+        detalle: previa?.detalle || '',
+        referencia: previa?.referencia || '',
         alergias: ''
     });
     const [azucar, setAzucar] = useState(true);
@@ -210,6 +210,7 @@ const RegistroDireccionPage = ({ visita = false }) => {
             guardarDireccionDeVisita({
                 lat: centro.lat, lng: centro.lng, calle: calleDelMapa || '',
                 distrito: distrito || campos.distrito.trim(), enCobertura,
+                detalle: campos.detalle.trim(), referencia: campos.referencia.trim(),
             });
             return navigate('/visita/cuenta');
         }
@@ -284,7 +285,9 @@ const RegistroDireccionPage = ({ visita = false }) => {
             <p className="afAuth__bajada">
                 {visita
                     ? 'Marca tu casa u oficina. Te decimos al instante si llegamos a ese punto.'
-                    : 'Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.'}
+                    : previa?.lat
+                        ? 'Es la dirección que marcaste cuando mirabas el app. Revísala y confirma.'
+                        : 'Marca el punto en el mapa. Es la dirección a la que llegará tu almuerzo.'}
             </p>
 
             <form id="afFormDireccion" className={guardando ? 'regStepResp disableForms' : 'regStepResp'} onSubmit={guardar}>
@@ -383,6 +386,21 @@ const RegistroDireccionPage = ({ visita = false }) => {
                         </small>
                     </div>
                 }
+
+                {/* De visita son opcionales: quien los deja escritos encuentra
+                    el paso de la direccion completo cuando compra. */}
+                {visita && marcado && enCobertura && <>
+                    <div className="afCampo">
+                        <TextField id="detalle" name="detalle" variant="filled"
+                                   label={'Número, piso o departamento (opcional)'}
+                                   onChange={cambiar} value={campos.detalle} />
+                    </div>
+                    <div className="afCampo">
+                        <TextField id="referencia" name="referencia" variant="filled"
+                                   label={'Referencia (opcional)'} placeholder="Frente al parque, portón verde…"
+                                   onChange={cambiar} value={campos.referencia} />
+                    </div>
+                </>}
 
                 {!visita && <>
                 {(distritoNoDetectado || !distrito) &&

@@ -180,6 +180,13 @@ export default function EmpezarNativo(p) {
       <MarcoAuth fase="empezar" paso={1} volver={volver}>
         <Paso id="objetivo" dir={dir}>
           <h1 className="empN__h">Tres preguntas y te decimos <em>tu plan</em></h1>
+          {/* Viene de marcar su direccion de visita: se le dice que ya la
+              tenemos, para que entienda por que no se la pedimos. */}
+          {p.direccionPrevia &&
+            <p className="empN__yaDir">
+              <b>Ya sabemos dónde llevártelo.</b>{' '}
+              {[p.direccionPrevia.calle, p.direccionPrevia.distrito].filter(Boolean).join(' · ')}
+            </p>}
 
           <p className="empN__q">¿Qué quieres lograr?</p>
           <div className="empN__metas">

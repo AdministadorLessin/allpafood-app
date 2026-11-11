@@ -11,6 +11,7 @@ import { API_URL } from '../../../config';
 import { REPARTO } from './../../../components/dashboard/PedidoDeHoy/PedidoDeHoy';
 import { esNativo } from '../../../nativo';
 import EmpezarNativo from './EmpezarNativo';
+import { direccionDeVisita } from '../../../visita';
 import './empezar.scss';
 
 /* Los distritos a los que se reparte hoy, tomados de las direcciones activas.
@@ -35,12 +36,26 @@ const OBJETIVOS = [
 
 const soloDigitos = (v) => (v || '').replace(/\D/g, '');
 
+/* Quien ya marco su direccion mirando el app de visita, y el mapa le dijo que
+   llegamos, no tiene por que elegir su distrito otra vez: se toma de ahi. El
+   mapa es mas exacto que la lista, asi que su palabra vale aunque el nombre
+   no este entre los dieciseis. */
+const sinTildes = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const distritoDeLaVisita = () => {
+  const d = direccionDeVisita();
+  if (!d?.lat || d.enCobertura === false || !d.distrito) return null;
+  const buscado = sinTildes(d.distrito);
+  const deLaLista = DISTRITOS.find((n) => sinTildes(n) === buscado || sinTildes(n).endsWith(buscado));
+  return { distrito: deLaLista || d.distrito, calle: d.calle || '' };
+};
+
 export default function EmpezarPage() {
 
   const navigate = useNavigate();
 
-  const [paso, setPaso] = useState(0);
-  const [distrito, setDistrito] = useState('');
+  const previa = useState(distritoDeLaVisita)[0];
+  const [paso, setPaso] = useState(previa ? 1 : 0);
+  const [distrito, setDistrito] = useState(previa?.distrito || '');
   const [fuera, setFuera] = useState(false);
 
   const [objetivo, setObjetivo] = useState('');
@@ -155,6 +170,7 @@ export default function EmpezarPage() {
         plan={plan} esRecomendado={esRecomendado} recomendado={recomendado}
         porComida={porComida} alternativas={alternativas} setMirando={setMirando}
         semana={semana} continuar={continuar}
+        direccionPrevia={previa}
       />
     );
   }

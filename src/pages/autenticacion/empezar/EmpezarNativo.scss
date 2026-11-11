@@ -281,3 +281,10 @@ $verde: #177A4C;
     span{ display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: $tinta; }
     svg{ width: 16px; height: 16px; color: $verde; flex: 0 0 auto; }
 }
+
+/* La direccion que ya marco estando de visita. */
+.empN__yaDir{
+    margin: 12px 0 0; padding: 10px 14px; border-radius: 16px;
+    background: #EAFBF3; color: #3D5247; font-size: 13px; line-height: 1.45;
+    b{ color: #16211B; }
+}
