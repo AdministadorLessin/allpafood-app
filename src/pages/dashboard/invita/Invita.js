@@ -15,10 +15,10 @@ import './Invita.scss';
  * comparte.
  */
 
-/* A donde manda el mensaje. Por ahora la ficha del App Store; cuando Android
-   salga a produccion conviene una pagina con las dos tiendas, y se cambia
-   solo esta linea. */
-const ENLACE_APP = 'https://apps.apple.com/pe/app/allpa-food-comida-saludable/id6828184246';
+/* A donde manda el mensaje: una pagina de la web que muestra el codigo y lleva
+   a la tienda del telefono que la abre (pages/invitacion). Un solo enlace
+   para iPhone y Android. */
+const enlaceDe = (codigo) => `https://app.allpafood.com/i/${codigo}`;
 
 const Ico = ({ d, w = 2 }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w}
@@ -50,7 +50,7 @@ export default function InvitaPage() {
   }, [token]);
 
   const mensaje = datos
-    ? `Te invito a Allpa Food: almuerzos saludables que te llegan a la oficina. Baja el app y, al pagar tu primer plan, pon mi código ${datos.codigo}: te regalan ${entregas(datos.regaloAmigo)}. ${ENLACE_APP}`
+    ? `Te invito a Allpa Food: almuerzos saludables que te llegan a la oficina. Baja el app y, al pagar tu primer plan, pon mi código ${datos.codigo}: te regalan ${entregas(datos.regaloAmigo)}. ${enlaceDe(datos.codigo)}`
     : '';
 
   const compartir = () => {

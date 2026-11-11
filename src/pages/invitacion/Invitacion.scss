@@ -1,0 +1,52 @@
+/* La pagina a la que llega el enlace de una invitacion. */
+$tinta: #16211B;
+$muted: #55655C;
+$menta: #3CFB9F;
+$verde: #177A4C;
+
+.invP{
+    min-height: 100vh; min-height: 100dvh; box-sizing: border-box; padding: 40px 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #F7FAF4 0%, #E8F6ED 100%); color: $tinta;
+    font-family: 'Poppins', system-ui, sans-serif;
+}
+.invP__col{ width: 100%; max-width: 420px; }
+.invP__marca{ margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: $verde; }
+.invP__espera{ margin: 24px 0 0; color: $muted; }
+.invP__h{
+    margin: 14px 0 0; font-size: 34px; line-height: 1.08; font-weight: 700; letter-spacing: -.04em;
+    em{
+        font-style: normal;
+        background: linear-gradient(90deg, #12B36E, #0B7A4A);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+}
+.invP__bajada{ margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: $muted; b{ color: $tinta; } }
+.invP__codigo{
+    margin-top: 22px; padding: 18px; border-radius: 26px; background: $tinta; color: #fff;
+    box-shadow: 0 22px 44px rgba(22,33,27,.28);
+    span{ display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $menta; }
+    div{
+        margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 10px 10px 10px 16px; border-radius: 18px;
+        background: rgba(255,255,255,.06); border: 1.5px dashed rgba(60,251,159,.55);
+    }
+    b{ font-size: 26px; line-height: 1.1; letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
+    button{
+        flex: 0 0 auto; height: 44px; padding: 0 14px; border: 0; border-radius: 13px;
+        background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    small{ display: block; margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.72); }
+}
+.invP__botones{ margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.invP__btn{
+    height: 56px; border-radius: 18px; background: $menta; color: $tinta;
+    font-size: 16px; font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 28px rgba(60,251,159,.45);
+    &--claro{ background: #fff; box-shadow: 0 8px 20px rgba(22,35,29,.08); }
+}
+.invP__pie{
+    margin: 20px 0 0; text-align: center; font-size: 14px; color: $muted;
+    a{ color: $verde; font-weight: 600; text-decoration: none; padding: 12px 4px; }
+}

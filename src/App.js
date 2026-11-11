@@ -19,6 +19,7 @@ import RegistroPage from './pages/autenticacion/registro/registro';
 import EmpezarPage from './pages/autenticacion/empezar/empezar';
 import { VisitaInicio, VisitaCuenta } from './pages/visita/Visita';
 import InvitaPage from './pages/dashboard/invita/Invita';
+import InvitacionPage from './pages/invitacion/Invitacion';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
@@ -87,6 +88,9 @@ function App() {
                   {/* El app por dentro para quien todavia no es cliente: mira
                       el menu, elige su avatar y prueba su direccion sin crear
                       una cuenta. La direccion usa la pantalla del registro. */}
+                  {/* El enlace de una invitacion: muestra el codigo y lleva a
+                      la tienda del telefono que lo abre. */}
+                  <Route path='/i/:codigo' element={ <InvitacionPage /> } />
                   <Route path='/visita' element={ <VisitaInicio /> } />
                   <Route path='/visita/cuenta' element={ <VisitaCuenta /> } />
                   <Route path='/visita/direccion' element={ <RegistroDireccionPage visita /> } />
