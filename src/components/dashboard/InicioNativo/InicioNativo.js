@@ -336,6 +336,14 @@ export default function InicioNativo({ perfil, plan, ordenes, aviso, metricas, o
               </div>}
           </div>
 
+          {/* Invita y come gratis: todo cliente tiene su codigo. */}
+          <Link to="/invita" className="inN__invita">
+            <span className="inN__invitaEt">INVITA Y COME GRATIS</span>
+            <b>Gana 1 entrega por cada amigo que compre</b>
+            <small>Tu amigo recibe 2 entregas de regalo en su primer plan.</small>
+            <span className="inN__invitaBtn">Invitar a un amigo</span>
+          </Link>
+
           <ActivarAvisos />
           <Tarjetas lugar="inicio" titulo="Para ti" />
         </>}

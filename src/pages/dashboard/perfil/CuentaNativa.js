@@ -117,6 +117,7 @@ export default function CuentaNativa({ person, nombre, telefono, plan, delivery,
         <Fila ico={I.plan} tono="mentaFuerte" titulo="Mi plan" sub={plan?.planName} a="/mi-plan" />
         <Fila ico={I.pagos} tono="gris" titulo="Mis pagos" a="/facturacion" />
         <Fila ico={I.regalo} tono="crema" titulo="Allpa+ · Tus beneficios" a="/beneficios" />
+        <Fila ico={I.chat} tono="menta" titulo="Invita y come gratis" sub="Gana entregas por cada amigo que compre" a="/invita" />
       </nav>
 
       <p className="cuN__grupo">AYUDA</p>

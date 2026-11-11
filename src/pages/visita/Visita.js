@@ -12,6 +12,7 @@ import { Ico, MotoEnCamino } from '../../components/dashboard/InicioNativo/Inici
 import {
   avatarDeVisita, guardarAvatarDeVisita, direccionDeVisita, entrarDeVisita,
 } from '../../visita';
+import { codigoGuardado, invitadoPor, guardarCodigo, olvidarCodigo, limpiarCodigo } from '../../referido';
 
 import '../../components/LayoutDashborad/LayoutDashboard.scss';
 import '../../components/TabBar/TabBar.scss';
@@ -175,6 +176,12 @@ export function VisitaInicio() {
 
         <AvisoVisita />
 
+        {codigoGuardado() &&
+          <p className="vis__invitado">
+            <b>{invitadoPor() ? `${invitadoPor()} te invitó.` : 'Tienes un código de invitación.'}</b>{' '}
+            2 entregas de regalo en tu primer plan.
+          </p>}
+
         <section className="inN__hoy">
           <span className="inN__hoyBrillo" aria-hidden="true" />
           <div className="inN__hoyCab">
@@ -287,6 +294,71 @@ const Fila = ({ ico, tono, titulo, sub, a, href, candado }) => {
   return <div className="cuN__fila vis__cerrada">{dentro}</div>;
 };
 
+/** El codigo de un amigo, escrito antes de tener cuenta. Se revisa contra el
+    servidor solo para saber de quien es; si le vale o no se decide al pagar. */
+function CodigoDeVisita() {
+  const [codigo, setCodigo] = useState(codigoGuardado());
+  const [nombre, setNombre] = useState(invitadoPor());
+  const [abierto, setAbierto] = useState(false);
+  const [texto, setTexto] = useState('');
+  const [error, setError] = useState('');
+  const [revisando, setRevisando] = useState(false);
+
+  const aplicar = () => {
+    const limpio = limpiarCodigo(texto);
+    if (!limpio) return setError('Escribe el código que te pasaron.');
+    setRevisando(true);
+    setError('');
+    axios.get(`${API_URL}public/referidos/${encodeURIComponent(limpio)}`)
+      .then((r) => {
+        const d = r.data?.data ?? {};
+        if (!d.valido) return setError('Ese código no existe. Revísalo con quien te invitó.');
+        guardarCodigo(d.codigo || limpio, d.nombre);
+        setCodigo(d.codigo || limpio);
+        setNombre(d.nombre || '');
+        setAbierto(false);
+        vibrar.exito();
+      })
+      .catch(() => setError('No pudimos revisar el código. Inténtalo de nuevo.'))
+      .finally(() => setRevisando(false));
+  };
+
+  if (codigo) {
+    return (
+      <div className="cuN__fila vis__cerrada">
+        <span className="cuN__ico cuN__ico--menta"><Ico d={I.regalo} /></span>
+        <span className="cuN__filaTxt">
+          <b>{codigo}</b>
+          <small>{nombre ? `${nombre} te invitó · ` : ''}2 entregas de regalo al comprar</small>
+        </span>
+        <button type="button" className="vis__quitar"
+                onClick={() => { olvidarCodigo(); setCodigo(''); setNombre(''); setTexto(''); }}>Quitar</button>
+      </div>
+    );
+  }
+  if (!abierto) {
+    return (
+      <button type="button" className="cuN__fila" onClick={() => { vibrar.toque(); setAbierto(true); }}>
+        <span className="cuN__ico cuN__ico--gris"><Ico d={I.regalo} /></span>
+        <span className="cuN__filaTxt"><b>Tengo un código de invitación</b><small>Gana 2 entregas en tu primer plan</small></span>
+        <span className="cuN__ir"><Ico d={I.ir} /></span>
+      </button>
+    );
+  }
+  return (
+    <div className="vis__codigo">
+      <label htmlFor="codigoVisita">Código de invitación</label>
+      <div>
+        <input id="codigoVisita" value={texto} placeholder="Ej. DIANA947" maxLength={16}
+               autoCapitalize="characters" autoCorrect="off" autoComplete="off"
+               onChange={(e) => { setTexto(e.target.value.toUpperCase()); setError(''); }} />
+        <button type="button" disabled={revisando} onClick={aplicar}>{revisando ? 'Revisando…' : 'Aplicar'}</button>
+      </div>
+      {error && <p>{error}</p>}
+    </div>
+  );
+}
+
 export function VisitaCuenta() {
   const [avatar, setAvatar] = useState(avatarDeVisita());
   const dir = direccionDeVisita();
@@ -328,6 +400,7 @@ export function VisitaCuenta() {
                 sub={dir?.calle ? `${dir.calle}${dir.enCobertura ? ' · sí llegamos' : ''}` : 'Marca tu casa u oficina y mira si llegamos'} />
           <Fila ico={I.plan} tono="mentaFuerte" titulo="Descubrir mi plan" a="/empezar"
                 sub="Tres preguntas y te decimos cuál y cuánto" />
+          <CodigoDeVisita />
           <Fila ico={I.chat} tono="menta" titulo="Escríbenos" sub="Por WhatsApp" href={`https://wa.me/${WHATSAPP}`} />
         </nav>
 
@@ -335,6 +408,7 @@ export function VisitaCuenta() {
         <nav className="cuN__lista" aria-label="Se abre con tu plan">
           <Fila ico={I.pagos} tono="gris" titulo="Mis pagos" sub="Tus comprobantes y renovaciones" candado />
           <Fila ico={I.regalo} tono="gris" titulo="Allpa+ · Tus beneficios" sub="Descuentos en gimnasios, terapia y cursos" candado />
+          <Fila ico={I.chat} tono="gris" titulo="Invita y come gratis" sub="Gana entregas por cada amigo que compre" candado />
         </nav>
 
         <p className="vis__entrar">¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link></p>

@@ -125,3 +125,10 @@
 @media (prefers-reduced-motion: reduce){
     .afPago__iso{ animation: none; }
 }
+
+/* Las entregas de regalo por el codigo de invitacion. */
+.afPago__regalo{
+    margin: 14px 0 0; padding: 12px 14px; border-radius: 16px; text-align: left;
+    background: #EAFBF3; color: #3D5247; font-size: 13px; line-height: 1.45;
+    b{ color: #16211B; }
+}

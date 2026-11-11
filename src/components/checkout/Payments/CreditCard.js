@@ -16,6 +16,7 @@ import {
     } from '@mercadopago/sdk-react';
 
 import axios from 'axios';
+import { codigoAplicado } from '../../../referido';
 
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -79,7 +80,8 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                 paymentMethodType: paymentMetod,
                 paymentMethodId: paymentMethods.results[0].id,
                 paymentToken: response.id,
-                invoiceAddress
+                invoiceAddress,
+                referralCode: codigoAplicado()
             },
             {
                 headers: {"Authorization" : `Bearer ${token}`} 

@@ -1,0 +1,45 @@
+$tinta: #16211B;
+$muted: #55655C;
+$verde: #177A4C;
+
+.codN{
+    display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box;
+    margin: 14px 0 0; padding: 12px 14px; border-radius: 18px; background: #fff;
+    font: inherit; color: $tinta; text-align: left;
+    &--cerrado{ border: 1.5px dashed #C9D3CD; cursor: pointer; }
+    &--ok{ border: 1.5px dashed #12C97B; }
+    &--abierto{ display: block; border: 1.5px solid #DCE3DF; }
+}
+.codN__ico{
+    width: 38px; height: 38px; border-radius: 12px; flex: 0 0 auto; padding: 9.5px; box-sizing: border-box;
+    background: #F2F5F3; color: $muted; display: flex;
+    svg{ width: 100%; height: 100%; }
+    .codN--ok &{ background: #EAFBF3; color: $verde; }
+}
+.codN__txt{
+    flex: 1; min-width: 0;
+    b{ display: block; font-size: 14.5px; }
+    small{ display: block; font-size: 12.5px; line-height: 1.35; color: $muted; }
+    .codN--ok & b{ letter-spacing: .04em; }
+    .codN--ok & small{ color: $verde; font-weight: 600; }
+}
+.codN__link{
+    flex: 0 0 auto; min-height: 44px; padding: 0 4px; border: 0; background: none;
+    display: inline-flex; align-items: center;
+    font: inherit; font-size: 13px; font-weight: 600; color: $verde; cursor: pointer;
+    .codN--ok &{ color: $muted; }
+}
+.codN__et{ display: block; margin: 0 2px 8px; font-size: 12.5px; font-weight: 600; color: $muted; }
+.codN__fila{ display: flex; gap: 8px; }
+.codN__campo{
+    flex: 1; min-width: 0; height: 50px; box-sizing: border-box; border-radius: 14px;
+    border: 1.5px solid #DCE3DF; background: #fff; padding: 0 14px;
+    font: inherit; font-size: 16px; font-weight: 600; letter-spacing: .04em; color: $tinta;
+    &:focus{ outline: none; border-color: $tinta; }
+}
+.codN__btn{
+    flex: 0 0 auto; height: 50px; padding: 0 18px; border: 0; border-radius: 14px;
+    background: $tinta; color: #fff; font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    &:disabled{ opacity: .6; }
+}
+.codN__error{ margin: 8px 2px 0; font-size: 12.5px; line-height: 1.4; color: #B4372B; }

@@ -122,3 +122,31 @@ $verde: #177A4C;
 }
 .vis__dirOk{ background: #EAFBF3; color: #3D5247; }
 .vis__dirNo{ background: #FFF1DE; color: #6B4A1E; }
+
+/* El codigo de invitacion, escrito de visita. */
+.vis__invitado{
+    margin: 0 0 14px; padding: 10px 14px; border-radius: 16px; background: #16211B; color: rgba(255,255,255,.85);
+    font-size: 13px; line-height: 1.4;
+    b{ color: #fff; }
+}
+.vis__quitar{
+    flex: 0 0 auto; min-height: 44px; padding: 0 4px; border: 0; background: none;
+    font: inherit; font-size: 13px; font-weight: 600; color: $muted; cursor: pointer;
+}
+.vis__codigo{
+    padding: 12px 14px; border-top: 1px solid #EEF2EF;
+    label{ display: block; margin: 0 2px 8px; font-size: 12.5px; font-weight: 600; color: $muted; }
+    div{ display: flex; gap: 8px; }
+    input{
+        flex: 1; min-width: 0; height: 50px; box-sizing: border-box; border-radius: 14px;
+        border: 1.5px solid #DCE3DF; padding: 0 14px; background: #fff;
+        font: inherit; font-size: 16px; font-weight: 600; letter-spacing: .04em; color: $tinta;
+        &:focus{ outline: none; border-color: $tinta; }
+    }
+    button{
+        flex: 0 0 auto; height: 50px; padding: 0 18px; border: 0; border-radius: 14px;
+        background: $tinta; color: #fff; font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer;
+        &:disabled{ opacity: .6; }
+    }
+    p{ margin: 8px 2px 0; font-size: 12.5px; line-height: 1.4; color: #B4372B; }
+}

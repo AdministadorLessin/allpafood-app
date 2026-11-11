@@ -21,6 +21,8 @@ import icoDiner from '../../../assets/img/ico_payment_diner.svg';
 import icoYape from '../../../assets/img/ico_payment_yape.png';
 
 import axios from 'axios';
+import { codigoAplicado } from '../../../referido';
+import CodigoInvitacion from '../../../components/checkout/CodigoInvitacion/CodigoInvitacion';
 
 import { AnimatePresence } from "motion/react"
 import * as motion from "motion/react-client"
@@ -344,6 +346,8 @@ const CheckoutPage = (props) => {
 
     // Modal
     const [showLoaderPayment, setShowLoaderPayment] = useState(false);
+    /* El codigo de invitacion que el servidor acepto, o null. */
+    const [invitacion, setInvitacion] = useState(null);
 
     // NOTA: aqui vivia un onSubmitHandler que mandaba un paymentToken falso
     // (faker) y paymentMethodId 'yape' quemado. Se pasaba como prop
@@ -429,7 +433,8 @@ const CheckoutPage = (props) => {
                     paymentMethodType: paymentMetod,
                     paymentMethodId: 'yape',
                     paymentToken: resp.data.data.token,
-                    invoiceAddress
+                    invoiceAddress,
+                    referralCode: codigoAplicado()
                 },
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
@@ -606,6 +611,10 @@ const CheckoutPage = (props) => {
                         );
                     })}
                 </section>
+
+                {/* El codigo de quien lo invito. El regalo son entregas: el
+                    total de abajo no cambia. */}
+                <CodigoInvitacion token={token} alCambiar={setInvitacion} />
 
                 <section className="pagN__total">
                     <span className="pagN__totalEt">Total a pagar</span>
@@ -1082,6 +1091,7 @@ const CheckoutPage = (props) => {
                     total={totalPayment + totalPaymentAd}
                     plan={cartItems[0]?.description}
                     adicionales={cartAdicionales.length}
+                    invitacion={invitacion}
                 />
             )}
         </Marco>

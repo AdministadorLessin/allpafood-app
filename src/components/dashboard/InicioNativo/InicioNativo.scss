@@ -284,3 +284,22 @@ $verde: #177A4C;
 @media (prefers-reduced-motion: reduce){
     .inN__hoyEstado i, .inN__det{ animation: none; }
 }
+
+/* La tarjeta para invitar, debajo del plan. */
+.inN__invita{
+    position: relative; overflow: hidden; display: block; margin-bottom: 16px; padding: 20px;
+    border-radius: 28px; background: $tinta; color: #fff; text-decoration: none;
+    box-shadow: 0 22px 44px rgba(22,33,27,.30);
+    &::before{
+        content: ''; position: absolute; right: -60px; top: -70px; width: 220px; height: 220px; border-radius: 50%;
+        background: radial-gradient(closest-side, rgba(60,251,159,.22), rgba(60,251,159,0));
+    }
+    > *{ position: relative; }
+    b{ display: block; margin-top: 10px; font-size: 21px; line-height: 1.2; letter-spacing: -.025em; }
+    small{ display: block; margin-top: 6px; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.72); }
+}
+.inN__invitaEt{ display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $menta; }
+.inN__invitaBtn{
+    margin-top: 14px; height: 48px; border-radius: 16px; background: $menta; color: $tinta;
+    font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+}

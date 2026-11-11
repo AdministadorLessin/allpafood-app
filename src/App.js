@@ -18,6 +18,7 @@ import LoginPage from './pages/autenticacion/login/login';
 import RegistroPage from './pages/autenticacion/registro/registro';
 import EmpezarPage from './pages/autenticacion/empezar/empezar';
 import { VisitaInicio, VisitaCuenta } from './pages/visita/Visita';
+import InvitaPage from './pages/dashboard/invita/Invita';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
@@ -66,6 +67,8 @@ function App() {
                     {/* Pantalla propia del plan: envios restantes, vencimiento,
                         creditos y compras. Antes no existia en ningun lado. */}
                     <Route path='/mi-plan' element={ <MiPlanPage /> } />
+                    {/* Invita y come gratis: el codigo del cliente y su escalera. */}
+                    <Route path='/invita' element={ <InvitaPage /> } />
                     <Route path='/registro/perfil' element={ <RegistroPageProfile /> } />
                     <Route path='/registro/direccion' element={ <RegistroDireccionPage /> } />
                     <Route path='/registro/cocina' element={ <RegistroCocinaPage /> } />

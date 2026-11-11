@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { olvidarCodigo } from '../../../referido';
 import { useNavigate } from "react-router-dom";
 
 import './PagoListo.scss';
@@ -19,12 +20,14 @@ const MS_ACTIVANDO = 3600;
  * segundos, y al llegar al panel nadie le decia que lo siguiente —lo unico
  * que tiene que hacer para comer el lunes— es elegir sus almuerzos.
  */
-const PagoListo = ({ total, plan, adicionales = 0 }) => {
+const PagoListo = ({ total, plan, adicionales = 0, invitacion = null }) => {
 
   const navigate = useNavigate();
   const [listo, setListo] = useState(false);
 
   useEffect(() => {
+    /* El codigo ya viajo con el pago: no tiene que quedar para otra compra. */
+    olvidarCodigo();
     const t = setTimeout(() => { setListo(true); vibrar.exito(); }, MS_ACTIVANDO);
     return () => clearTimeout(t);
   }, []);
@@ -80,6 +83,13 @@ const PagoListo = ({ total, plan, adicionales = 0 }) => {
                 caia en el panel sin saber que sin elegir sus platos no come
                 el lunes. Ahora primero la direccion: sin ella el pedido no
                 tiene a donde ir, y es lo unico que no se puede saltar. */}
+            {invitacion &&
+              <p className="afPago__regalo">
+                <b>+{invitacion.regalo} entregas de regalo</b>
+                {invitacion.nombre ? ` por la invitación de ${invitacion.nombre}.` : ' por tu código de invitación.'}
+                {' '}Ya están sumadas a tu plan.
+              </p>}
+
             <p className="afPago__sig">
               Falta lo último: dinos a dónde te llevamos el almuerzo.
             </p>
