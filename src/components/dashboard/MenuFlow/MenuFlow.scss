@@ -407,3 +407,9 @@
 
     .afBtn{ height: 56px; border-radius: 18px; font-size: 16px; }
 }
+
+/* Mi menu cuando todavia no hay plan: que es esta pantalla y como empezar. */
+.afMenu__sinPlan{
+    .afMenu__ayuda{ margin-top: 10px; }
+    .afBtn{ margin-top: 20px; width: 100%; }
+}

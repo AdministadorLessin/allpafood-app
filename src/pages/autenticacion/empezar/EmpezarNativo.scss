@@ -187,15 +187,19 @@ $verde: #177A4C;
     }
 }
 .empN__planFoto{
-    /* Mas chica y mas arriba que antes: con 230px se metia debajo del precio
-       y de "por comida". */
-    position: absolute; right: -34px; top: -38px;
-    width: 176px; height: 176px; object-fit: cover; border-radius: 50%;
-    box-shadow: 0 0 0 6px rgba(255,255,255,.06);
+    /* La foto va de fondo, a todo el ancho de la tarjeta, oscurecida para que
+       el precio se lea encima. Se dibuja ya desenfocada (blur fijo sobre la
+       imagen, no backdrop-filter): un desenfoque en vivo cuesta cuadros en el
+       iPhone. Se agranda un poco para que el borde borroso quede fuera. */
+    position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px);
+    object-fit: cover; object-position: center;
+    filter: blur(7px) saturate(1.1);
 }
 .empN__planVelo{
     position: absolute; inset: 0;
-    background: linear-gradient(90deg, rgba(14,23,19,.9) 0%, rgba(14,23,19,.35) 62%, rgba(14,23,19,0) 100%);
+    background:
+        linear-gradient(180deg, rgba(10,18,14,.50) 0%, rgba(10,18,14,.74) 55%, rgba(10,18,14,.90) 100%),
+        linear-gradient(90deg, rgba(10,18,14,.55) 0%, rgba(10,18,14,0) 100%);
 }
 .empN__planTxt{ position: relative; z-index: 1; padding: 22px 22px 0; }
 .empN__etq{
