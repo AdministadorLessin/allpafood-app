@@ -109,3 +109,5 @@
     &--baja{ i:nth-child(2){ height: 46px; width: 60%; } } }
 @keyframes iniNLate{ 0%, 100%{ opacity: 1; } 50%{ opacity: .55; } }
 @media (prefers-reduced-motion: reduce){ .iniN__espera{ animation: none; } }
+
+.iniN__platoFoto{ width: 76px; height: 76px; flex: 0 0 auto; border-radius: 22px; object-fit: cover; display: block; background: var(--n-menta-suave); }

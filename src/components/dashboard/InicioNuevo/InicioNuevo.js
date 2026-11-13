@@ -98,6 +98,7 @@ export default function InicioNuevo({ perfil, plan, ordenes, aviso, objetivo, ca
   const delicado = !!pedido && (estadoHoy === 'F' || estadoHoy === 'X' || !!aviso
     || (estadoHoy !== 'C' && horas > REPARTO.horaCierre - REPARTO.margenGracia));
   const platos = (pedido?.items || []).map((i) => i?.menu?.name).filter(Boolean);
+  const fotoHoy = (pedido?.items || []).map((i) => i?.menu?.imageUrl).find(Boolean) || null;
   const paso = estadoHoy === 'C' ? 2 : estadoHoy === 'I' ? 1 : 0;
 
   /* --- La semana y lo que falta elegir --- */
@@ -205,7 +206,10 @@ export default function InicioNuevo({ perfil, plan, ordenes, aviso, objetivo, ca
             <span className="iniN__chip">{estadoHoy === 'C' ? 'Entregado' : `Llega antes de la ${REPARTO.hasta}`}</span>
           </div>
           <div className="iniN__plato">
-            <span className="iniN__platoIc"><Ico d={PLATO} /></span>
+            {/* La foto del plato, si el menu la trae; si no, el dibujo. */}
+            {fotoHoy
+              ? <img className="iniN__platoFoto" src={fotoHoy} alt="" />
+              : <span className="iniN__platoIc"><Ico d={PLATO} /></span>}
             <span>
               <b>{platos[0] || 'Tu almuerzo de hoy'}</b>
               {platos.length > 1 && <small>Con {platos.slice(1).join(', ').toLowerCase()}</small>}
