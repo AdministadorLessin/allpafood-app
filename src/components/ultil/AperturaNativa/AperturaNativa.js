@@ -1,62 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { useReducedMotion } from 'motion/react';
 import './AperturaNativa.scss';
 
 /*
- * La apertura del app instalado: una sola, igual para todos.
+ * La apertura del app instalado, como la de la mayoria de apps: el fondo es
+ * el mismo color claro del app y el isotipo esta al centro desde el primer
+ * instante (lo pone el telefono mientras el app carga). Cuando el app esta
+ * listo, ese mismo isotipo da un saltito, guiña y se va, dejando ver la
+ * pantalla que toque. Menos de dos segundos.
  *
- * Android pone el fondo verde de la marca (sin icono) y aqui sigue sin corte:
- * se traza la sonrisa, brotan las hojas, se llenan de color y aparece
- * "Allpa Food" letra a letra. Luego se desvanece sobre la pantalla que toque,
- * el inicio o el ingreso.
- *
- * Antes eran dos: Android mostraba su icono en un circulo y despues el ingreso
- * volvia a dibujar el logo. El logo aparecia dos veces.
+ * El telefono muestra ese mismo fondo claro mientras el app carga, asi que no
+ * hay corte entre uno y otro.
  *
  * Una sola vez por arranque: volver al app desde segundo plano no la repite.
  */
+const HOJAS = 'M143.93 105.199C146.554 98.1537 148.952 91.0695 151.803 84.153C158.927 66.8568 168.734 51.2773 182.094 38.0363C200.011 20.2763 221.343 8.87054 245.96 3.47349C256.725 1.11536 267.608 -0.0192943 278.629 0.0300389C279.803 0.0300389 280.336 0.316159 280.356 1.55936C280.642 17.5532 279.438 33.3694 274.672 48.7515C269.887 64.2224 261.915 77.9765 251.663 90.4084C236.518 108.77 218.334 123.166 196.242 132.381C180.643 138.893 164.393 142.149 147.481 142.198C138 142.228 128.547 142.041 119.174 140.373C98.3555 136.673 79.5299 128.405 62.6974 115.677C44.6316 102.002 30.0388 85.3468 19.8663 64.9821C13.6109 52.4613 9.88132 39.2006 8.72693 25.2788C8.08559 17.5137 8.05598 9.70919 7.69091 1.91454C7.62184 0.385211 8.16452 0.000410067 9.64452 0.000410067C31.6274 -0.0489231 52.6236 4.35162 72.426 13.9617C85.8939 20.5033 97.6846 29.4129 108.074 40.1873C123.969 56.6646 134.221 76.4077 141.463 97.8973C142.272 100.305 143.061 102.722 143.87 105.139C143.88 105.169 143.959 105.179 143.93 105.169V105.199Z';
+const SONRISA = 'M63.0724 160.294C70.1369 182.158 82.2432 200.047 102.174 211.788C115.602 219.691 130.136 223.786 145.923 223.352C164.63 222.839 181.196 216.583 195.631 204.99C210.075 193.387 219.39 178.182 224.866 160.373C225.379 160.58 225.852 160.738 226.296 160.945C246.247 170.309 266.197 179.662 286.137 189.036C288.288 190.042 288.318 190.062 287.519 192.41C281.135 211.166 271.397 228.009 258.195 242.769C248.615 253.475 237.83 262.799 225.625 270.485C206.81 282.344 186.435 289.863 164.363 292.537C133.283 296.306 103.466 291.974 75.3267 277.835C63.9308 272.113 53.4425 265.019 43.8324 256.612C28.6773 243.371 16.4426 227.88 7.7205 209.716C5.00718 204.062 2.82665 198.142 0.507991 192.301C-0.37014 190.091 -0.241882 190.032 1.94851 188.996C18.5541 181.201 35.1695 173.417 51.775 165.622C55.4849 163.876 59.1948 162.129 63.0724 160.304V160.294Z';
 
-const HOJAS = 'M47.1079 34.4313C47.9669 32.1255 48.7516 29.8069 49.6849 27.5431C52.0164 21.8821 55.2264 16.783 59.5989 12.4492C65.4634 6.63641 72.4452 2.90331 80.5024 1.13687C84.0256 0.365055 87.5876 -0.00631499 91.1947 0.00983168C91.579 0.00983168 91.7534 0.103478 91.7599 0.510374C91.8535 5.74512 91.4595 10.9218 89.8998 15.9563C88.3335 21.0199 85.7242 25.5216 82.3689 29.5905C77.4152 35.6003 71.4603 40.3119 64.2298 43.3281C59.1242 45.4595 53.8055 46.5251 48.2704 46.5413C45.167 46.551 42.0733 46.4896 39.0055 45.9439C32.1916 44.7329 26.03 42.0267 20.5208 37.8608C14.6078 33.385 9.83166 27.9339 6.50221 21.2685C4.45481 17.1705 3.23413 12.8303 2.8563 8.2737C2.64639 5.73221 2.6367 3.1778 2.51722 0.626626C2.49461 0.126079 2.67223 0.000134214 3.15663 0.000134214C10.3516 -0.0160125 17.2236 1.42428 23.7049 4.56965C28.1129 6.7107 31.972 9.62679 35.3725 13.1532C40.5749 18.5462 43.9302 25.0081 46.3005 32.0416C46.5653 32.8296 46.8237 33.6207 47.0885 34.4119C47.0917 34.4216 47.1176 34.4248 47.1079 34.4216V34.4313Z';
-const SONRISA = 'M20.6435 52.4639C22.9557 59.6201 26.9181 65.4749 33.4413 69.3178C37.8364 71.9045 42.5933 73.2446 47.7602 73.1025C53.883 72.9346 59.3051 70.8872 64.0296 67.0927C68.7573 63.295 71.8058 58.3187 73.5981 52.4897C73.766 52.5575 73.921 52.6092 74.0663 52.677C80.5961 55.7416 87.1258 58.8031 93.6523 61.8709C94.353 62.2003 94.3659 62.2068 94.1044 62.9753C92.015 69.1143 88.8276 74.6268 84.5068 79.4579C81.3711 82.9617 77.8414 86.0134 73.8468 88.5291C67.6884 92.4107 61.0198 94.8715 53.7958 95.7466C43.6234 96.9802 33.8644 95.5626 24.6543 90.9349C20.9244 89.0619 17.4916 86.74 14.3463 83.9886C9.38601 79.6549 5.38164 74.5848 2.52691 68.6396C1.63884 66.7892 0.925158 64.8516 0.166265 62.9398C-0.121146 62.2165 -0.0791675 62.1971 0.637745 61.858C6.07271 59.3068 11.5109 56.7589 16.9459 54.2077C18.1601 53.6361 19.3743 53.0645 20.6435 52.4671V52.4639Z';
-
+const DURA = 1.9;               // segundos, de principio a fin
 let yaSeVio = false;
 
-const Nombre = ({ texto, desde }) => (
-  <span>
-    {texto.split('').map((letra, i) => (
-      <span key={i} className="afApertura__letra"
-            style={{ animationDelay: `${(desde + i * 0.06).toFixed(2)}s` }}>{letra}</span>
-    ))}
-  </span>
-);
-
 export default function AperturaNativa() {
-  const [fase, setFase] = useState(() => (yaSeVio ? 'fin' : 'dibuja'));
+  const quieto = useReducedMotion();
+  const [fuera, setFuera] = useState(yaSeVio);
 
   useEffect(() => {
-    if (fase === 'fin') return undefined;
+    if (fuera) return undefined;
     yaSeVio = true;
-    /* El fondo de Android y el nuestro son el mismo verde: se cambia sin que
-       se note. */
+    /* El fondo nativo y el nuestro son el mismo: se cambia sin que se note. */
     SplashScreen.hide({ fadeOutDuration: 0 }).catch(() => {});
-    const sale = setTimeout(() => setFase('sale'), 2600);
-    const fin = setTimeout(() => setFase('fin'), 3150);
-    return () => { clearTimeout(sale); clearTimeout(fin); };
+    const fin = setTimeout(() => setFuera(true), (quieto ? 0.7 : DURA) * 1000);
+    return () => clearTimeout(fin);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (fase === 'fin') return null;
+  if (fuera) return null;
 
+  /* Todo el movimiento va en la hoja de estilos (AperturaNativa.scss): corre
+     aunque el telefono este ocupado arrancando el app, que es justo cuando
+     esto se ve. */
   return (
-    <div className={`afApertura${fase === 'sale' ? ' afApertura--sale' : ''}`} aria-hidden="true">
-      <div className="afApertura__aura" />
-      <svg className="afApertura__iso" viewBox="0 0 94 97">
-        <path className="afApertura__traza afApertura__traza--b" pathLength="1" d={SONRISA} />
-        <path className="afApertura__traza afApertura__traza--a" pathLength="1" d={HOJAS} />
-      </svg>
-      <div className="afApertura__nombre">
-        <Nombre texto="Allpa" desde={1.45} />
-        <Nombre texto="Food" desde={1.79} />
+    <div className="afApertura" aria-hidden="true">
+      {/* Arranca ya dibujado y en el mismo sitio que el isotipo que puso el
+          telefono: lo que se ve es que ese dibujo cobra vida. Un saltito, el
+          guiño, y se va creciendo. */}
+      <div className="afApertura__iso">
+        <svg viewBox="0 0 288 294" width="96" height="98" style={{ overflow: 'visible' }}>
+          <defs>
+            <clipPath id="afApIzq"><rect x="-20" y="-20" width="164" height="190" /></clipPath>
+            <clipPath id="afApDer"><rect x="144" y="-20" width="170" height="190" /></clipPath>
+          </defs>
+          <path fillRule="evenodd" clipRule="evenodd" d={HOJAS} fill="#3CFB9F" clipPath="url(#afApIzq)" />
+          {/* El guiño: la hoja derecha se cierra sobre su propio eje, sin moverse. */}
+          <g className="afApertura__guino">
+            <path fillRule="evenodd" clipRule="evenodd" d={HOJAS} fill="#3CFB9F" clipPath="url(#afApDer)" />
+          </g>
+          <path fillRule="evenodd" clipRule="evenodd" d={SONRISA} fill="#16211B" />
+        </svg>
       </div>
     </div>
   );
