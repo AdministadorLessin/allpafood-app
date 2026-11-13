@@ -26,6 +26,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Usamos la cámara solo cuando quieres enviarle una foto de tu pedido a nuestro asistente.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Usamos tus fotos solo cuando eliges una para enviarla a nuestro asistente.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Usamos tu ubicación solo para encontrar tu dirección de entrega en el mapa.</string>
 	<key>UIApplicationSceneManifest</key>
