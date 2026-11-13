@@ -1,0 +1,89 @@
+/* La identidad nueva del app: menta arriba, tinta para lo que pesa, papel
+   crema de fondo. Bricolage solo en titulares y numeros grandes; todo lo
+   pequeño e intermedio en Figtree, para que la pantalla no se sature. */
+@import '@fontsource-variable/bricolage-grotesque/index.css';
+@import '@fontsource-variable/figtree/index.css';
+
+:root{
+    --n-menta: #3CFB9F;
+    --n-menta-suave: #DDF9EA;
+    --n-tinta: #16211B;
+    --n-tinta-78: rgba(22,33,27,.78);
+    --n-gris: #66736C;
+    --n-fondo: #F6F6F1;
+    --n-papel: #FFFFFF;
+    --n-hundido: #F4F5EF;
+    --n-linea: rgba(22,33,27,.1);
+    --n-coral: #F2553D;          /* solo avisos de tiempo */
+    --n-coral-texto: #9C3F2C;
+    --n-proteina: #12A866;
+    --n-carbo: #5AA9E6;
+    --n-grasa: #F2553D;
+
+    --n-titular: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+    --n-texto: 'Figtree Variable', 'Figtree', system-ui, -apple-system, sans-serif;
+
+    --n-sombra: 0 6px 16px rgba(22,33,27,.06);
+    --n-arriba: env(safe-area-inset-top, 0px);
+    --n-abajo: env(safe-area-inset-bottom, 0px);
+}
+
+/* Una pantalla con la identidad nueva: se pone en su contenedor raiz. */
+.nPant{
+    font-family: var(--n-texto);
+    color: var(--n-tinta);
+    background: var(--n-fondo);
+    -webkit-font-smoothing: antialiased;
+    h1, h2, .nTitular{
+        font-family: var(--n-titular);
+        font-weight: 800;
+        letter-spacing: -.035em;
+        line-height: 1;
+        margin: 0;
+    }
+    button, input, textarea{ font-family: inherit; }
+}
+/* El degradado menta de arriba, que se deshace en el fondo. */
+.nMenta{
+    position: absolute; left: 0; right: 0; top: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, var(--n-menta) 0%, rgba(60,251,159,.55) 45%, rgba(246,246,241,0) 100%);
+}
+
+/* --- La identidad nueva sobre TODO el app ---
+   Cada pantalla se rehace con su maqueta, pero mientras tanto ninguna se
+   queda con la cara de antes: la tipografia, el fondo y los titulares
+   cambian aqui, de una vez, para todas. Medio proyecto usa var(--poppins):
+   apuntarla a Figtree alcanza a todas las pantallas sin tocarlas. */
+:root{
+    --poppins: 'Figtree Variable', 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --af-ink: #16211B;
+    --af-muted: #66736C;
+}
+body{
+    background: var(--n-fondo);
+    background-attachment: scroll;
+    color: var(--n-tinta);
+    -webkit-font-smoothing: antialiased;
+    /* Titulares en Bricolage; lo intermedio se queda en Figtree. */
+    h1, .afPanel__titular{
+        font-family: var(--n-titular);
+        font-weight: 800;
+        letter-spacing: -.035em;
+    }
+}
+/* Las pantallas nuevas llenan la caja del panel de borde a borde. */
+.mainLayoutBox.nCaja{ padding: 0 0 110px !important; margin: 0 !important; max-width: none; background: var(--n-fondo); min-height: 100vh; }
+
+/* En el iPhone, las pantallas nuevas llegan hasta el borde de arriba: el menta
+   pasa por detras de la hora en vez de empezar debajo de una franja clara.
+   Lo que sube al hacer scroll se deshace en una franja menta, del mismo color
+   con que empieza cada pantalla. */
+.es-nativo .mainLayout:has(.nCaja){ padding-top: 0; }
+.es-nativo .pageLayout:has(.nCaja)::before{
+    height: calc(env(safe-area-inset-top, 0px) + 22px);
+    background: linear-gradient(180deg,
+        #3CFB9F 0,
+        #3CFB9F calc(env(safe-area-inset-top, 0px) - 6px),
+        rgba(60, 251, 159, 0) 100%);
+}

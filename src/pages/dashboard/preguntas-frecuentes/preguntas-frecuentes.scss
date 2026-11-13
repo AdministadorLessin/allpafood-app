@@ -1,137 +1,27 @@
-@import '../../../assets/css/mixin.scss';
+/* Preguntas frecuentes, con la identidad nueva: una pregunta por fila,
+   separadas por lineas; la respuesta se abre debajo. */
 
-.preFreBox{
-    .MuiPaper-root{
-        box-shadow: 0px 0px 20px 0px rgba(0,0,0,.1);
-        border-radius: 25px !important;
-        margin-bottom: 25px;
-        .MuiAccordionSummary-content {
-            margin: 0px !important;
-        }
-        .MuiAccordion-heading{
-            .MuiButtonBase-root{
-                min-height: auto;
-                padding: 20px 30px 20px 20px;
-                flex-direction: row-reverse;
-                @include mediaTablet{
-                    padding: 15px 30px 15px 15px;
-                }
-                @include mediaPhone{
-                    padding: 10px 30px 10px 10px;
-                }
-                span{
-                    color: var(--dark-blue);
-                    font-size: 22px;
-                    font-weight: 600;
-                    @include mediaTablet{
-                        font-size: 20px;
-                    }
-                    @include mediaPhone{
-                        font-size: 18px;
-                    }
-                    @include mediaMiniPhone{
-                        font-size: 16px;
-                    }
-                }
-                .MuiAccordionSummary-expandIconWrapper{
-                    margin-right: 10px;
-                    color: var(--dark-blue);
-                    @include mediaPhone{
-                        margin-right: 10px;
-                    }
-                }
-            }
-        }
-        .MuiCollapse-root{
-            
-            .MuiAccordionDetails-root {
-                padding: 0px 20px 30px 30px;
-                
-                p{
-                    color: var(--dark-gris);
-                    margin-bottom: 25px;
-                    font-size: 14px;
-                    &:last-child{
-                        margin-bottom: 0px;
-                    }
-
-                }
-                @include mediaPhone{
-                    padding: 0px 20px 20px 20px;
-                }
-            }
-        }
-        &::before{
-            display: none;
-        }
-    }
-}
-/* Acordeon con el lenguaje del panel: una fila por pregunta, el signo a la
-   derecha y la respuesta debajo en gris. */
-.afFaq{
-    &__it{
-        border-bottom: 1px solid var(--af-line);
-        &:last-child{ border-bottom: 0; }
-    }
+.faq{
+    &__lista{ margin-top: 14px; }
+    &__it{ border-bottom: 1px solid var(--n-linea); &:last-child{ border-bottom: 0; } }
     &__btn{
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        width: 100%;
-        padding: 16px 0;
-        border: 0;
-        background: none;
-        font-family: inherit;
-        font-size: 15.5px;
-        font-weight: 700;
-        line-height: 1.35;
-        color: var(--af-ink);
-        text-align: left;
-        cursor: pointer;
-
-        span{ flex: 1; }
-        &:focus-visible{ outline: 2px solid var(--af-accent); outline-offset: 3px; border-radius: 10px; }
+        display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; min-height: 60px;
+        padding: 14px 0; border: 0; background: none; cursor: pointer; text-align: left;
+        font-family: inherit; font-size: 15.5px; font-weight: 700; line-height: 1.3; color: var(--n-tinta);
+        > span{ flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 2px; border-radius: 14px; }
     }
     &__mas{
-        flex: 0 0 auto;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        background: var(--af-accent-soft);
-        color: var(--af-accent);
-        font-size: 17px;
-        font-weight: 800;
-        line-height: 1;
-        font-style: normal;
+        flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--n-menta-suave); color: var(--n-tinta);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 16px; height: 16px; }
+        .is-on &{ background: var(--n-tinta); color: var(--n-menta); }
     }
-    &__it--on &__mas{ background: var(--af-ink); color: var(--af-mint); }
-
-    &__txt{
-        margin: -4px 0 18px;
-        padding-right: 42px;
-        font-size: 14px;
-        line-height: 1.55;
-        color: var(--af-muted);
-        white-space: pre-line;
-    }
+    &__txt{ margin: 0; padding: 0 46px 18px 0; font-size: 14.5px; line-height: 1.6; color: #55655C; white-space: pre-line; overflow-wrap: anywhere; }
 
     &__ayuda{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-
-        b{ display: block; font-size: 15.5px; color: var(--af-ink); }
-        small{ display: block; font-size: 13px; color: var(--af-muted); margin-top: 2px; }
-    }
-    &__wa{
-        width: auto !important;
-        padding: 0 22px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
+        margin-top: 26px;
+        > b{ display: block; font-size: 17px; font-weight: 700; }
+        > p{ margin: 4px 0 14px; font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.8); }
     }
 }

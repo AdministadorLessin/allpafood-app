@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 
 import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
 import { useAuthContext } from '../../../context/authContext';
 import { API_URL } from '../../../config';
 import { vibrar } from '../../../nativo';
-import '../empezar/EmpezarNativo.scss';
+import { resorte } from '../../../movimiento';
 import './Cocina.scss';
 
 /**
@@ -39,13 +39,12 @@ const RUTINAS = [
   { v: 'D', t: 'Hago deporte', d: 'Tres veces por semana o más' },
 ];
 
-const Ico = ({ d }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {[].concat(d).map((x) => <path key={x} d={x} />)}
-  </svg>
+const Marca = () => (
+  <span className="rg__marca" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2"
+         strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
+  </span>
 );
-const OLLA = ['M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z', 'M2 10h20', 'M9 6c0-1 1-2 3-2s3 1 3 2', 'M12 4V2'];
 
 const terminarAlta = () => {
   try {
@@ -57,6 +56,7 @@ const terminarAlta = () => {
 export default function CocinaPage() {
   const navigate = useNavigate();
   const { token } = useAuthContext();
+  const quieto = useReducedMotion();
 
   const [tieneAlergia, setTieneAlergia] = useState(false);
   const [alergia, setAlergia] = useState('');
@@ -112,57 +112,54 @@ export default function CocinaPage() {
 
   return (
     <MarcoAuth fase="cocina" paso={0} sinVolver>
-      <motion.div initial={{ x: 36, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.3, ease: [0.2, 0.9, 0.2, 1] }}>
-        <div className="empN__ico"><Ico d={OLLA} /></div>
-        <h1 className="empN__h">Para tu <em>cocina</em></h1>
-        <p className="empN__b">Dos cosas rápidas para que tu almuerzo te llegue bien.</p>
+      <h1 className="afAuth__titular">Para tu cocina</h1>
+      <p className="afAuth__bajada">Dos cosas rápidas para que tu almuerzo te llegue bien.</p>
 
-        <p className="empN__q">¿Tienes alguna alergia?</p>
-        <div className="empN__lados" role="radiogroup" aria-label="¿Tienes alguna alergia?">
-          {[[false, 'No'], [true, 'Sí']].map(([v, t]) => (
-            <button type="button" key={t} role="radio" aria-checked={tieneAlergia === v}
-              className={tieneAlergia === v ? 'is-on' : undefined} onClick={() => elegir(setTieneAlergia, v)}>{t}</button>
-          ))}
-        </div>
-        {tieneAlergia && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-            <label className="cocN__otra">
+      <p className="rg__q">¿Tienes alguna alergia?</p>
+      <div className="rg__pildoras rg__pildoras--dos" role="radiogroup" aria-label="¿Tienes alguna alergia?">
+        {[[false, 'No'], [true, 'Sí']].map(([v, t]) => (
+          <button type="button" key={t} role="radio" aria-checked={tieneAlergia === v}
+            className={`rg__pildora${tieneAlergia === v ? ' is-on' : ''}`} onClick={() => elegir(setTieneAlergia, v)}>{t}</button>
+        ))}
+      </div>
+      {tieneAlergia && (
+        <motion.div initial={{ opacity: 0, y: quieto ? 0 : 8 }} animate={{ opacity: 1, y: 0 }} transition={resorte.entra}>
+          <label className="rg__campo cocN__otra">
+            <span>Tu alergia</span>
+            <div>
               <input type="text" value={alergia} maxLength={MAX_ALERGIA} autoFocus
                      onChange={(e) => setAlergia(e.target.value)}
-                     placeholder="Ej. maní, mariscos" aria-label="Tu alergia" />
-            </label>
-            <p className="cocN__nota">Solo alergias. Los platos son los del menú del día y no se preparan a pedido.</p>
-          </motion.div>
-        )}
+                     placeholder="Ej. maní, mariscos" />
+            </div>
+          </label>
+          <p className="rg__nota">Solo alergias. Los platos son los del menú del día y no se preparan a pedido.</p>
+        </motion.div>
+      )}
 
-        <p className="empN__q">Tu refresco</p>
-        <div className="empN__lados" role="radiogroup" aria-label="Tu refresco">
-          {[[true, 'Con azúcar'], [false, 'Sin azúcar']].map(([v, t]) => (
-            <button type="button" key={t} role="radio" aria-checked={azucar === v}
-              className={azucar === v ? 'is-on' : undefined} onClick={() => elegir(setAzucar, v)}>{t}</button>
-          ))}
-        </div>
+      <p className="rg__q">Tu refresco</p>
+      <div className="rg__pildoras rg__pildoras--dos" role="radiogroup" aria-label="Tu refresco">
+        {[[true, 'Con azúcar'], [false, 'Sin azúcar']].map(([v, t]) => (
+          <button type="button" key={t} role="radio" aria-checked={azucar === v}
+            className={`rg__pildora${azucar === v ? ' is-on' : ''}`} onClick={() => elegir(setAzucar, v)}>{t}</button>
+        ))}
+      </div>
 
-        <p className="empN__q">¿Cómo es tu día?</p>
-        <div className="cocN__rutinas">
-          {RUTINAS.map((r) => (
-            <button type="button" key={r.v}
-              className={`cocN__rutina${rutina === r.v ? ' is-on' : ''}`} onClick={() => elegir(setRutina, r.v)}>
-              <b>{r.t}</b><small>{r.d}</small>
-            </button>
-          ))}
-        </div>
-
-      </motion.div>
+      <p className="rg__q">¿Cómo es tu día?</p>
+      <div className="rg__opciones" role="radiogroup" aria-label="¿Cómo es tu día?">
+        {RUTINAS.map((r) => (
+          <button type="button" key={r.v} role="radio" aria-checked={rutina === r.v}
+            className={`rg__opcion${rutina === r.v ? ' is-on' : ''}`} onClick={() => elegir(setRutina, r.v)}>
+            <span><b>{r.t}</b><small>{r.d}</small></span>
+            <Marca />
+          </button>
+        ))}
+      </div>
 
       <Accion>
-        <button type="button" className="afBtn afBtn--mint" disabled={guardando} onClick={guardar}>
+        <button type="button" className="afBtn" disabled={guardando} onClick={guardar}>
           {guardando ? 'Guardando…' : 'Entrar a Allpa Food'}
         </button>
-        <p className="afAuth__pie">
-          <button type="button" className="cocN__saltar" onClick={entrar} disabled={guardando}>Saltar por ahora</button>
-        </p>
+        <button type="button" className="afNatPie__suave" onClick={entrar} disabled={guardando}>Saltar por ahora</button>
       </Accion>
     </MarcoAuth>
   );

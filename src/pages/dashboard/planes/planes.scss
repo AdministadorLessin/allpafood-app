@@ -1,128 +1,48 @@
-/* ==========================================================================
-   Planes: donde el registro se convierte en compra.
+/* Planes, con la identidad nueva (maqueta HojaRenovar): una lista de planes
+   de la que se marca uno; solo el marcado va enmarcado en tinta. */
 
-   Se usan las mismas tarjetas, la misma escala y el mismo acento que el panel.
-   Antes esta pantalla tenia borde arcoiris, precios en verde de 60px y botones
-   con degradado; el cliente aterrizaba dos pantallas despues en un panel que
-   no se le parecia en nada.
-   ========================================================================== */
+.pln{
+    &__et{ display: block; margin-bottom: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #55655C; }
+    &__necesitas{ padding: 18px; }
 
-/* --- Tarjeta de plan --- */
-.afPlanCard{
-    position: relative;
-    background: var(--af-paper);
-    border: 1.5px solid transparent;
-    border-radius: var(--af-r-card);
-    box-shadow: var(--af-shadow-s);
-    padding: 20px 19px;
-    margin-bottom: 14px;
-
-    &__cinta{
-        position: absolute;
-        top: -9px;
-        left: 19px;
-        background: var(--af-ink);
-        color: var(--af-mint);
-        font-size: 10.5px;
-        font-weight: 800;
-        letter-spacing: .07em;
-        text-transform: uppercase;
-        border-radius: var(--af-r-pill);
-        padding: 4px 12px;
+    &__lista{ margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    &__plan{
+        display: block; width: 100%; box-sizing: border-box; padding: 16px; border-radius: 22px;
+        font-family: inherit; color: var(--n-tinta); text-align: left; cursor: pointer;
+        background: var(--n-papel); border: 2.5px solid var(--n-papel);
+        &.is-on{ border-color: var(--n-tinta); box-shadow: 0 12px 26px rgba(22,33,27,.12); }
+        &:focus-visible{ outline: 3px solid var(--n-menta); outline-offset: 2px; }
     }
-
-    &__nivel{
-        margin: 0 0 3px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: .09em;
-        text-transform: uppercase;
-        color: var(--af-accent);
+    &__cab{ display: flex; align-items: center; gap: 12px; }
+    &__radio{
+        width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center; border: 2px solid #A9B0A6; color: var(--n-tinta);
+        .is-on &{ border: 0; background: var(--n-menta); }
+        svg{ width: 15px; height: 15px; }
     }
-    &__nombre{
-        margin: 0 0 12px !important;
-        font-size: var(--af-t-xl) !important;
-        font-weight: 800;
-        letter-spacing: -.03em;
-        color: var(--af-ink) !important;
+    &__txt{
+        flex: 1; min-width: 0;
+        b{ display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; font-size: 15.5px; font-weight: 700; color: var(--n-tinta); }
+        small{ display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: #55655C; }
     }
-
     &__precio{
-        display: flex;
-        align-items: baseline;
-        gap: 2px;
-        margin-bottom: 4px;
-        color: var(--af-ink);
-        font-variant-numeric: tabular-nums;
-
-        b{
-            font-size: 40px;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -.045em;
-        }
-        small{ font-size: 17px; font-weight: 700; }
-        em{
-            font-style: normal;
-            font-size: 12.5px;
-            color: var(--af-muted);
-            text-decoration: line-through;
-            margin-left: 9px;
-        }
+        flex: 0 0 auto; text-align: right;
+        b{ display: block; font-size: 15px; font-weight: 700; color: var(--n-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+        small{ display: block; font-size: 11.5px; color: #55655C; text-decoration: line-through; white-space: nowrap; }
     }
-    &__pen{
-        font-size: 17px;
-        font-weight: 700;
-        margin-right: 3px;
-    }
-
-    /* El renglon que de verdad decide la compra. */
+    &__detalle{ display: block; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--n-linea); }
     &__unidad{
-        margin: 0 0 16px;
-        font-size: 12.5px;
-        color: var(--af-muted);
-        b{ color: var(--af-accent); font-weight: 700; }
+        display: block; font-size: 13.5px; line-height: 1.45; color: #55655C;
+        b{ font-weight: 700; color: var(--n-tinta); }
     }
-
-    &__lista{
-        list-style: none;
-        margin: 0 0 14px;
-        padding: 0;
-
-        li{
-            display: flex;
-            align-items: flex-start;
-            gap: 9px;
-            font-size: 13.5px;
-            line-height: 1.45;
-            color: var(--af-ink);
-            padding: 5px 0;
-        }
+    &__incluye{
+        display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
+        > span{ display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.35; color: var(--n-tinta); }
     }
-    &__tick{
-        width: 14px;
-        height: 14px;
-        flex: 0 0 auto;
-        margin-top: 3px;
-        color: var(--af-accent);
-    }
+    &__tick{ width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: var(--n-proteina); }
+    &__radio &__tick{ margin: 0; color: var(--n-tinta); }
+    &__macros{ display: block; margin-top: 10px; font-size: 12.5px; line-height: 1.45; color: #55655C; }
 
-    &__macros{
-        margin: 0 0 4px;
-        font-size: 11.5px;
-        line-height: 1.5;
-        color: var(--af-muted);
-        padding-top: 12px;
-        border-top: 1px solid var(--af-line);
-    }
-
-    .afBtn{ margin-bottom: 0; }
-
-    /* El plan que mas se pide se destaca en tinta, igual que el heroe de
-       Mi plan. Antes llevaba un borde con degradado rosa, azul y naranja. */
-    &--top{
-        border-color: var(--af-ink);
-        box-shadow: var(--af-shadow-m);
-        margin-top: 22px;
-    }
+    &__pie{ margin-top: 16px; }
+    &__nota{ margin-top: 10px; text-align: center; }
 }

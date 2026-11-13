@@ -204,6 +204,206 @@ const RegistroPage = (props) => {
 
     const paso = Number(stepItem) || 0;
 
+    /* El codigo en el app: seis cajas y un solo campo invisible encima. Asi
+       el telefono puede rellenarlo desde el mensaje y pegar funciona, que con
+       seis campos sueltos no pasa. Solo cambia como se ve: el valor es el
+       mismo codeVerify de siempre. */
+    const alEscribirCodigo = (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+        handleChangeCode(e);
+    };
+    const numeroBonito = numberVerify
+        ? `+51 ${numberVerify.replace(/(\d{3})(?=\d)/g, '$1 ')}`
+        : '';
+
+    const cuerpo = (
+        <div className={loadingValid ? 'afAuth__ocupado' : undefined}>
+
+        { paso === 0 ?
+            <>
+                {esNativo ?
+                    <h1 className="afAuth__titular">Tu número y listo</h1>
+                :
+                    <h1 className="afAuth__titular">
+                        <span className="t1">Empecemos por</span>
+                        tu número
+                    </h1>
+                }
+                <p className="afAuth__bajada">
+                    Te mandamos un código por WhatsApp para confirmar que eres tú.
+                    Es lo único que necesitas para empezar.
+                </p>
+
+                <form id="afFormNumero" onSubmit={handleSubmit(onSubmitHandler)}>
+                    <div className="afCampo afCampo--grande">
+                        <TextField 
+                            id="fValidNumber"
+                            name="fValidNumber" 
+                            /* 'tel' y no 'number': el campo numerico
+                               acepta signos y notacion cientifica, y
+                               en algunos telefonos se come lo pegado
+                               desde los contactos. */
+                            type='tel'
+                            inputMode="numeric"
+                            autoComplete="tel-national"
+                            /* En el app, la etiqueta encima, un ejemplo
+                               de como se escribe y el +51 a la vista. */
+                            label={esNativo ? 'Celular' : undefined}
+                            placeholder={esNativo ? '987 654 321' : '963 987 654'}
+                            InputProps={esNativo ? { startAdornment: <span className="afNat__prefijo">+51</span> } : undefined}
+                            error={errors.fValidNumber ? true : false}
+                            {...register("fValidNumber", { onChange: handleChangeNumber })}
+                            value={numberVerify} 
+                            variant="outlined"
+                        />
+                    </div>
+
+                    {errors.fValidNumber &&
+                        <div className="afAuth__error">
+                            <IcoError />
+                            Son los 9 dígitos de tu celular. El +51 lo ponemos nosotros.
+                        </div>
+                    }
+                    {errorSendCode &&
+                        <div className="afAuth__error">
+                            <IcoError />
+                            {errorSendCode}
+                        </div>
+                    }
+
+                </form>
+
+                <Accion>
+                    <motion.button type="submit" form="afFormNumero"
+                        className="afBtn afBtn--mint" {...alToque}>
+                        {loadingValid ? 'Enviando…' : 'Enviarme el código'}
+                    </motion.button>
+
+                    <p className="afAuth__pie">
+                        ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
+                    </p>
+                </Accion>
+            </>
+
+        : paso === 1 ?
+            <>
+                {esNativo ?
+                    <>
+                        <h1 className="afAuth__titular">Te llegó un código</h1>
+                        <p className="afAuth__bajada">
+                            Lo enviamos {numeroBonito ? `al ${numeroBonito}` : 'a tu WhatsApp'}. Vale por 10 minutos.
+                        </p>
+                    </>
+                :
+                    <>
+                        <h1 className="afAuth__titular">
+                            <span className="t1">Te llegó un código a</span>
+                            {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
+                        </h1>
+                        <p className="afAuth__bajada">
+                            Vale por 10 minutos. Escríbelo aquí y seguimos.
+                        </p>
+                    </>
+                }
+
+                {esNativo ?
+                    <label className="rg__codigo">
+                        {[0, 1, 2, 3, 4, 5].map((i) => (
+                            <span key={i} aria-hidden="true"
+                                  className={i === Math.min(String(codeVerify).length, 5) ? 'is-aqui' : undefined}>
+                                {String(codeVerify)[i] || ''}
+                            </span>
+                        ))}
+                        <input
+                            id="fValidCode"
+                            name="fValidCode"
+                            type="tel"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength={6}
+                            autoFocus
+                            aria-label="Código de 6 dígitos"
+                            onChange={alEscribirCodigo}
+                            value={codeVerify}
+                        />
+                    </label>
+                :
+                    <div className="afCampo afCampo--grande">
+                        <TextField 
+                            id="fValidCode"
+                            name="fValidCode" 
+                            type='number'
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            placeholder="000000"
+                            onChange={handleChangeCode} 
+                            value={codeVerify} 
+                            variant="outlined"
+                        />
+                    </div>
+                }
+
+                {errorVerifyCode &&
+                    <div className="afAuth__error">
+                        <IcoError />
+                        {errorVerifyCode}
+                    </div>
+                }
+
+                {/* En el app, reenviar va junto al codigo y no en el pie:
+                    abajo queda un solo boton. */}
+                {esNativo &&
+                    <p className="rg__reenviar">
+                        {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
+                        <button type="button" onClick={reenviarCodigo}
+                                disabled={reenviando || esperaReenvio > 0}>
+                            {reenviando ? 'Reenviando…'
+                                : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio} s`
+                                : 'Reenviar el código'}
+                        </button>
+                    </p>
+                }
+
+                <Accion>
+                    <motion.button type="button" onClick={sendCode}
+                        className="afBtn afBtn--mint" {...alToque}>
+                        {loadingValid ? 'Verificando…' : 'Verificar'}
+                    </motion.button>
+
+                    {!esNativo &&
+                        <p className="afAuth__pie">
+                            {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
+                            <button type="button" onClick={reenviarCodigo}
+                                    disabled={reenviando || esperaReenvio > 0}>
+                                {reenviando ? 'Reenviando…'
+                                    : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio}s`
+                                    : 'Reenviar el código'}
+                            </button>
+                        </p>
+                    }
+                </Accion>
+            </>
+
+        :
+            <>
+                {esNativo ?
+                    <h1 className="afAuth__titular">Número confirmado. Ahora, tus datos</h1>
+                :
+                    <h1 className="afAuth__titular">
+                        <span className="t1">Número confirmado.</span>
+                        Ahora, tus datos
+                    </h1>
+                }
+                <p className="afAuth__bajada">
+                    Con esto creamos tu cuenta y podemos emitir tus comprobantes.
+                </p>
+                <FormDatos telefono={numberVerify ? numberVerify : null} />
+            </>
+        }
+
+        </div>
+    );
+
     return (
         <MarcoAuth
             fase="cuenta"
@@ -214,156 +414,21 @@ const RegistroPage = (props) => {
                le sirve. */
             sinVolver={paso === 2}
         >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={paso}
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <div className={loadingValid ? 'afAuth__ocupado' : undefined}>
-
-                    { paso === 0 ?
-                        <>
-                            {esNativo ?
-                                <h1 className="afAuth__titular">Tu número y <em>listo</em></h1>
-                            :
-                                <h1 className="afAuth__titular">
-                                    <span className="t1">Empecemos por</span>
-                                    tu número
-                                </h1>
-                            }
-                            <p className="afAuth__bajada">
-                                Te mandamos un código por WhatsApp para confirmar que eres tú.
-                                Es lo único que necesitas para empezar.
-                            </p>
-
-                            <form id="afFormNumero" onSubmit={handleSubmit(onSubmitHandler)}>
-                                <div className="afCampo afCampo--grande">
-                                    <TextField 
-                                        id="fValidNumber"
-                                        name="fValidNumber" 
-                                        /* 'tel' y no 'number': el campo numerico
-                                           acepta signos y notacion cientifica, y
-                                           en algunos telefonos se come lo pegado
-                                           desde los contactos. */
-                                        type='tel'
-                                        inputMode="numeric"
-                                        autoComplete="tel-national"
-                                        /* En el app, un ejemplo que no parezca un
-                                           numero ya escrito, y el +51 a la vista. */
-                                        placeholder={esNativo ? 'Tu celular' : '963 987 654'}
-                                        InputProps={esNativo ? { startAdornment: <span className="afNat__prefijo">+51</span> } : undefined}
-                                        error={errors.fValidNumber ? true : false}
-                                        {...register("fValidNumber", { onChange: handleChangeNumber })}
-                                        value={numberVerify} 
-                                        variant="outlined"
-                                    />
-                                </div>
-
-                                {errors.fValidNumber &&
-                                    <div className="afAuth__error">
-                                        <IcoError />
-                                        Son los 9 dígitos de tu celular. El +51 lo ponemos nosotros.
-                                    </div>
-                                }
-                                {errorSendCode &&
-                                    <div className="afAuth__error">
-                                        <IcoError />
-                                        {errorSendCode}
-                                    </div>
-                                }
-
-                            </form>
-
-                            <Accion>
-                                <motion.button type="submit" form="afFormNumero"
-                                    className="afBtn afBtn--mint" {...alToque}>
-                                    {loadingValid ? 'Enviando…' : 'Enviarme el código'}
-                                </motion.button>
-
-                                <p className="afAuth__pie">
-                                    ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
-                                </p>
-                            </Accion>
-                        </>
-
-                    : paso === 1 ?
-                        <>
-                            {esNativo ?
-                                <h1 className="afAuth__titular">
-                                    Te llegó un código a <em>{numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}</em>
-                                </h1>
-                            :
-                                <h1 className="afAuth__titular">
-                                    <span className="t1">Te llegó un código a</span>
-                                    {numberVerify ? `+51 ${numberVerify}` : 'tu WhatsApp'}
-                                </h1>
-                            }
-                            <p className="afAuth__bajada">
-                                Vale por 10 minutos. Escríbelo aquí y seguimos.
-                            </p>
-
-                            <div className="afCampo afCampo--grande">
-                                <TextField 
-                                    id="fValidCode"
-                                    name="fValidCode" 
-                                    type='number'
-                                    inputMode="numeric"
-                                    autoComplete="one-time-code"
-                                    placeholder="000000"
-                                    onChange={handleChangeCode} 
-                                    value={codeVerify} 
-                                    variant="outlined"
-                                />
-                            </div>
-
-                            {errorVerifyCode &&
-                                <div className="afAuth__error">
-                                    <IcoError />
-                                    {errorVerifyCode}
-                                </div>
-                            }
-
-                            <Accion>
-                                <motion.button type="button" onClick={sendCode}
-                                    className="afBtn afBtn--mint" {...alToque}>
-                                    {loadingValid ? 'Verificando…' : 'Verificar'}
-                                </motion.button>
-
-                                <p className="afAuth__pie">
-                                    {avisoReenvio ? `${avisoReenvio} ` : '¿No te llegó? '}
-                                    <button type="button" onClick={reenviarCodigo}
-                                            disabled={reenviando || esperaReenvio > 0}>
-                                        {reenviando ? 'Reenviando…'
-                                            : esperaReenvio > 0 ? `Reenviar en ${esperaReenvio}s`
-                                            : 'Reenviar el código'}
-                                    </button>
-                                </p>
-                            </Accion>
-                        </>
-
-                    :
-                        <>
-                            {esNativo ?
-                                <h1 className="afAuth__titular">Número confirmado. <em>Ahora, tus datos</em></h1>
-                            :
-                                <h1 className="afAuth__titular">
-                                    <span className="t1">Número confirmado.</span>
-                                    Ahora, tus datos
-                                </h1>
-                            }
-                            <p className="afAuth__bajada">
-                                Con esto creamos tu cuenta y podemos emitir tus comprobantes.
-                            </p>
-                            <FormDatos telefono={numberVerify ? numberVerify : null} />
-                        </>
-                    }
-
-                    </div>
-                </motion.div>
-            </AnimatePresence>
+            {/* En el app el cambio de paso lo anima el marco: el nuevo entra
+                desde la derecha y el anterior sale a la izquierda. */}
+            {esNativo ? cuerpo :
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={paso}
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -10, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        {cuerpo}
+                    </motion.div>
+                </AnimatePresence>
+            }
         </MarcoAuth>
     )
 };

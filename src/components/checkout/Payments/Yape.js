@@ -30,6 +30,8 @@ import yapeImg7 from '../../../assets/img/payment_yape_7.png';
 import './Yape.scss';
 import CheckoutPaymentFail from './FailPayment';
 import { useAuthContext } from './../../../context/authContext';
+import { esNativo } from '../../../nativo';
+import { Accion } from '../../auth/Marco/MarcoAuth';
 
 const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,loadYape,serverFail,correoGuardado,errorCorreo}) => {
 
@@ -81,8 +83,14 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
 
 
 
+    /* Solo para escribirlo en el boton del app: el cobro lo calcula el
+       servidor con el plan y los adicionales, no con este numero. */
+    const { cartItems, cartAdicionales } = useAuthContext();
+    const totalAPagar = [...(cartItems || []), ...(cartAdicionales || [])]
+        .reduce((suma, item) => suma + (parseFloat(item.price) || 0), 0);
+
     return (
-        <form className={'inlineFlex'} onSubmit={handleSubmit(yapeSubmitForm)}>
+        <form id="afFormYape" className={'inlineFlex'} onSubmit={handleSubmit(yapeSubmitForm)}>
             <div className="inlineFlex yapeFormContent">
                 <div className="inlineFlex yapeFormBox">
                     <Grid container spacing={2}>
@@ -149,7 +157,15 @@ const CheckoutPaymentYape = ({yapeSubmitForm,handleOpenMp,handleCloseMp,openMp,l
                                 </div>
                             </Grid>
 
-                            {loadYape ?
+                            {/* En el app el boton va fijo abajo, con el total,
+                                y envia este mismo formulario. */}
+                            {esNativo ?
+                                <Accion>
+                                    <button type="submit" form="afFormYape" className="afBtn" disabled={loadYape}>
+                                        {loadYape ? 'Procesando tu pago…' : `Pagar S/ ${totalAPagar.toFixed(2)}`}
+                                    </button>
+                                </Accion>
+                            : loadYape ?
                                 <Grid item xs={12} sm={12} md={12}>
                                     <button type={'submit'} className="btnPrimary  btnPayment">
                                         <CircularProgress size={20} color={'white'} />

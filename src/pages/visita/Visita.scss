@@ -1,152 +1,318 @@
-/* El modo visita. Las pantallas se arman con las piezas del Inicio (.inN) y
-   de Mi cuenta (.cuN); aqui va solo lo propio: el aviso de que es un ejemplo,
-   los platos para probar, los candados y el boton de comprar. */
+/* El modo visita, con la identidad nueva: menta arriba, tinta para lo que
+   pesa, listas con lineas finas. Abajo, fijo, el boton de comprar y la barra
+   de pestañas con su pildora menta. */
 
-$tinta: #16211B;
-$muted: #55655C;
-$menta: #3CFB9F;
-$menta2: #12C97B;
-$verde: #177A4C;
+$gris: #55655C;
+$hundido: #E9EBE3;
 
-/* Sitio para el boton de comprar, que va fijo encima de la barra de abajo. */
-.vis .mainLayoutBox{ padding-bottom: 170px !important; }
+.visN{
+    position: relative; min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+    a{ color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    button{ -webkit-tap-highlight-color: transparent; color: inherit; }
 
-.vis__ava{
-    position: relative;
-    span{ display: flex; align-items: center; justify-content: center; background: #EAFBF3; color: $verde;
-          svg{ width: 24px; height: 24px; } }
-    i{
-        position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%;
-        border: 2px solid #fff; box-sizing: border-box; background: $tinta; color: $menta;
-        font-style: normal; font-size: 15px; font-weight: 700; line-height: 1;
+    &__col{
+        position: relative; box-sizing: border-box; width: 100%; max-width: 560px; margin: 0 auto;
+        /* Abajo, el sitio del boton y la barra, que van fijos. */
+        padding: calc(var(--n-arriba) + 14px) 22px calc(200px + var(--n-abajo));
+    }
+
+    /* --- Arriba --- */
+    &__cab{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    &__fecha{
+        display: flex; align-items: center; gap: 8px; min-width: 0;
+        font-size: 13px; font-weight: 600; color: var(--n-tinta-78);
+        svg{ flex: 0 0 auto; color: var(--n-tinta); }
+    }
+    &__ingresar{
+        flex: 0 0 auto; padding: 12px 0; font-size: 13.5px; font-weight: 600;
+        text-decoration: underline !important; text-underline-offset: 4px;
+    }
+    &__h{ margin: 10px 0 0 !important; font-size: 42px !important; line-height: .98 !important; }
+
+    &__aviso{
+        margin: 16px 0 0; display: flex; align-items: center; gap: 8px;
+        padding: 10px 14px; border-radius: 16px; background: var(--n-tinta); color: #fff;
+        font-size: 13px; line-height: 1.35;
+        svg{ width: 17px; height: 17px; flex: 0 0 auto; }
+    }
+    &__invitado{
+        margin: 10px 0 0; display: flex; align-items: center; gap: 10px;
+        padding: 12px 14px; border-radius: 16px; background: var(--n-menta-suave);
+        font-size: 13px; line-height: 1.4;
+        em{
+            flex: 0 0 auto; display: inline-block; transform: rotate(-4deg);
+            font-style: normal; font-weight: 800; font-size: 12.5px; letter-spacing: .02em; line-height: 1;
+            background: var(--n-tinta); color: #fff; padding: 5px 8px 4px; border-radius: 6px;
+        }
+    }
+
+    /* --- Asi sigues tu almuerzo --- */
+    &__card{
+        margin-top: 16px; padding: 18px; border-radius: 30px; background: var(--n-papel);
+        box-shadow: 0 14px 34px rgba(22,33,27,.08);
+    }
+    &__cardCab{ display: flex; align-items: center; justify-content: space-between; gap: 8px 10px; flex-wrap: wrap; }
+    &__et{ font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $gris; }
+    &__chip{
+        font-size: 12px; font-weight: 600; color: #0B6B43; background: var(--n-menta-suave);
+        padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+    }
+    &__hoy{
+        margin-top: 12px; display: flex; align-items: center; gap: 12px;
+        > span:last-child{ min-width: 0; }
+        b{ display: block; font-weight: 700; font-size: 18px; line-height: 1.2; overflow-wrap: anywhere; }
+        small{ display: block; margin-top: 4px; font-size: 12.5px; color: $gris; }
+    }
+    &__hoyFoto{
+        flex: 0 0 auto; width: 62px; height: 62px; border-radius: 20px; object-fit: cover;
+        &.is-vacia{ background: var(--n-menta); display: flex; align-items: center; justify-content: center; svg{ width: 28px; height: 28px; } }
+    }
+    &__pasos{
+        margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+        span{ height: 7px; border-radius: 4px; background: #ECEDE6; overflow: hidden; }
+        i{ display: block; height: 100%; border-radius: 4px; background: var(--n-tinta); transform-origin: left center; }
+    }
+    &__pasosTxt{
+        margin-top: 6px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+        font-size: 11.5px; font-weight: 600; color: $gris;
+        span:nth-child(2){ text-align: center; } span:nth-child(3){ text-align: right; }
+        .is-on{ color: var(--n-tinta); }
+    }
+    &__cardNota{ margin: 14px 0 0; font-size: 12.5px; line-height: 1.45; color: $gris; }
+
+    /* --- Prueba elegir tu semana --- */
+    &__sec{
+        margin-top: 28px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+        b{ font-weight: 800; font-size: 24px; line-height: 1.1; letter-spacing: -.02em; }
+        span{ flex: 0 0 auto; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    }
+    &__ayuda{ margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; color: $gris; }
+
+    &__dias{ margin-top: 16px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    &__dia{
+        border: 0; background: none; padding: 0 0 2px; cursor: pointer; text-align: center; font-family: inherit;
+        small{ display: block; font-size: 11.5px; font-weight: 600; color: rgba(22,33,27,.72); }
+        b{
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; margin: 4px auto 0; border-radius: 50%;
+            font-weight: 700; font-size: 20px; color: var(--n-tinta);
+            transition: color .18s ease;
+            /* El circulo es uno solo y viaja de un dia al otro. */
+            i{ position: absolute; inset: 0; border-radius: 50%; background: var(--n-tinta); }
+            span{ position: relative; }
+        }
+        em{ display: block; margin-top: 4px; font-style: normal; font-size: 11.5px; font-weight: 600; color: var(--n-tinta); }
+        &.is-sel b{ color: #fff; }
+        &.is-listo em{ color: #0B6B43; }
+        &:focus-visible b{ outline: 2px solid var(--n-tinta); outline-offset: 2px; }
+    }
+
+    &__platos{ margin-top: 14px; }
+    &__vacio{
+        margin: 0; padding: 22px 12px; border-radius: 22px; background: $hundido; text-align: center;
+        font-size: 13.5px; color: $gris;
+    }
+    &__plato{
+        display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box;
+        padding: 12px 0; border: 0; border-bottom: 1px solid var(--n-linea); border-radius: 0;
+        background: none; cursor: pointer; text-align: left; font-family: inherit;
+        &:last-child{ border-bottom-color: transparent; }
+        /* Solo lo elegido va enmarcado. */
+        &.is-on{
+            width: calc(100% + 24px); margin: 8px -12px; padding: 12px; border-radius: 22px;
+            background: var(--n-papel); border: 2.5px solid var(--n-tinta);
+            box-shadow: 0 12px 26px rgba(22,33,27,.12);
+        }
+        &:focus-visible{ outline: 2px solid var(--n-tinta); outline-offset: 2px; }
+    }
+    &__platoFoto{
+        flex: 0 0 auto; width: 64px; height: 64px; border-radius: 18px; object-fit: cover;
+        &.is-vacia{ background: var(--n-menta-suave); display: flex; align-items: center; justify-content: center; svg{ width: 26px; height: 26px; } }
+    }
+    &__platoTxt{
+        flex: 1; min-width: 0;
+        b{ display: block; font-size: 15px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+        small{ display: block; margin-top: 3px; font-size: 12.5px; color: $gris; }
+    }
+    &__radio{
+        flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; box-sizing: border-box;
+        border: 2px solid #A9B0A6;
         display: flex; align-items: center; justify-content: center;
+        span{ display: flex; }
+        svg{ width: 15px; height: 15px; }
+        .is-on &{ border: 0; background: var(--n-menta); }
+    }
+    &__nota{ margin: 12px 0 0; font-size: 12.5px; line-height: 1.45; color: $gris; }
+
+    /* --- Tu plan --- */
+    &__plan{
+        display: block; width: 100%; box-sizing: border-box; margin-top: 22px; padding: 20px;
+        border: 0; border-radius: 30px; background: var(--n-tinta); color: #fff !important;
+        text-align: left; font-family: inherit; cursor: pointer;
+        .visN__et{ display: block; color: rgba(255,255,255,.72); }
+        b{
+            display: block; margin-top: 8px;
+            font-family: var(--n-titular); font-weight: 800; font-size: 28px; line-height: 1.05; letter-spacing: -.02em;
+        }
+    }
+    &__planPie{
+        display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px;
+        font-size: 13.5px; color: rgba(255,255,255,.82);
+        svg{ width: 20px; height: 20px; flex: 0 0 auto; color: #fff; }
+    }
+
+    /* --- Yo --- */
+    &__ficha{
+        margin-top: 10px; display: flex; align-items: center; gap: 16px;
+        > div{ flex: 1; min-width: 0; }
+        h1{ font-size: 34px; line-height: 1; letter-spacing: -.03em; }
+        div > span{ display: block; margin-top: 6px; font-size: 13.5px; line-height: 1.35; color: var(--n-tinta-78); }
+    }
+    &__ava{
+        flex: 0 0 auto; width: 92px; height: 92px; border-radius: 50%; box-sizing: border-box; overflow: hidden;
+        border: 3px solid var(--n-tinta); background: var(--n-papel);
+        display: flex; align-items: center; justify-content: center;
+        img{ display: block; width: 100%; height: 100%; object-fit: cover; }
+        svg{ width: 38px; height: 38px; }
+    }
+    &__avaEt{ margin: 18px 0 8px; font-size: 13px; font-weight: 600; }
+    /* Son 24: la fila se desliza de lado. */
+    &__avatares{
+        display: flex; gap: 10px; margin: 0 -22px; padding: 2px 22px;
+        overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        &::-webkit-scrollbar{ display: none; }
+        button{
+            flex: 0 0 58px; width: 58px; height: 58px; padding: 0; box-sizing: border-box;
+            border-radius: 50%; cursor: pointer; background: #fff; border: 3px solid #fff;
+            transition: border-color .15s ease, transform .12s ease;
+            &:active{ transform: scale(.94); }
+            &.is-on{ border-color: var(--n-tinta); }
+            img{ display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        }
+    }
+
+    &__grupo{ margin: 26px 0 0; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $gris; }
+    &__grupo ~ &__grupo{ margin-top: 22px; }
+    &__lista{ display: block; }
+    &__fila{
+        display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box;
+        padding: 14px 0; border: 0; border-bottom: 1px solid var(--n-linea); background: none;
+        text-align: left; font-family: inherit; cursor: pointer;
+        &:last-child{ border-bottom: 0; }
+        &.is-cerrada{ cursor: default; }
+        &:focus-visible{ outline: 2px solid var(--n-tinta); outline-offset: 2px; border-radius: 12px; }
+    }
+    &__filaIco{
+        flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; background: var(--n-menta-suave);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; }
+        &--menta{ background: var(--n-menta); }
+    }
+    &__filaTxt{
+        flex: 1; min-width: 0;
+        b{ display: block; font-size: 15px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+        small{ display: block; font-size: 12.5px; line-height: 1.35; color: $gris; }
+    }
+    &__ir{ flex: 0 0 auto; display: flex; svg{ width: 18px; height: 18px; } }
+    &__candado{
+        flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px;
+        font-size: 12px; font-weight: 600; color: $gris; background: $hundido;
+        padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+        svg{ width: 12px; height: 12px; }
+    }
+    &__quitar{
+        flex: 0 0 auto; min-height: 44px; padding: 0 4px; border: 0; background: none; cursor: pointer;
+        font-family: inherit; font-size: 13px; font-weight: 600; color: $gris;
+        text-decoration: underline; text-underline-offset: 4px;
+    }
+
+    /* El codigo de invitacion, escrito de visita. */
+    &__codigo{
+        padding: 14px 0; border-bottom: 1px solid var(--n-linea);
+        label{ display: block; margin: 0 0 8px; font-size: 12.5px; font-weight: 600; color: $gris; }
+        div{ display: flex; gap: 8px; }
+        input{
+            flex: 1; min-width: 0; height: 52px; box-sizing: border-box; border-radius: 16px;
+            border: 2px solid #E3E5DC; padding: 0 14px; background: #fff;
+            font-size: 16px; font-weight: 700; letter-spacing: .04em; color: var(--n-tinta);
+            &:focus{ outline: none; border-color: var(--n-tinta); }
+        }
+        button{
+            flex: 0 0 auto; height: 52px; padding: 0 18px; border: 0; border-radius: 16px; cursor: pointer;
+            background: var(--n-tinta); color: #fff; font-size: 14.5px; font-weight: 600;
+            &:disabled{ opacity: .6; }
+        }
+        p{ margin: 8px 0 0; font-size: 12.5px; line-height: 1.4; font-weight: 600; color: var(--n-coral-texto); }
     }
 }
 
-.vis__aviso{
-    display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 12px;
-    border-radius: 14px; background: #FFF1DE; color: #6B4A1E; font-size: 12.5px; line-height: 1.35;
-    svg{ width: 15px; height: 15px; flex: 0 0 auto; }
-}
-
-.vis__hoyNota{ position: relative; margin: 14px 0 0; font-size: 12.5px; line-height: 1.45; color: rgba(255,255,255,.7); }
-
-.vis__platos{ margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
-.vis__vacio{ margin: 0; padding: 18px 12px; border-radius: 18px; background: #F6F9F7; text-align: center;
-             font-size: 13px; color: $muted; }
-.vis__plato{
-    display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px 10px 10px;
-    border-radius: 22px; border: 2px solid #F6F9F7; background: #F6F9F7; box-sizing: border-box;
-    font: inherit; color: $tinta; text-align: left; cursor: pointer;
-    transition: border-color .15s ease, box-shadow .15s ease, transform .12s ease;
-    &:active{ transform: scale(.985); }
-    &.is-on{ background: #fff; border-color: $tinta; box-shadow: 0 14px 30px rgba(22,33,27,.16); }
-}
-.vis__platoIco{
-    width: 60px; height: 60px; border-radius: 16px; flex: 0 0 auto;
-    display: flex; align-items: center; justify-content: center;
-    svg{ width: 24px; height: 24px; }
-    &--0{ background: linear-gradient(135deg, #DDF7E9, #B9EED2); color: $verde; }
-    &--1{ background: linear-gradient(135deg, #FFEBD2, #FFD3A6); color: #C26A12; }
-    &--2{ background: linear-gradient(135deg, #E2EEFB, #C5DCF5); color: #2A5F9E; }
-}
-.vis__platoTxt{ flex: 1; min-width: 0; b{ display: block; font-size: 14px; line-height: 1.3; } }
-.vis__chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.vis__chip{
-    font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
-    &--crema{ background: #FFF1DE; color: #8A4B0F; }
-    &--cielo{ background: #E4EFFA; color: #2A5F9E; }
-}
-.vis__radio{
-    width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto; box-sizing: border-box;
-    border: 2px solid #C9D3CD; background: #fff; color: $tinta;
-    display: flex; align-items: center; justify-content: center;
-    svg{ width: 14px; height: 14px; }
-    .is-on &{ border: 0; background: $menta; }
-}
-.vis__nota{ margin: 12px 2px 0; font-size: 12.5px; line-height: 1.45; color: $muted; }
-
-.vis__plan{
-    margin-top: 16px;
-    .inN__chip{ background: #F2F5F3; color: $muted; }
-    b{ display: block; margin-top: 12px; font-size: 20px; line-height: 1.2; letter-spacing: -.025em; }
-    p{ margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: $muted; }
-}
-.vis__btnTinta{
-    margin-top: 14px; width: 100%; height: 48px; border: 0; border-radius: 16px;
-    background: $tinta; color: #fff; font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer;
-    transition: transform .12s ease;
-    &:active{ transform: scale(.97); }
-}
-
-.vis__sinPlan{
-    display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600;
-    background: #F2F5F3; color: $muted; padding: 5px 12px; border-radius: 999px;
-}
-.vis__candado{
-    display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
-    font-size: 11.5px; font-weight: 600; color: $muted; background: #F2F5F3;
-    padding: 4px 9px; border-radius: 999px;
-    svg{ width: 11px; height: 11px; }
-}
-.vis__cerrada{ cursor: default; }
-.vis__entrar{
-    margin: 22px 0 0; text-align: center; font-size: 14px; color: $muted;
-    a{ color: $verde; font-weight: 600; text-decoration: none; padding: 12px 4px; }
-}
-
-/* El boton de comprar, fijo encima de la barra de abajo. Va en el body para
-   que ningun contenedor animado lo mueva (igual que .afNatPie). */
-.vis__pie{
+/* El boton de comprar y la barra, fijos abajo. Van en el body para que ningun
+   contenedor animado los mueva. El fondo se deshace hacia arriba: el contenido
+   no asoma entre el boton y las pestañas. */
+.visN__pie{
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 80;
-    /* Llega hasta abajo, por detras de la barra: asi el contenido no asoma
-       entre el boton y las pestanas. */
-    padding: 22px 16px calc(88px + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(180deg, rgba(247,250,244,0) 0, rgba(247,250,244,.96) 20px, #F7FAF4 34px);
+    padding: 22px 16px calc(14px + var(--n-abajo));
+    background: linear-gradient(180deg, rgba(246,246,241,0) 0, var(--n-fondo) 26px);
     pointer-events: none;
+    font-family: var(--n-texto);
 }
-.vis__comprar{
-    pointer-events: auto;
-    display: block; width: 100%; max-width: 560px; margin: 0 auto; height: 54px; border: 0; border-radius: 18px;
-    background: $menta; color: $tinta; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
-    box-shadow: 0 12px 28px rgba(60,251,159,.45);
-    transition: transform .12s ease;
-    &:active{ transform: scale(.97); }
+.visN__pieCol{ max-width: 528px; margin: 0 auto; pointer-events: auto; }
+.visN__comprar{
+    width: 100%; height: 56px; border: 0; border-radius: 18px; cursor: pointer;
+    background: var(--n-tinta); color: #fff; font-family: inherit; font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+    svg{ width: 18px; height: 18px; flex: 0 0 auto; }
+}
+
+/* La misma barra del app: una sola pildora menta que viaja a la pestaña. */
+.visN__tabs{
+    position: relative; margin-top: 12px; height: 64px; box-sizing: border-box; padding: 0 8px;
+    border-radius: 32px; background: var(--n-tinta);
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 16px 36px rgba(22,33,27,.30);
+}
+.visN__pildora{
+    position: absolute; left: 0; top: 8px; bottom: 8px; border-radius: 24px;
+    background: var(--n-menta); will-change: transform, width;
+}
+.visN__tab{
+    position: relative; z-index: 1; min-width: 0; border-radius: 24px;
+    color: rgba(255,255,255,.75); text-decoration: none;
+    -webkit-tap-highlight-color: transparent; transition: color .2s ease;
+    svg{ width: 22px; height: 22px; flex: 0 0 auto; }
+    &.is-on{
+        color: var(--n-tinta);
+        .visN__tabCaja{ padding: 0 16px; }
+        .visN__tabTxt{
+            max-width: 110px; opacity: 1; margin-left: 8px;
+            /* El nombre aparece cuando la pildora ya llego. */
+            animation: visTabTxt .3s .12s both ease-out;
+        }
+        svg{ width: 20px; height: 20px; }
+    }
+    &:focus-visible{ outline: 2px solid var(--n-menta); outline-offset: 2px; }
+}
+.visN__tabCaja{
+    display: flex; align-items: center; justify-content: center;
+    height: 48px; min-width: 48px; box-sizing: border-box; padding: 0 13px; border-radius: 24px;
+}
+.visN__tabTxt{
+    font-size: 13.5px; font-weight: 600; white-space: nowrap;
+    max-width: 0; opacity: 0; overflow: hidden;
+}
+@keyframes visTabTxt{ from{ opacity: 0; transform: translateX(-4px); } to{ opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce){
+    .visN__tab.is-on .visN__tabTxt{ animation: none; }
 }
 
 /* La direccion de visita usa la pantalla del registro; solo cambia su nota. */
 .vis__dirOk, .vis__dirNo{
-    margin: 12px 0 0; padding: 14px; border-radius: 22px; font-size: 13px; line-height: 1.5;
-    b{ display: block; font-size: 15.5px; letter-spacing: -.01em; margin-bottom: 4px; color: $tinta; }
-    a{ color: inherit; font-weight: 600; }
+    margin: 12px 0 0; padding: 14px 16px; border-radius: 20px; font-size: 13px; line-height: 1.5;
+    font-family: var(--n-texto); color: var(--n-tinta-78);
+    b{ display: block; font-size: 15.5px; letter-spacing: -.01em; margin-bottom: 4px; color: var(--n-tinta); }
+    a{ color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 }
-.vis__dirOk{ background: #EAFBF3; color: #3D5247; }
-.vis__dirNo{ background: #FFF1DE; color: #6B4A1E; }
-
-/* El codigo de invitacion, escrito de visita. */
-.vis__invitado{
-    margin: 0 0 14px; padding: 10px 14px; border-radius: 16px; background: #16211B; color: rgba(255,255,255,.85);
-    font-size: 13px; line-height: 1.4;
-    b{ color: #fff; }
-}
-.vis__quitar{
-    flex: 0 0 auto; min-height: 44px; padding: 0 4px; border: 0; background: none;
-    font: inherit; font-size: 13px; font-weight: 600; color: $muted; cursor: pointer;
-}
-.vis__codigo{
-    padding: 12px 14px; border-top: 1px solid #EEF2EF;
-    label{ display: block; margin: 0 2px 8px; font-size: 12.5px; font-weight: 600; color: $muted; }
-    div{ display: flex; gap: 8px; }
-    input{
-        flex: 1; min-width: 0; height: 50px; box-sizing: border-box; border-radius: 14px;
-        border: 1.5px solid #DCE3DF; padding: 0 14px; background: #fff;
-        font: inherit; font-size: 16px; font-weight: 600; letter-spacing: .04em; color: $tinta;
-        &:focus{ outline: none; border-color: $tinta; }
-    }
-    button{
-        flex: 0 0 auto; height: 50px; padding: 0 18px; border: 0; border-radius: 14px;
-        background: $tinta; color: #fff; font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer;
-        &:disabled{ opacity: .6; }
-    }
-    p{ margin: 8px 2px 0; font-size: 12.5px; line-height: 1.4; color: #B4372B; }
-}
+.vis__dirOk{ background: var(--n-menta-suave); }
+.vis__dirNo{ background: $hundido; }

@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../../config';
 import { limpiarCodigo } from '../../referido';
+import { motion, useReducedMotion } from 'motion/react';
+import Isotipo from '../../components/ultil/Isotipo';
+import { cascada, sube, resorte } from '../../movimiento';
 import './Invitacion.scss';
 
 /**
@@ -32,6 +35,7 @@ export default function InvitacionPage() {
   const [dato, setDato] = useState(null);     // { valido, nombre, regalo }
   const [copiado, setCopiado] = useState(false);
   const cual = telefono();
+  const quieto = useReducedMotion();
 
   useEffect(() => {
     if (!codigo) return setDato({ valido: false });
@@ -51,51 +55,63 @@ export default function InvitacionPage() {
   const valido = dato?.valido;
   const regalo = dato?.regalo || 2;
 
-  return (
-    <main className="invP">
-      <div className="invP__col">
-        <p className="invP__marca">Allpa Food</p>
+  const toque = quieto ? {} : { whileTap: { scale: 0.97 }, transition: resorte.toque };
+  const FLECHA = 'M5 12h14M13 6l6 6-6 6';
+  const flecha = (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={FLECHA} /></svg>
+  );
 
-        {dato === null && <p className="invP__espera">Un momento…</p>}
+  return (
+    <main className="nPant invP">
+      <span className="nMenta invP__menta" aria-hidden="true" />
+      {/* La clave cambia cuando llega la respuesta: lo nuevo entra en cascada. */}
+      <motion.div className="invP__col" key={dato === null ? 'espera' : 'listo'}
+        variants={cascada(quieto ? 0 : 0.06)} initial="oculto" animate="visible">
+        <motion.p className="invP__marca" variants={sube}><Isotipo size={20} />Allpa Food</motion.p>
+
+        {dato === null && <motion.p className="invP__espera" variants={sube}>Un momento…</motion.p>}
 
         {dato !== null && valido &&
           <>
-            <h1 className="invP__h">
-              {dato.nombre ? <>{dato.nombre} te invitó a <em>comer bien</em></> : <>Te invitaron a <em>comer bien</em></>}
-            </h1>
-            <p className="invP__bajada">
+            <motion.h1 className="invP__h" variants={sube}>
+              {dato.nombre ? <>{dato.nombre} te invitó a comer bien</> : <>Te invitaron a comer bien</>}
+            </motion.h1>
+            <motion.p className="invP__bajada" variants={sube}>
               Almuerzos saludables recién cocinados, en tu casa u oficina, de lunes a viernes.
               Con este código te regalamos <b>{regalo} entregas</b> en tu primer plan.
-            </p>
+            </motion.p>
 
-            <div className="invP__codigo">
-              <span>TU CÓDIGO DE INVITACIÓN</span>
+            <motion.div className="invP__codigo" variants={sube}>
+              <span>TU CÓDIGO DE INVITACIÓN<em>REGALO</em></span>
               <div>
                 <b>{codigo}</b>
                 <button type="button" onClick={copiar}>{copiado ? 'Copiado' : 'Copiar'}</button>
               </div>
               <small>Escríbelo en el app al pagar tu plan.</small>
-            </div>
+            </motion.div>
           </>}
 
         {dato !== null && !valido &&
           <>
-            <h1 className="invP__h">Ese código <em>no existe</em></h1>
-            <p className="invP__bajada">
+            <motion.h1 className="invP__h" variants={sube}>Ese código no existe</motion.h1>
+            <motion.p className="invP__bajada" variants={sube}>
               Revísalo con quien te invitó. Igual puedes bajar el app y mirar el menú de la semana.
-            </p>
+            </motion.p>
           </>}
 
         {dato !== null &&
-          <div className="invP__botones">
+          <motion.div className="invP__botones" variants={sube}>
             {cual !== 'android' &&
-              <a className="invP__btn" href={TIENDAS.ios}>Bajar en el App Store</a>}
+              <motion.a className="invP__btn" href={TIENDAS.ios} {...toque}>Bajar en el App Store {flecha}</motion.a>}
             {cual !== 'ios' &&
-              <a className={`invP__btn${cual === null ? ' invP__btn--claro' : ''}`} href={TIENDAS.android}>Bajar en Google Play</a>}
-          </div>}
+              <motion.a className={`invP__btn${cual === null ? ' invP__btn--claro' : ''}`} href={TIENDAS.android} {...toque}>
+                Bajar en Google Play {flecha}
+              </motion.a>}
+          </motion.div>}
 
-        <p className="invP__pie">¿Ya eres cliente? <Link to="/ingresar">Ingresa</Link></p>
-      </div>
+        <motion.p className="invP__pie" variants={sube}>¿Ya eres cliente? <Link to="/ingresar">Ingresa</Link></motion.p>
+      </motion.div>
     </main>
   );
 }

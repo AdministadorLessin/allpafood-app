@@ -1,0 +1,5 @@
+.afJalar{ position: fixed; z-index: 120; left: 50%; top: calc(var(--n-arriba) - 44px); width: 44px; height: 44px; margin-left: -22px; border-radius: 50%;
+    background: #fff; color: var(--n-tinta); box-shadow: 0 8px 22px rgba(22,33,27,.2); display: flex; align-items: center; justify-content: center; pointer-events: none;
+    svg{ width: 22px; height: 22px; &.is-gira{ animation: afJalarGira .8s linear infinite; } }
+    &__txt{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@keyframes afJalarGira{ to{ transform: rotate(360deg); } }

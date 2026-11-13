@@ -1,111 +1,134 @@
-/* "Invita y come gratis", con las piezas del Inicio y de Mi cuenta. */
-$tinta: #16211B;
-$muted: #55655C;
-$menta: #3CFB9F;
-$menta2: #12C97B;
-$verde: #177A4C;
+/* "Invita y come gratis": el codigo en tinta, y debajo la escalera y los
+   invitados como listas con lineas finas. */
 
-.invN{ color: $tinta; }
-.invN__volver{
-    width: 44px; height: 44px; border-radius: 14px; border: 0; padding: 13px; box-sizing: border-box;
-    background: #fff; color: $tinta; box-shadow: 0 6px 16px rgba(22,35,29,.08); cursor: pointer; display: flex;
-    svg{ width: 100%; height: 100%; }
-}
-.invN__h{
-    margin: 16px 0 0; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.035em;
-    em{
-        font-style: normal;
-        background: linear-gradient(90deg, #12B36E, #0B7A4A);
-        -webkit-background-clip: text; background-clip: text; color: transparent;
+$gris: #55655C;
+$hundido: #E9EBE3;
+
+.invN{
+    position: relative; overflow: hidden;
+    padding: calc(var(--n-arriba) + 14px) 22px 24px;
+    > *:not(.invN__menta){ position: relative; }
+    button{ -webkit-tap-highlight-color: transparent; }
+    &__menta{ height: 380px; }
+
+    &__volver{
+        width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+        background: var(--n-tinta); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 18px; height: 18px; }
     }
-}
-.invN__bajada{ margin: 8px 0 0; font-size: 14px; line-height: 1.45; color: $muted; }
-.invN__error, .invN__aviso{
-    margin: 16px 0 0; padding: 12px 14px; border-radius: 16px; font-size: 13px; line-height: 1.45;
-}
-.invN__error{ background: #FDECEA; color: #8A2B21; }
-.invN__aviso{ background: #FFF1DE; color: #6B4A1E; b{ color: $tinta; } }
+    &__h{ margin: 18px 0 0 !important; font-size: 42px !important; line-height: .98 !important; }
+    &__bajada{ margin: 10px 0 0; font-size: 14.5px; line-height: 1.45; color: var(--n-tinta-78); }
 
-.invN__codigo{
-    position: relative; overflow: hidden; margin-top: 20px; padding: 20px; border-radius: 28px;
-    background: $tinta; color: #fff; box-shadow: 0 22px 44px rgba(22,33,27,.30);
-    &::before{
-        content: ''; position: absolute; right: -60px; top: -70px; width: 220px; height: 220px; border-radius: 50%;
-        background: radial-gradient(closest-side, rgba(60,251,159,.22), rgba(60,251,159,0));
+    &__error{
+        margin: 20px 0 0; padding: 16px 18px; border-radius: 24px; background: var(--n-papel);
+        box-shadow: var(--n-sombra); font-size: 13.5px; line-height: 1.45; color: $gris;
+        b{ display: block; font-size: 15px; color: var(--n-tinta); }
     }
-    > *{ position: relative; }
-}
-.invN__et{ display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $menta; }
-.invN__caja{
-    margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 10px 10px 10px 16px; border-radius: 18px;
-    background: rgba(255,255,255,.06); border: 1.5px dashed rgba(60,251,159,.55);
-    b{ font-size: 26px; line-height: 1.1; letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
-    button{
-        flex: 0 0 auto; height: 44px; padding: 0 14px; border: 0; border-radius: 13px;
-        background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    /* Mientras llega el codigo: la silueta de la tarjeta, respirando. */
+    &__espera{
+        margin-top: 20px; height: 286px; box-sizing: border-box; padding: 20px; border-radius: 32px;
+        background: var(--n-tinta); display: flex; flex-direction: column; gap: 12px;
+        animation: invLate 1.4s ease-in-out infinite;
+        i{ display: block; border-radius: 18px; background: rgba(255,255,255,.08); }
+        i:nth-child(1){ height: 68px; margin-top: 24px; }
+        i:nth-child(2){ height: 56px; }
+        i:nth-child(3){ flex: 1; }
     }
-}
-.invN__compartir{
-    margin-top: 12px; width: 100%; height: 54px; border: 0; border-radius: 17px;
-    background: $menta; color: $tinta; font: inherit; font-size: 15.5px; font-weight: 600; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 9px;
-    transition: transform .12s ease;
-    &:active{ transform: scale(.97); }
-    svg{ width: 19px; height: 19px; }
-}
-.invN__cifras{
-    margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
-    div{ padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,.06); }
-    b{ display: block; font-size: 22px; line-height: 1.1; color: $menta; }
-    small{ display: block; margin-top: 2px; font-size: 12px; color: rgba(255,255,255,.72); }
+
+    /* --- Tu codigo --- */
+    &__codigo{
+        margin-top: 20px; padding: 20px; border-radius: 32px;
+        background: var(--n-tinta); color: #fff; box-shadow: 0 18px 40px rgba(22,33,27,.28);
+    }
+    &__et{ display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: rgba(255,255,255,.72); }
+    &__caja{
+        margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 12px 12px 12px 18px; border-radius: 20px; border: 1.5px dashed rgba(60,251,159,.55);
+        b{
+            min-width: 0; overflow-wrap: anywhere;
+            font-family: var(--n-titular); font-weight: 800; font-size: 30px; line-height: 1.05; letter-spacing: .06em;
+        }
+        button{
+            flex: 0 0 auto; height: 44px; padding: 0 14px; border: 0; border-radius: 14px; cursor: pointer;
+            background: rgba(255,255,255,.12); color: #fff; font-size: 13.5px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+            svg{ width: 16px; height: 16px; }
+        }
+    }
+    &__compartir{
+        margin-top: 12px; width: 100%; height: 56px; border: 0; border-radius: 18px; cursor: pointer;
+        background: var(--n-menta); color: var(--n-tinta); font-size: 16px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        svg{ width: 19px; height: 19px; }
+    }
+    &__cifras{
+        margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+        div{ padding: 12px 14px; border-radius: 18px; background: rgba(255,255,255,.07); }
+        b{
+            display: block; font-family: var(--n-titular); font-weight: 800; font-size: 30px; line-height: 1;
+            color: var(--n-menta); font-variant-numeric: tabular-nums;
+        }
+        small{ display: block; margin-top: 4px; font-size: 12.5px; color: rgba(255,255,255,.78); }
+    }
+
+    &__aviso{
+        margin: 14px 0 0; display: flex; align-items: center; gap: 10px;
+        padding: 14px; border-radius: 20px; background: var(--n-menta-suave);
+        font-size: 13.5px; line-height: 1.4;
+        em{
+            flex: 0 0 auto; display: inline-block; transform: rotate(-4deg);
+            font-style: normal; font-weight: 800; font-size: 12.5px; letter-spacing: .02em; line-height: 1;
+            background: var(--n-tinta); color: #fff; padding: 5px 8px 4px; border-radius: 6px;
+        }
+    }
+
+    /* --- La escalera y los invitados --- */
+    &__sec{
+        margin-top: 28px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+        h2{
+            margin: 0; font-family: var(--n-texto) !important; font-weight: 800; font-size: 24px;
+            line-height: 1.1 !important; letter-spacing: -.02em !important;
+        }
+        span{ flex: 0 0 auto; font-size: 13px; font-weight: 600; }
+    }
+    &__ayuda{ margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; color: $gris; }
+    &__lista{
+        list-style: none; margin: 4px 0 0; padding: 0;
+        > *{
+            display: flex; align-items: center; gap: 14px; padding: 13px 0;
+            border-bottom: 1px solid var(--n-linea);
+        }
+    }
+    &__num{
+        flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: $hundido;
+        font-size: 14px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 17px; height: 17px; }
+        .is-ok &{ background: var(--n-menta); }
+    }
+    &__txt{
+        flex: 1; min-width: 0;
+        b{ display: block; font-size: 15px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+        small{ display: block; font-size: 12.5px; color: $gris; }
+    }
+    &__chip{
+        flex: 0 0 auto; font-size: 12px; font-weight: 600; white-space: nowrap;
+        color: #0B6B43; background: var(--n-menta-suave); padding: 4px 10px; border-radius: 999px;
+        &--tinta{ background: var(--n-tinta); color: #fff; }
+    }
+    &__amigo{
+        img, .invN__inicial{ flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+    }
+    &__inicial{
+        background: var(--n-menta-suave); font-weight: 700; font-size: 16px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    &__mas{ flex: 0 0 auto; font-size: 13.5px; font-weight: 700; color: #0B6B43; white-space: nowrap; }
+    &__reglas{ margin: 16px 0 0; font-size: 12.5px; line-height: 1.5; color: $gris; }
 }
 
-.invN__card{
-    margin-top: 16px; padding: 18px 16px 8px; border-radius: 28px; background: #fff;
-    box-shadow: 0 18px 40px rgba(22,35,29,.10);
+@keyframes invLate{ 0%, 100%{ opacity: 1; } 50%{ opacity: .72; } }
+@media (prefers-reduced-motion: reduce){
+    .invN__espera{ animation: none; }
 }
-.invN__cardCab{
-    display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px;
-    h2{ margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
-    span{ font-size: 12.5px; color: $muted; b{ color: $verde; } }
-}
-.invN__ayuda{ margin: 4px 2px 0; font-size: 13px; color: $muted; b{ color: $tinta; } }
-.invN__barra{
-    margin: 14px 2px 0; height: 10px; border-radius: 5px; background: #EEF2EF; overflow: hidden;
-    i{ display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, $menta, $menta2); }
-}
-.invN__pasos{
-    list-style: none; margin: 12px 0 0; padding: 0;
-    li{ display: flex; align-items: center; gap: 12px; padding: 11px 2px; }
-    li + li{ border-top: 1px solid #EEF2EF; }
-}
-.invN__num{
-    width: 36px; height: 36px; border-radius: 50%; flex: 0 0 auto; box-sizing: border-box;
-    background: #F2F5F3; color: $muted; font-size: 13.5px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    svg{ width: 16px; height: 16px; }
-    .is-ok &{ background: $menta; color: $tinta; }
-}
-.invN__pasoTxt{
-    flex: 1; min-width: 0;
-    b{ display: block; font-size: 14.5px; }
-    small{ display: block; font-size: 12.5px; color: $muted; }
-}
-.invN__chip{
-    flex: 0 0 auto; font-size: 12px; font-weight: 600; color: $verde; background: #EAFBF3;
-    padding: 4px 10px; border-radius: 999px;
-}
-
-.invN__grupo{ margin: 26px 4px 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; color: $muted; }
-.invN__lista{ border-radius: 22px; background: #fff; box-shadow: 0 12px 30px rgba(22,35,29,.08); overflow: hidden; }
-.invN__amigo{
-    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-    & + &{ border-top: 1px solid #EEF2EF; }
-    img, .invN__inicial{ width: 40px; height: 40px; border-radius: 50%; flex: 0 0 auto; object-fit: cover; }
-}
-.invN__inicial{
-    background: #EAFBF3; color: $verde; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-}
-.invN__reglas{ margin: 18px 4px 0; font-size: 12px; line-height: 1.5; color: $muted; }

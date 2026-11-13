@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import './PagoListo.scss';
 import { motion, alToque } from './../../ultil/Motion/Motion';
 import IcoIsotipoSvg from './../../ultil/iconSvg/icoIsotipoSvg';
-import { vibrar } from '../../../nativo';
+import { esNativo, vibrar } from '../../../nativo';
+import Isotipo from './../../ultil/Isotipo';
+import { resorte, cascada, sube } from '../../../movimiento';
+import { useReducedMotion } from 'motion/react';
 
 /* Cuanto esperamos antes de dar por activado el plan. El servidor aplica los
    beneficios justo despues de confirmar el cobro; salir antes lleva al cliente
@@ -31,6 +34,75 @@ const PagoListo = ({ total, plan, adicionales = 0, invitacion = null }) => {
     const t = setTimeout(() => { setListo(true); vibrar.exito(); }, MS_ACTIVANDO);
     return () => clearTimeout(t);
   }, []);
+
+  const quieto = useReducedMotion();
+
+  /* En el app, la unica pantalla que celebra: menta de borde a borde, el
+     isotipo y el siguiente paso (maqueta RegListo). Los datos son los
+     mismos que en la web. */
+  if (esNativo) {
+    return (
+      <motion.div className="afListo" role="dialog" aria-live="polite" aria-label="Pago recibido"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: quieto ? 0 : 0.25 }}>
+        <span className="afListo__picos" aria-hidden="true" />
+
+        {!listo ?
+          <div className="afListo__cuerpo">
+            <motion.div className="afListo__iso"
+              animate={quieto ? undefined : { scale: [1, 1.08, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
+              <Isotipo size={72} hojas="#16211B" sonrisa="#16211B" />
+            </motion.div>
+            <h1 className="afListo__t">Activando<br />tu plan</h1>
+            <p className="afListo__d">Un momento, estamos cargando tus almuerzos.</p>
+          </div>
+        :
+          <>
+            <motion.div className="afListo__cuerpo" key="listo"
+              variants={cascada(0.07, 0.05)} initial={quieto ? false : 'oculto'} animate="visible">
+              <motion.div className="afListo__iso"
+                initial={quieto ? false : { scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                transition={resorte.entra}>
+                <Isotipo size={72} hojas="#16211B" sonrisa="#16211B" />
+              </motion.div>
+              <motion.h1 className="afListo__t" variants={sube}>¡Listo, ya<br />eres parte!</motion.h1>
+              <motion.p className="afListo__d" variants={sube}>
+                {plan ? <>Tu <b>{plan}</b> está activo.</> : 'Tu plan está activo.'}
+                {adicionales > 0 && ` Con ${adicionales} ${adicionales === 1 ? 'adicional' : 'adicionales'}.`}
+                {total > 0 && ` Pagaste S/\u00a0${Number(total).toFixed(2)}.`}
+              </motion.p>
+
+              {invitacion &&
+                <motion.div className="afListo__regalo" variants={sube}>
+                  <b>+{invitacion.regalo}</b>
+                  <span>
+                    <strong>entregas de regalo</strong>
+                    {invitacion.nombre ? `Por la invitación de ${invitacion.nombre}.` : 'Por tu código de invitación.'}
+                    {' '}Ya están sumadas a tu plan.
+                  </span>
+                </motion.div>}
+
+              <motion.p className="afListo__sig" variants={sube}>
+                Falta lo último: dinos a dónde te llevamos el almuerzo.
+              </motion.p>
+            </motion.div>
+
+            <motion.div className="afListo__pie"
+              initial={quieto ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ ...resorte.entra, delay: quieto ? 0 : 0.3 }}>
+              <motion.button type="button" className="afListo__btn"
+                onClick={() => navigate('/registro/direccion', { replace: true })}
+                whileTap={quieto ? undefined : { scale: 0.97 }}>
+                Indicar mi dirección
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </motion.button>
+            </motion.div>
+          </>
+        }
+      </motion.div>
+    );
+  }
 
   return (
     <div className="afPago">

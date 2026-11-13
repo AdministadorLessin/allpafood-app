@@ -16,11 +16,11 @@
         background: var(--af-ink);
         transition: width .45s cubic-bezier(.4,0,.2,1);
     }
-    /* Verde cuando queda holgura, ambar cuando el plan se acaba. Un solo dato
-       de color, en el sitio donde el cliente ya esta mirando. */
-    &--ok i{ background: var(--af-accent); }
-    &--bajo i{ background: #C58A2E; }
-    &--sky i{ background: var(--af-accent); opacity: .55; }
+    /* Tinta cuando queda holgura, coral cuando el plan se acaba (es un aviso
+       de tiempo). Un solo dato de color, donde el cliente ya esta mirando. */
+    &--ok i{ background: var(--n-tinta); }
+    &--bajo i{ background: var(--n-coral); }
+    &--sky i{ background: var(--n-proteina); }
 }
 
 .afFila{
@@ -41,10 +41,10 @@
         margin: 14px 0 0;
         padding: 11px 12px;
         border-radius: 12px;
-        background: var(--af-accent-soft);
+        background: var(--n-menta-suave);
         font-size: 12.5px;
         line-height: 1.45;
-        color: var(--af-accent);
+        color: var(--n-tinta);
     }
     &__chip{
         font-size: 11px;
@@ -54,7 +54,7 @@
         background: rgba(16,31,24,.06);
         color: var(--af-muted);
         white-space: nowrap;
-        &--bajo{ background: #FBF0DC; color: #8A5F14; }
+        &--bajo{ background: #FDE3DE; color: var(--n-coral-texto); }
     }
 }
 

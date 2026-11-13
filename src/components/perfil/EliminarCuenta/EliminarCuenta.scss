@@ -11,32 +11,27 @@
     font-weight: 600;
     color: #B42318;
     cursor: pointer;
+
+    /* En "Yo": al lado de "Cerrar sesion", en la misma linea. */
+    &--enlace{
+        margin: 0; min-height: 48px; padding: 14px 0; font-size: 13.5px; color: #B4372B;
+        -webkit-tap-highlight-color: transparent;
+        &:focus-visible{ outline: 3px solid #B4372B; outline-offset: 2px; border-radius: 10px; }
+    }
 }
 
-.afEliminarCuentaDlg{
-    padding: 26px 24px 20px;
-    max-width: 340px;
-
-    h3{
-        font-size: 19px !important;
-        font-weight: 700;
-        margin: 0 0 8px !important;
-        color: var(--af-ink) !important;
-    }
+/* El texto de la hoja. */
+.afEliminarCuentaTxt{
     p{
         font-size: 14px;
         line-height: 1.5;
-        color: var(--af-muted);
+        color: #55655C;
         margin: 0 0 12px;
-        &:last-of-type{ margin-bottom: 22px; }
+        &:last-child{ margin-bottom: 0; }
     }
     &__error{
-        color: #B42318 !important;
+        color: #B4372B !important;
         a{ color: inherit; font-weight: 700; }
     }
-    &__acciones{
-        display: flex;
-        gap: 10px;
-        .afBtn{ margin: 0; flex: 1; }
-    }
 }
+.hoja__btn.hoja__btn--peligro{ background: #B4372B; }

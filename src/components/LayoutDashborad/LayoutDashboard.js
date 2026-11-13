@@ -1,8 +1,8 @@
 import React,{useState} from "react"
+import { useLocation, useNavigationType } from 'react-router-dom';
 import Sidebar from '../sidebar/sidebar';
 import TabBar from '../TabBar/TabBar';
 import NavLateral from '../NavLateral/NavLateral';
-import CargaAllpa from '../ultil/CargaAllpa/CargaAllpa';
 import ReprogramarMenu from '../ReprogramarMenu/ReprogramarMenu';
 import Centro from '../Centro/Centro';
 
@@ -11,16 +11,24 @@ import './LayoutDashboard.scss';
 import * as motion from "motion/react-client";
 import DashLoadState from './../dashboard/Loading/Loading';
 
-const animationConfiguration = {
-    initial: { opacity: 0,translateY: 50 },
-    exit: { opacity: 0,translateY: -50},
-    animate: { opacity: 1,translateY: 0 }
+/* Como entra cada pantalla, igual que en un telefono:
+   - una pestaña (Inicio, Menu, Progreso, Bienestar, Yo) aparece con un
+     fundido corto, sin desplazarse;
+   - una pantalla hija (Mi plan, Mis pagos...) llega desde la derecha;
+   - al volver atras, la pantalla llega desde la izquierda. */
+const PESTANAS = ['/', '/menu', '/progreso', '/bienestar', '/perfil'];
+const entradaDe = (ruta, tipo) => {
+    if (tipo === 'POP') return { opacity: 0, x: -26 };
+    if (PESTANAS.includes(ruta)) return { opacity: 0, y: 6 };
+    return { opacity: 0, x: 30 };
 };
 
 const LayoutDasboard = ({children,claseStyle}) => {
 
     const [openReprogramar,setOpenReprogramar] = useState(false);
     const [menuActive,setMenuActive] = useState(0);
+    const { pathname } = useLocation();
+    const tipo = useNavigationType();
 
     return (
         <main className="displayFlex pageLayout">
@@ -38,12 +46,9 @@ const LayoutDasboard = ({children,claseStyle}) => {
                     teñir el centro de la pantalla: el degradado del body ya
                     aporta la profundidad que hacia falta. */}
                 <motion.div
-                    //key={keytst}
-                    variants={animationConfiguration}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    transition={{ duration:0.5 }}
+                    initial={entradaDe(pathname, tipo)}
+                    animate={{ opacity: 1, x: 0, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 34, opacity: { duration: 0.18 } }}
                     className={claseStyle ? 'mainLayoutBox ' +claseStyle :'mainLayoutBox'}
                 >
                     {children}
@@ -57,9 +62,8 @@ const LayoutDasboard = ({children,claseStyle}) => {
             
             <DashLoadState />
 
-            {/* La marca, dibujandose, mientras llegan los datos del cliente.
-                Una vez por visita. */}
-            <CargaAllpa />
+{/* Aqui salia una animacion de la marca despues de iniciar sesion. Con la
+                apertura nueva y las siluetas de espera ya no hace falta. */}
         </main>
     )
 };

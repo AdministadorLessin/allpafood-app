@@ -21,6 +21,7 @@ import AvisosCliente from '../../../components/dashboard/AvisosCliente/AvisosCli
 import Tarjetas from '../../../components/dashboard/Tarjetas/Tarjetas';
 import ActivarAvisos from '../../../components/dashboard/ActivarAvisos/ActivarAvisos';
 import InicioNativo from '../../../components/dashboard/InicioNativo/InicioNativo';
+import InicioNuevo from '../../../components/dashboard/InicioNuevo/InicioNuevo';
 import { esNativo } from '../../../nativo';
 
 // Charts
@@ -358,7 +359,7 @@ const DashboadHome = (props) => {
   const estado = planChecked ? estadoDelPanel({ plan, ordenes: menuList, creditos: plan && plan.credits }) : null;
 
   return (
-    <LayoutDasboard claseStyle={false}>
+    <LayoutDasboard claseStyle={esNativo ? 'nCaja' : false}>
 
       {/* Estructura nueva: primero QUE tengo que hacer, despues QUE me llega,
           al final COMO voy. Antes eran cinco tarjetas del mismo peso y ninguna
@@ -367,7 +368,8 @@ const DashboadHome = (props) => {
           llega ve primero que tiene que hacer y despues el detalle. */}
       {/* En el app instalado, el inicio con el lenguaje del registro. */}
       {esNativo ? (
-        <InicioNativo
+        <InicioNuevo
+          alActualizar={() => { getPlan(); getMenus(); }}
           perfil={helloCard?.profile}
           plan={plan}
           ordenes={menuList}

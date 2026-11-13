@@ -1,15 +1,13 @@
-/* Entrada de marca: fondo del mismo verde suave del panel, el isotipo se
-   dibuja con su trazo, se rellena y respira una vez. Nada de giros infinitos:
-   esto dura lo que tarda el panel en tener datos, no es un spinner. */
+/* Entrada de marca: la menta de arriba del app a pantalla completa y el
+   isotipo en tinta, que se dibuja con su trazo y se rellena. Nada de giros
+   infinitos: esto dura lo que tarda el panel en tener datos, no es un spinner. */
 .afCarga{
     position: fixed;
     inset: 0;
     z-index: 3000;
     display: grid;
     place-items: center;
-    background:
-        radial-gradient(90% 70% at 50% 30%, #FFFFFF 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(160deg, #EAF6EE 0%, #F7FAF4 45%, #E4F0FF 100%);
+    background: linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 55%, #F6F6F1 100%);
     opacity: 1;
     transition: opacity .42s ease, transform .42s ease;
 
@@ -22,41 +20,42 @@
     &__marca{
         display: grid;
         justify-items: center;
-        gap: 14px;
+        gap: 16px;
         animation: afCargaSube .7s cubic-bezier(.16,.84,.44,1) both;
     }
 
     &__iso{
-        width: 104px;
-        height: 104px;
+        width: 96px;
+        height: 99px;
         overflow: visible;
-        filter: drop-shadow(0 12px 30px rgba(23,122,76,.18));
     }
 
     &__hoja{
-        fill: var(--af-accent, #177A4C);
-        stroke: var(--af-accent, #177A4C);
-        stroke-width: 4;
-        stroke-dasharray: 1400;
-        stroke-dashoffset: 1400;
+        fill: #16211B;
+        stroke: #16211B;
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
         fill-opacity: 0;
         animation:
             afCargaTrazo .85s cubic-bezier(.65,0,.35,1) forwards,
             afCargaRelleno .45s ease forwards;
 
         &--1{ animation-delay: 0s, .55s; }
-        /* La hoja de abajo entra despues: se lee como un gesto, no como dos
-           formas apareciendo a la vez. */
-        &--2{ fill: var(--af-mint, #3CFB9F); stroke: var(--af-mint, #3CFB9F); animation-delay: .18s, .72s; }
+        /* La sonrisa entra despues: se lee como un gesto, no como dos formas
+           apareciendo a la vez. */
+        &--2{ animation-delay: .18s, .72s; }
     }
 
     &__txt{
         margin: 0;
-        font-size: 15px;
+        font-family: var(--n-texto, system-ui, sans-serif);
+        font-size: 13px;
         font-weight: 800;
         letter-spacing: .14em;
         text-transform: uppercase;
-        color: var(--af-accent, #177A4C);
+        color: #16211B;
         opacity: 0;
         animation: afCargaTexto .5s ease .78s forwards;
     }
@@ -69,6 +68,7 @@
 
 /* Quien pidio menos movimiento ve la marca quieta, sin dibujo ni rebote. */
 @media (prefers-reduced-motion: reduce){
+    .afCarga{ transition: opacity .2s ease; &--fuera{ transform: none; } }
     .afCarga__marca, .afCarga__txt{ animation: none; opacity: 1; }
     .afCarga__hoja{ animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
 }

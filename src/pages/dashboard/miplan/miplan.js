@@ -4,9 +4,11 @@ import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 
-import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
+import { motion, useReducedMotion } from 'motion/react';
+
+import Pantalla, { Tramo } from './../../../components/perfil/Pantalla/Pantalla';
 import { useAuthContext } from './../../../context/authContext';
-import { Cascada, Bloque, BarraAnimada, motion, alToque } from './../../../components/ultil/Motion/Motion';
+import { resorte } from '../../../movimiento';
 import './miplan.scss';
 import { API_URL } from '../../../config';
 
@@ -24,7 +26,7 @@ const NOMBRES = {
 };
 
 const Ico = ({ n }) => {
-  const c = { className: 'afInc__ic', viewBox: '0 0 24 24', fill: 'none',
+  const c = { 'aria-hidden': true, viewBox: '0 0 24 24', fill: 'none',
               stroke: 'currentColor', strokeWidth: 1.7,
               strokeLinecap: 'round', strokeLinejoin: 'round' };
   if (n === 'taza')  return <svg {...c}><path d="M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10h1.8a2.6 2.6 0 0 1 0 5.2H16"/></svg>;
@@ -50,36 +52,6 @@ const habilesEntre = (desde, hasta) => {
 };
 
 /**
- * El anillo del plan. Se vacia conforme se consume: el cliente entiende de un
- * vistazo cuanto le queda sin leer una sola cifra.
- */
-const Anillo = ({ restantes, total, unidad }) => {
-  const R = 54;
-  const C = 2 * Math.PI * R;
-  const frac = total ? Math.max(restantes, 0) / total : 0;
-  return (
-    <div className="afAnillo">
-      <svg viewBox="0 0 132 132" aria-hidden="true">
-        <circle cx="66" cy="66" r={R} fill="none" strokeWidth="13"
-                stroke="rgba(255,255,255,.13)" />
-        <motion.circle
-          cx="66" cy="66" r={R} fill="none" strokeWidth="13" strokeLinecap="round"
-          stroke="var(--af-mint)" transform="rotate(-90 66 66)"
-          strokeDasharray={C}
-          initial={{ strokeDashoffset: C }}
-          animate={{ strokeDashoffset: C * (1 - frac) }}
-          transition={{ duration: 1.1, ease: [0.16, 0.84, 0.44, 1], delay: 0.2 }}
-        />
-      </svg>
-      <span className="afAnillo__txt">
-        <b>{Math.max(restantes, 0)}</b>
-        <small>de {total} {unidad}</small>
-      </span>
-    </div>
-  );
-};
-
-/**
  * Pantalla "Mi plan".
  *
  * Es la pantalla donde el cliente comprueba que el mes que pago vale la pena,
@@ -92,6 +64,7 @@ const MiPlanPage = () => {
 
   const { token } = useAuthContext();
   const navigate = useNavigate();
+  const quieto = useReducedMotion();
 
   const [plan, setPlan] = useState();
   const [facturas, setFacturas] = useState([]);
@@ -168,226 +141,194 @@ const MiPlanPage = () => {
   const porUnidad = total && bruto ? (bruto - dcto) / total : null;
   const porUnidadLista = total && bruto ? bruto / total : null;
 
+  const IR = <span className="cuP__filaIr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></span>;
+
   if (!listo) {
     return (
-      <LayoutDasboard claseStyle={false}>
-        <div className="afPanel">
-          <Skeleton variant="text" width="55%" height={40} />
-          <Skeleton variant="rounded" height={188} sx={{ borderRadius: '22px', mt: 2 }} />
-          <Skeleton variant="rounded" height={130} sx={{ borderRadius: '20px', mt: 2 }} />
-        </div>
-      </LayoutDasboard>
+      <Pantalla etiqueta="Mi plan" titulo="Tu plan" clase="mpl">
+        <Skeleton variant="rounded" height={230} sx={{ borderRadius: '32px', mt: '20px' }} />
+        <Skeleton variant="rounded" height={64} sx={{ borderRadius: '18px', mt: '14px' }} />
+        <Skeleton variant="rounded" height={64} sx={{ borderRadius: '18px', mt: '10px' }} />
+      </Pantalla>
     );
   }
 
+  const pctVigencia = inicia && vence
+    ? Math.min(Math.max(hoy.diff(inicia, 'days') / Math.max(vence.diff(inicia, 'days'), 1), 0), 1)
+    : 0;
+  const crece = (hasta, espera = 0.25) => ({
+    initial: { scaleX: 0 }, animate: { scaleX: hasta },
+    transition: quieto ? { duration: 0 } : { ...resorte.suave, delay: espera },
+  });
+
   return (
-    <LayoutDasboard claseStyle={false}>
-      <Cascada className="afPanel afPanel--plan">
+    <Pantalla
+      etiqueta="Mi plan"
+      titulo={plan ? plan.planName : 'Sin plan activo'}
+      bajada={plan
+        ? (vence
+            ? <>Hasta el <b>{vence.format('D [de] MMMM')}</b>{diasRestantes >= 0 ? ` · ${diasRestantes === 1 ? 'queda 1 día' : `quedan ${diasRestantes} días`}` : ' · vencido'}</>
+            : null)
+        : 'Elige uno y empieza a recibir tus almuerzos esta semana.'}
+      clase="mpl">
 
-        <Bloque><h1 className="afPanel__titular">Mi plan</h1></Bloque>
+      {plan ?
+        <>
+          {/* Cuanto queda: el numero grande, la barra y los envios uno por
+              uno. Un numero se olvida; ver la fila completa de lo que compro
+              es lo que hace tangible el mes. */}
+          <Tramo as="section" className="cuP__papel" aria-label="Lo que te queda">
+            <div className="mpl__quedan">
+              <b>{restantes}</b>
+              <span>{restantes === 1 ? 'entrega' : 'entregas'}<br />te {restantes === 1 ? 'queda' : 'quedan'}</span>
+            </div>
+            <span className="mpl__barra" role="img" aria-label={`Usaste ${usados} de ${total} entregas`}>
+              <motion.i {...crece(total ? Math.min(restantes / total, 1) : 0)} />
+            </span>
+            <span className="mpl__nota">Usaste {usados} de {total}.</span>
 
-        {plan ?
-          <>
-            {/* La unica pieza oscura de la app. Esta pantalla es el recibo de un
-                mes pagado: merece pesar distinto al resto del panel. */}
-            <Bloque>
-              <div className="afHero">
-                <div className="afHero__txt">
-                  <p className="afHero__et">Tu plan</p>
-                  <p className="afHero__nombre">{plan.planName}</p>
-                  {vence &&
-                    <p className="afHero__vig">
-                      Hasta el <b>{vence.format('D [de] MMM')}</b>
-                      {diasRestantes >= 0 && ` · ${diasRestantes} días`}
-                    </p>
-                  }
-                </div>
-                <Anillo restantes={restantes} total={total}
-                        unidad={total === 1 ? 'envío' : 'envíos'} />
+            {total > 0 && total <= 40 &&
+              <div className="mpl__tira" aria-hidden="true">
+                {Array.from({ length: total }, (_, i) => (
+                  <motion.span
+                    key={i}
+                    className={`mpl__u${i < usados ? ' is-usado' : ''}${
+                      esperados !== null && i === esperados - 1 && esperados > usados
+                        ? ' is-meta' : ''}`}
+                    initial={quieto ? false : { opacity: 0, scale: .6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={quieto ? { duration: 0 } : { ...resorte.entra, delay: 0.25 + i * 0.012 }}
+                  />
+                ))}
               </div>
-            </Bloque>
+            }
 
-            {/* Allpa+ vive aqui y no en el menu lateral: es un beneficio DEL
-                plan, y este es el sitio donde el cliente viene a ver que le
-                dio su plata. En el menu era una entrada mas entre siete. */}
-            <Bloque>
-              <motion.button type="button" className="afPlusBoton"
-                onClick={() => navigate('/beneficios')} {...alToque}>
-                <span className="afPlusBoton__ico">
+            {esperados !== null &&
+              <p className={`mpl__ritmo${noAlcanza ? ' is-ojo' : ''}`}>
+                {noAlcanza
+                  ? `Quedan ${habilesQuedan} días hábiles y ${restantes} envíos: si no cambias el ritmo, ${restantes - habilesQuedan} se van a vencer sin usar.`
+                  : atraso > 2
+                    ? `Vas ${atraso} envíos por detrás del ritmo del plan. Todavía te alcanza el tiempo para usarlos todos.`
+                    : 'Vas al día con tu plan. Te alcanza el tiempo de sobra.'}
+              </p>
+            }
+
+            <motion.button
+              type="button"
+              className={`cuP__btn mpl__renovar${pocos ? '' : ' cuP__btn--hundido'}`}
+              onClick={() => navigate('/planes')}
+              whileTap={{ scale: 0.97 }} transition={resorte.toque}
+            >
+              {pocos ? 'Renovar mi plan' : 'Ver otros planes'}
+            </motion.button>
+          </Tramo>
+
+          {creditos > 0 &&
+            <Tramo className="cuP__tinta mpl__credito">
+              <b>Tienes otro plan esperando</b>
+              <p>
+                {creditos} envíos más. Empiezan solos cuando termines el plan actual,
+                sin que tengas que hacer nada.
+              </p>
+            </Tramo>
+          }
+
+          {/* Allpa+ vive aqui: es un beneficio DEL plan, y este es el sitio
+              donde el cliente viene a ver que le dio su plata. */}
+          <Tramo>
+            <p className="cuP__grupo">Con tu plan</p>
+            <div className="cuP__lista">
+              <button type="button" className="cuP__fila" onClick={() => navigate('/beneficios')}>
+                <span className="cuP__filaIco" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                        strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6L12 16.8 6.6 19.6l1.2-6L3.3 9.4l6.1-.8L12 3z" />
                   </svg>
                 </span>
-                <span className="afPlusBoton__txt">
+                <span className="cuP__filaTxt">
                   <b>Allpa+ · Tus beneficios</b>
                   <small>Descuentos en salud, fitness, hogar y formación</small>
                 </span>
-                <span className="afPlusBoton__ir">›</span>
-              </motion.button>
-            </Bloque>
-
-            {/* Los 20 envios, uno por uno. Un numero se olvida; ver la fila
-                completa de lo que compro es lo que hace tangible el mes. */}
-            {total > 0 && total <= 40 &&
-              <Bloque>
-                <div className="afCard">
-                  <div className="afCard__head">
-                    <span className="afCard__title">Tus {total} envíos</span>
-                    <span className="afCard__label">{usados} ya pedidos</span>
-                  </div>
-
-                  <div className="afTira">
-                    {Array.from({ length: total }, (_, i) => (
-                      <motion.span
-                        key={i}
-                        className={`afTira__u${i < usados ? ' afTira__u--usado' : ''}${
-                          esperados !== null && i === esperados - 1 && esperados > usados
-                            ? ' afTira__u--meta' : ''}`}
-                        initial={{ opacity: 0, scale: .6 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.25 + i * 0.012, duration: .3 }}
-                      />
-                    ))}
-                  </div>
-
-                  {esperados !== null &&
-                    <p className={`afRitmo${atraso > 2 || noAlcanza ? ' afRitmo--ojo' : ''}`}>
-                      {noAlcanza
-                        ? `Quedan ${habilesQuedan} días hábiles y ${restantes} envíos: si no cambias el ritmo, ${restantes - habilesQuedan} se van a vencer sin usar.`
-                        : atraso > 2
-                          ? `Vas ${atraso} envíos por detrás del ritmo del plan. Todavía te alcanza el tiempo para usarlos todos.`
-                          : 'Vas al día con tu plan. Te alcanza el tiempo de sobra.'}
-                    </p>
-                  }
+                {IR}
+              </button>
+              {incluye.map((i) => (
+                <div className="cuP__fila cuP__fila--quieta" key={i.clave}>
+                  <span className="cuP__filaIco"><Ico n={i.ico} /></span>
+                  <span className="cuP__filaTxt"><b>{i.texto}</b></span>
                 </div>
-              </Bloque>
-            }
-
-            {incluye.length > 0 &&
-              <Bloque>
-                <div className="afCard">
-                  <div className="afCard__head">
-                    <span className="afCard__title">Lo que incluye</span>
-                  </div>
-                  <div className="afInc">
-                    {incluye.map((i) => (
-                      <span className="afInc__it" key={i.clave}>
-                        <Ico n={i.ico} />
-                        {i.texto}
-                      </span>
-                    ))}
-                    <span className="afInc__it afInc__it--libre">
-                      <Ico n="moto" />
-                      Delivery incluido
-                    </span>
-                  </div>
-                </div>
-              </Bloque>
-            }
-
-            {ahorro > 0 &&
-              <Bloque>
-                <div className="afCard afAhorro">
-                  <div className="afCard__head">
-                    <span className="afCard__title">Lo que te ahorraste</span>
-                  </div>
-                  <p className="afAhorro__n">S/ {ahorro.toFixed(2)}</p>
-                  {porUnidad !== null &&
-                    <p className="afAhorro__d">
-                      Cada almuerzo te sale <b>S/ {porUnidad.toFixed(2)}</b> en vez
-                      de S/ {porUnidadLista.toFixed(2)} sueltos.
-                    </p>
-                  }
-                  <p className="afAhorro__f">Según los descuentos de tus comprobantes.</p>
-                </div>
-              </Bloque>
-            }
-
-            {inicia && vence &&
-              <Bloque>
-                <div className="afCard">
-                  <div className="afCard__head">
-                    <span className="afCard__title">Vigencia</span>
-                    <span className="afCard__label">
-                      {diasRestantes >= 0 ? `${diasRestantes} días` : 'Vencido'}
-                    </span>
-                  </div>
-                  <BarraAnimada
-                    className={`afBarra afBarra--${pocos ? 'bajo' : 'ok'}`}
-                    porcentaje={Math.min(
-                      Math.max((hoy.diff(inicia, 'days') / Math.max(vence.diff(inicia, 'days'), 1)) * 100, 0),
-                      100
-                    )}
-                  />
-                  <div className="afFila">
-                    <span>{inicia.format('D MMM')}</span>
-                    <span>{vence.format('D MMM')}</span>
-                  </div>
-                </div>
-              </Bloque>
-            }
-
-            {creditos > 0 &&
-              <Bloque>
-                <div className="afCard afCredito">
-                  <p className="afCredito__t">Tienes otro plan esperando</p>
-                  <p className="afCredito__d">
-                    {creditos} envíos más. Empiezan solos cuando termines el plan actual,
-                    sin que tengas que hacer nada.
-                  </p>
-                </div>
-              </Bloque>
-            }
-
-            <Bloque>
-              <motion.button
-                type="button"
-                className={`afBtn${pocos ? ' afBtn--mint' : ''}`}
-                onClick={() => navigate('/planes')}
-                {...alToque}
-              >
-                {pocos ? 'Renovar mi plan' : 'Ver otros planes'}
-              </motion.button>
-            </Bloque>
-          </>
-        :
-          <Bloque>
-            <div className="afCard afSinPlan">
-              <p className="afSinPlan__t">No tienes un plan activo</p>
-              <p className="afSinPlan__d">Elige uno y empieza a recibir tus almuerzos esta semana.</p>
-              <motion.button type="button" className="afBtn afBtn--mint"
-                onClick={() => navigate('/planes')} {...alToque}>
-                Ver planes
-              </motion.button>
+              ))}
+              {incluye.length > 0 &&
+                <div className="cuP__fila cuP__fila--quieta">
+                  <span className="cuP__filaIco"><Ico n="moto" /></span>
+                  <span className="cuP__filaTxt"><b>Delivery incluido</b></span>
+                </div>}
             </div>
-          </Bloque>
-        }
+          </Tramo>
 
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head">
-              <span className="afCard__title">Tus compras</span>
-              <span className="afCard__label">{facturas.length}</span>
-            </div>
+          {ahorro > 0 &&
+            <Tramo as="section" className="cuP__bloque">
+              <h2>Lo que te ahorraste</h2>
+              <p className="mpl__ahorro">S/ {ahorro.toFixed(2)}</p>
+              {porUnidad !== null &&
+                <p className="cuP__ayuda">
+                  Cada almuerzo te sale <b>S/ {porUnidad.toFixed(2)}</b> en vez
+                  de S/ {porUnidadLista.toFixed(2)} sueltos.
+                </p>
+              }
+              <p className="cuP__ayuda">Según los descuentos de tus comprobantes.</p>
+            </Tramo>
+          }
 
-            {facturas.length > 0 ?
-              facturas.map((f) => (
-                <div className="afSrow" key={f.id}>
-                  <span>{f.emissionDate ? moment(f.emissionDate).format('D MMM YYYY') : '—'}</span>
-                  <b>S/ {Number(f.totalPrice ?? 0).toFixed(2)}</b>
-                </div>
-              ))
-            :
-              <p className="afMenu__nota afMenu__nota--suelta">
-                Aquí aparecerán tus compras cuando tengas la primera.
+          {inicia && vence &&
+            <Tramo as="section" className="cuP__bloque">
+              <h2>Vigencia</h2>
+              <p className="cuP__ayuda">
+                {diasRestantes >= 0
+                  ? (diasRestantes === 1 ? 'Te queda 1 día.' : `Te quedan ${diasRestantes} días.`)
+                  : 'Tu plan ya venció.'}
               </p>
-            }
-          </div>
-        </Bloque>
+              <span className="mpl__barra mpl__barra--tinta" aria-hidden="true">
+                <motion.i {...crece(pctVigencia, 0.1)} />
+              </span>
+              <div className="mpl__fechas">
+                <span>{inicia.format('D MMM').replace('.', '')}</span>
+                <span>{vence.format('D MMM').replace('.', '')}</span>
+              </div>
+            </Tramo>
+          }
+        </>
+      :
+        <Tramo>
+          <motion.button type="button" className="cuP__btn mpl__sinPlan"
+            onClick={() => navigate('/planes')} whileTap={{ scale: 0.97 }} transition={resorte.toque}>
+            Ver planes
+          </motion.button>
+        </Tramo>
+      }
 
-      </Cascada>
-    </LayoutDasboard>
+      <Tramo as="section" className="cuP__bloque">
+        <h2>Tus compras</h2>
+        {facturas.length > 0 ?
+          <div className="cuP__lista mpl__compras">
+            {facturas.map((f) => (
+              <div className="cuP__fila cuP__fila--quieta" key={f.id}>
+                <span className="cuP__filaTxt">
+                  <b>{f.emissionDate ? moment(f.emissionDate).format('D [de] MMMM [de] YYYY') : '—'}</b>
+                </span>
+                <span className="cuP__filaValor">S/ {Number(f.totalPrice ?? 0).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        :
+          <p className="cuP__vacio">
+            Aquí aparecerán tus compras cuando tengas la primera.
+          </p>
+        }
+        {facturas.length > 0 &&
+          <button type="button" className="cuP__enlace" onClick={() => navigate('/facturacion')}>Ver mis comprobantes</button>}
+      </Tramo>
+
+    </Pantalla>
   );
 };
 

@@ -9,11 +9,15 @@ import './MapaPin.scss';
 /* El pin. Leaflet trae uno por defecto que apunta desde el centro; este apunta
    con la punta, que es el punto exacto al que llega el motorizado. Unos metros
    de diferencia son media cuadra. */
+/* A color: circulo menta con el pin en tinta, y la punta debajo. */
 const PIN = L.divIcon({
   className: 'afPinWrap',
-  html: '<span class="afPin"></span>',
-  iconSize: [28, 38],
-  iconAnchor: [14, 38],
+  html: '<span class="afPin"><span class="afPin__c">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'
+    + '</span><span class="afPin__p"></span></span>',
+  iconSize: [48, 57],
+  iconAnchor: [24, 57],
 });
 
 /** Un toque en el mapa mueve el pin, igual que antes. */
@@ -114,7 +118,7 @@ const MapaPin = ({ punto, onMover, zona, conBuscador = true, alto = 320 }) => {
         {Array.isArray(zona) && zona.length > 2 && (
           <Polygon
             positions={zona.map((p) => [p.lat, p.lng])}
-            pathOptions={{ color: '#177A4C', weight: 1.5, fillColor: '#3CFB9F', fillOpacity: 0.12 }}
+            pathOptions={{ color: '#12A866', weight: 2, fillColor: '#3CFB9F', fillOpacity: 0.28 }}
           />
         )}
 

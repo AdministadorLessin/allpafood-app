@@ -1,14 +1,15 @@
 .afBanner{
-    border-radius: 22px;
+    border-radius: 30px;
     padding: 20px 20px 19px;
+    font-family: var(--n-texto);
     margin-bottom: 16px;
 
     &__kick{
-        font-size: 11px;
-        letter-spacing: .12em;
+        font-size: 11.5px;
+        letter-spacing: .1em;
         text-transform: uppercase;
-        font-weight: 700;
-        opacity: .65;
+        font-weight: 600;
+        opacity: .72;
         margin: 0 0 8px;
     }
     &__titulo{
@@ -30,50 +31,49 @@
         display: block;
         text-align: center;
         text-decoration: none;
-        font-weight: 700;
-        font-size: 14px;
-        padding: 13px 16px;
-        border-radius: var(--af-r-pill);
-        background: var(--af-ink);
-        color: #F1F6F2;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 16px 16px;
+        border-radius: 18px;
+        background: var(--n-tinta);
+        color: #fff;
     }
 
     /* Falta elegir dias: menta, el unico color grande de la pantalla. */
     &--accion{
-        background: linear-gradient(155deg, #3CFB9F 0%, #7FEFB8 100%);
-        color: var(--af-mint-ink);
-        .afBanner__accion{ background: var(--af-ink); color: #F1F6F2; }
+        background: linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 100%);
+        color: var(--n-tinta);
+        .afBanner__accion{ background: var(--n-tinta); color: #fff; }
     }
     /* Cierra hoy: tinta con el contador en menta. El crema amarillo no leia
        como urgencia, leia como aviso decorativo, y encima chocaba con el verde
        de la marca. */
     &--urgente{
-        background: var(--af-ink);
-        color: #F1F6F2;
-        .afBanner__kick{ color: var(--af-mint); opacity: 1; }
-        .afBanner__accion{ background: var(--af-mint); color: var(--af-mint-ink); }
+        background: var(--n-tinta);
+        color: #fff;
+        .afBanner__kick{ color: var(--n-menta); opacity: 1; }
+        .afBanner__accion{ background: var(--n-menta); color: var(--n-tinta); }
     }
     /* Renovacion o sin plan: tinta, maximo contraste. */
     &--dark{
-        background: var(--af-ink);
-        color: #F1F6F2;
-        .afBanner__accion{ background: var(--af-mint); color: var(--af-mint-ink); }
+        background: var(--n-tinta);
+        color: #fff;
+        .afBanner__accion{ background: var(--n-menta); color: var(--n-tinta); }
     }
     /* Todo listo: no hay nada que hacer, no debe competir por atencion. */
     &--calmo{
-        background: var(--af-paper);
-        color: var(--af-ink);
-        box-shadow: var(--af-shadow-s);
-        .afBanner__kick{ color: var(--af-accent); opacity: 1; }
+        background: var(--n-papel);
+        color: var(--n-tinta);
+        box-shadow: 0 14px 34px rgba(22,33,27,.08);
+        .afBanner__kick{ color: #0B6B43; opacity: 1; }
         .afBanner__accion{
-            background: transparent;
-            color: var(--af-ink);
-            border: 1.5px solid var(--af-line);
+            background: var(--n-hundido);
+            color: var(--n-tinta);
         }
     }
     &--esqueleto{
-        background: var(--af-paper);
-        box-shadow: var(--af-shadow-s);
+        background: var(--n-papel);
+        box-shadow: 0 14px 34px rgba(22,33,27,.08);
     }
 }
 

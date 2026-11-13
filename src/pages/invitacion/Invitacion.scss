@@ -1,52 +1,74 @@
-/* La pagina a la que llega el enlace de una invitacion. */
-$tinta: #16211B;
-$muted: #55655C;
-$menta: #3CFB9F;
-$verde: #177A4C;
+/* La pagina a la que llega el enlace de una invitacion: menta arriba, el
+   codigo en tinta y el boton de la tienda. */
+
+$gris: #55655C;
 
 .invP{
-    min-height: 100vh; min-height: 100dvh; box-sizing: border-box; padding: 40px 20px;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(180deg, #F7FAF4 0%, #E8F6ED 100%); color: $tinta;
-    font-family: 'Poppins', system-ui, sans-serif;
-}
-.invP__col{ width: 100%; max-width: 420px; }
-.invP__marca{ margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: $verde; }
-.invP__espera{ margin: 24px 0 0; color: $muted; }
-.invP__h{
-    margin: 14px 0 0; font-size: 34px; line-height: 1.08; font-weight: 700; letter-spacing: -.04em;
-    em{
-        font-style: normal;
-        background: linear-gradient(90deg, #12B36E, #0B7A4A);
-        -webkit-background-clip: text; background-clip: text; color: transparent;
+    position: relative; overflow: hidden;
+    min-height: 100vh; min-height: 100dvh; box-sizing: border-box;
+    padding: calc(var(--n-arriba) + 28px) 22px calc(30px + var(--n-abajo));
+    display: flex; justify-content: center;
+    a{ -webkit-tap-highlight-color: transparent; }
+
+    &__menta{ height: 400px; }
+    &__col{
+        position: relative; width: 100%; max-width: 420px;
+        display: flex; flex-direction: column;
     }
-}
-.invP__bajada{ margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: $muted; b{ color: $tinta; } }
-.invP__codigo{
-    margin-top: 22px; padding: 18px; border-radius: 26px; background: $tinta; color: #fff;
-    box-shadow: 0 22px 44px rgba(22,33,27,.28);
-    span{ display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: $menta; }
-    div{
-        margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        padding: 10px 10px 10px 16px; border-radius: 18px;
-        background: rgba(255,255,255,.06); border: 1.5px dashed rgba(60,251,159,.55);
+    &__marca{
+        margin: 0; display: flex; align-items: center; gap: 8px;
+        font-size: 13px; font-weight: 600; color: var(--n-tinta-78);
+        svg{ flex: 0 0 auto; color: var(--n-tinta); }
     }
-    b{ font-size: 26px; line-height: 1.1; letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
-    button{
-        flex: 0 0 auto; height: 44px; padding: 0 14px; border: 0; border-radius: 13px;
-        background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    &__espera{ margin: 24px 0 0; font-size: 14.5px; color: var(--n-tinta-78); }
+    &__h{ margin: 14px 0 0 !important; font-size: 42px !important; line-height: .98 !important; overflow-wrap: anywhere; }
+    &__bajada{
+        margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: var(--n-tinta-78);
+        b{ color: var(--n-tinta); }
     }
-    small{ display: block; margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.72); }
-}
-.invP__botones{ margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-.invP__btn{
-    height: 56px; border-radius: 18px; background: $menta; color: $tinta;
-    font-size: 16px; font-weight: 600; text-decoration: none;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 12px 28px rgba(60,251,159,.45);
-    &--claro{ background: #fff; box-shadow: 0 8px 20px rgba(22,35,29,.08); }
-}
-.invP__pie{
-    margin: 20px 0 0; text-align: center; font-size: 14px; color: $muted;
-    a{ color: $verde; font-weight: 600; text-decoration: none; padding: 12px 4px; }
+
+    &__codigo{
+        margin-top: 22px; padding: 20px; border-radius: 32px; background: var(--n-tinta); color: #fff;
+        box-shadow: 0 18px 40px rgba(22,33,27,.28);
+        > span{
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: rgba(255,255,255,.72);
+        }
+        em{
+            flex: 0 0 auto; display: inline-block; transform: rotate(-4deg);
+            font-style: normal; font-weight: 800; font-size: 13px; letter-spacing: .02em; line-height: 1;
+            background: var(--n-menta); color: var(--n-tinta); padding: 5px 8px 4px; border-radius: 6px;
+        }
+        > div{
+            margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 12px 12px 12px 18px; border-radius: 20px; border: 1.5px dashed rgba(60,251,159,.55);
+        }
+        b{
+            min-width: 0; overflow-wrap: anywhere;
+            font-family: var(--n-titular); font-weight: 800; font-size: 30px; line-height: 1.05; letter-spacing: .06em;
+        }
+        button{
+            flex: 0 0 auto; height: 44px; padding: 0 14px; border: 0; border-radius: 14px; cursor: pointer;
+            background: rgba(255,255,255,.12); color: #fff; font-size: 13.5px; font-weight: 600;
+        }
+        small{ display: block; margin-top: 12px; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,.78); }
+    }
+
+    &__botones{ margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+    &__btn{
+        height: 56px; border-radius: 18px; box-sizing: border-box;
+        background: var(--n-tinta); color: #fff !important; text-decoration: none;
+        font-size: 16px; font-weight: 600;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        svg{ width: 18px; height: 18px; flex: 0 0 auto; }
+        /* En computadora salen las dos tiendas: la segunda, en linea. */
+        &--claro{ background: none; color: var(--n-tinta) !important; box-shadow: inset 0 0 0 2px var(--n-tinta); }
+    }
+    &__pie{
+        margin: 24px 0 0; text-align: center; font-size: 14px; color: $gris;
+        a{
+            display: inline-block; padding: 12px 4px; color: var(--n-tinta); font-weight: 600;
+            text-decoration: underline; text-underline-offset: 4px;
+        }
+    }
 }

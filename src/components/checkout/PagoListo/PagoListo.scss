@@ -132,3 +132,67 @@
     background: #EAFBF3; color: #3D5247; font-size: 13px; line-height: 1.45;
     b{ color: #16211B; }
 }
+
+
+/* ==========================================================================
+   Dentro del app (maqueta RegListo): la pantalla entera en menta, con los
+   picos de tinta arriba, el isotipo, el titular grande y el siguiente paso
+   en el boton de abajo. Tapa el pago, incluido su boton fijo.
+   ========================================================================== */
+.afListo{
+    position: fixed; inset: 0; z-index: 200;
+    overflow-y: auto;
+    background: #3CFB9F; color: #16211B;
+    font-family: var(--n-texto);
+    -webkit-font-smoothing: antialiased;
+
+    &__picos{
+        position: absolute; left: 0; right: 0; top: 0; height: 16px;
+        background:
+            linear-gradient(135deg, #16211B 25%, transparent 25%) 0 0 / 32px 16px,
+            linear-gradient(225deg, #16211B 25%, transparent 25%) 0 0 / 32px 16px;
+    }
+    &__cuerpo{
+        position: relative;
+        min-height: 100%; box-sizing: border-box;
+        padding: clamp(96px, 18vh, 150px) 26px calc(120px + env(safe-area-inset-bottom, 0px));
+    }
+    &__iso{ width: 72px; transform-origin: 50% 60%; svg{ display: block; } }
+    /* Con !important porque otras hojas pintan los h1 del panel. */
+    &__t{
+        margin: 24px 0 0 !important;
+        font-family: var(--n-titular) !important; font-weight: 800 !important;
+        font-size: clamp(40px, 12.8vw, 50px) !important; line-height: .96 !important;
+        letter-spacing: -.04em !important; color: #16211B !important;
+    }
+    &__d{
+        margin: 14px 0 0; font-size: 16px; line-height: 1.5; color: rgba(22,33,27,.82);
+        b{ color: #16211B; font-weight: 700; }
+    }
+    &__regalo{
+        margin-top: 22px; padding: 16px 18px; border-radius: 26px;
+        display: flex; align-items: center; gap: 14px;
+        background: #16211B; color: #fff;
+        > b{
+            flex: 0 0 auto;
+            font-family: var(--n-titular); font-weight: 800; font-size: 44px; line-height: .9;
+            letter-spacing: -.03em; color: #3CFB9F;
+        }
+        span{ font-size: 14px; line-height: 1.4; min-width: 0; }
+        strong{ display: block; font-size: 15px; font-weight: 700; }
+    }
+    &__sig{ margin: 20px 0 0; font-size: 15px; line-height: 1.5; color: rgba(22,33,27,.82); }
+
+    &__pie{
+        position: fixed; left: 0; right: 0; bottom: 0;
+        padding: 16px 22px max(22px, calc(env(safe-area-inset-bottom, 0px) + 10px));
+        background: linear-gradient(180deg, rgba(60,251,159,0) 0, #3CFB9F 16px);
+    }
+    &__btn{
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; max-width: 560px; margin: 0 auto; height: 56px; padding: 0 16px;
+        border: 0; border-radius: 18px; background: #16211B; color: #fff;
+        font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+        svg{ width: 18px; height: 18px; flex: 0 0 auto; }
+    }
+}

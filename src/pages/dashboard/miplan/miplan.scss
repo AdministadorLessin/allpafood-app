@@ -1,253 +1,47 @@
-/* --- El recibo del mes --- */
+/* Mi plan, con la identidad nueva. El marco y las filas vienen de
+   components/perfil/Pantalla. */
 
-/* Unica tarjeta oscura de la app. Aqui el cliente comprueba en que se fue el
-   dinero de un mes completo: si pesa lo mismo que las demas, no la lee. */
-.afHero{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    background: var(--af-ink);
-    border-radius: var(--af-r-card);
-    padding: 22px 20px;
-    margin-bottom: 14px;
-    box-shadow: var(--af-shadow-m);
+.mpl{
+    .cuP__bajada b{ font-weight: 700; color: var(--n-tinta); }
 
-    &__txt{ min-width: 0; }
-
-    &__et{
-        margin: 0 0 6px;
-        font-size: 10.5px;
-        font-weight: 800;
-        letter-spacing: .11em;
-        text-transform: uppercase;
-        color: var(--af-mint);
+    &__quedan{
+        display: flex; align-items: flex-end; gap: 10px;
+        b{ font-family: var(--n-titular); font-weight: 800; font-size: 68px; line-height: .86; letter-spacing: -.04em; font-variant-numeric: tabular-nums; color: var(--n-tinta); }
+        > span{ font-size: 14px; line-height: 1.3; color: #55655C; padding-bottom: 4px; }
     }
-    &__nombre{
-        margin: 0;
-        font-size: 24px;
-        font-weight: 800;
-        letter-spacing: -.03em;
-        line-height: 1.1;
-        color: #F4F9F5;
-        text-wrap: balance;
+    &__barra{
+        display: block; margin-top: 14px; height: 8px; border-radius: 4px; background: #ECEDE6; overflow: hidden;
+        i{ display: block; width: 100%; height: 100%; border-radius: 4px; background: var(--n-proteina); transform-origin: left center; }
+        &--tinta i{ background: var(--n-tinta); }
     }
-    &__vig{
-        margin: 14px 0 0;
-        font-size: 12.5px;
-        color: rgba(244,249,245,.62);
-        b{ color: #F4F9F5; font-weight: 700; }
-    }
-}
+    &__nota{ display: block; margin-top: 10px; font-size: 13px; color: #55655C; }
 
-.afAnillo{
-    position: relative;
-    flex: 0 0 auto;
-    width: 112px;
-    height: 112px;
-    svg{ width: 100%; height: 100%; display: block; }
-
-    &__txt{
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        b{
-            font-size: 31px;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -.045em;
-            color: #F4F9F5;
-        }
-        small{
-            /* Cabe dentro del hueco del anillo (unos 80px): sin este ancho la
-               palabra se salia por encima del trazo. */
-            max-width: 68px;
-            font-size: 10px;
-            color: rgba(244,249,245,.55);
-            margin-top: 3px;
-            text-align: center;
-            line-height: 1.25;
-        }
-    }
-}
-
-@media (max-width: 359px){
-    .afHero{ gap: 10px; padding: 20px 16px; }
-    .afHero__nombre{ font-size: 21px; }
-    .afAnillo{ width: 96px; height: 96px; }
-    .afAnillo__txt b{ font-size: 27px; }
-    .afAnillo__txt small{ max-width: 58px; font-size: 9px; }
-}
-
-/* --- La tira de envios --- */
-/* Cada casilla es un almuerzo pagado. Ver la fila entera es lo que convierte
-   "20 envios" en algo que se siente comprado. */
-.afTira{
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-    margin: 2px 0 14px;
-
+    /* Los envios, uno por uno. */
+    &__tira{ margin-top: 16px; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
     &__u{
-        height: 32px;
-        border-radius: 9px;
-        background: rgba(16,31,24,.07);
-        display: block;
+        aspect-ratio: 1; border-radius: 50%; box-sizing: border-box;
+        border: 1.5px dashed rgba(22,33,27,.26);
+        &.is-usado{ border: 0; background: var(--n-tinta); }
+        &.is-meta{ border: 2px solid var(--n-tinta); }
     }
-    &__u--usado{ background: var(--af-accent); }
+    &__ritmo{
+        margin: 14px 0 0; font-size: 13.5px; line-height: 1.45; color: #55655C;
+        /* Aviso de tiempo: lo unico que va en coral. */
+        &.is-ojo{ padding: 12px 14px; border-radius: 16px; background: #FDE3DE; color: var(--n-coral-texto); }
+    }
+    &__renovar{ margin-top: 16px; min-height: 52px; border-radius: 17px; font-size: 14.5px; }
+    &__sinPlan{ margin-top: 22px; }
 
-    /* Donde deberia ir hoy si consumiera al ritmo del plan. Sin esta marca la
-       tira dice cuanto queda, pero no si va a llegar a tiempo. */
-    &__u--meta{
-        background: rgba(16,31,24,.07);
-        box-shadow: inset 0 0 0 2px var(--af-ink);
+    &__credito{
+        b{ display: block; font-size: 16px; font-weight: 700; }
+        p{ margin: 6px 0 0; font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.8); }
     }
-}
 
-.afRitmo{
-    margin: 0;
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: var(--af-muted);
-    &--ojo{
-        color: #8A4A1E;
-        background: #FDF0E6;
-        border-radius: 12px;
-        padding: 11px 13px;
+    &__ahorro{
+        margin: 12px 0 0; font-family: var(--n-titular); font-weight: 800; font-size: 52px; line-height: .95; letter-spacing: -.04em;
+        color: var(--n-tinta); font-variant-numeric: tabular-nums;
     }
-}
-
-/* --- Lo que incluye --- */
-.afInc{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-
-    &__it{
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 12.5px;
-        font-weight: 700;
-        color: var(--af-accent);
-        background: var(--af-accent-soft);
-        border-radius: var(--af-r-pill);
-        padding: 8px 14px 8px 11px;
-        &--libre{
-            color: var(--af-muted);
-            background: rgba(16,31,24,.05);
-        }
-    }
-    &__ic{ width: 15px; height: 15px; flex: 0 0 auto; }
-}
-
-/* --- Ahorro --- */
-.afAhorro{
-    &__n{
-        margin: 0;
-        font-size: 40px;
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -.04em;
-        color: var(--af-accent);
-        font-variant-numeric: tabular-nums;
-    }
-    &__d{
-        margin: 11px 0 0;
-        font-size: 13.5px;
-        line-height: 1.5;
-        color: var(--af-muted);
-        b{ color: var(--af-ink); font-weight: 700; }
-    }
-    &__f{
-        margin: 9px 0 0;
-        font-size: 11.5px;
-        color: var(--af-muted);
-        opacity: .75;
-    }
-}
-
-.afCredito{
-    background: var(--af-accent-soft) !important;
-    &__t{ margin: 0 0 5px; font-size: 14.5px; font-weight: 700; color: var(--af-accent); }
-    &__d{ margin: 0; font-size: 13px; line-height: 1.5; color: var(--af-accent); opacity: .9; }
-}
-
-.afSinPlan{
-    text-align: center;
-    padding: 30px 20px !important;
-    &__t{ margin: 0 0 6px; font-size: 17px; font-weight: 700; color: var(--af-ink); }
-    &__d{ margin: 0 0 20px; font-size: 13.5px; color: var(--af-muted); line-height: 1.5; }
-}
-
-/* Puerta a Allpa+.
-   Va en Mi plan y no en el menu lateral: es un beneficio DEL plan, y esta es
-   la pantalla donde el cliente viene a ver que le dio su plata. Lleva el
-   mismo degradado que la seccion, para que se lea como parte de lo que
-   compro y no como una promocion pegada. */
-.afPlusBoton{
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    width: 100%;
-    text-align: left;
-    font-family: inherit;
-    cursor: pointer;
-    border: 1px solid rgba(20,32,24,.06);
-    border-radius: var(--af-r-card);
-    padding: 14px 15px;
-    margin-bottom: 10px;
-    background:
-        radial-gradient(120% 160% at 92% 8%, #C9F5DE 0%, rgba(201,245,222,0) 62%),
-        linear-gradient(150deg, #F2FBF5 0%, #E7F5EC 100%);
-
-    &__ico{
-        width: 42px; height: 42px; flex: 0 0 auto;
-        border-radius: 13px;
-        background: rgba(255,255,255,.72);
-        color: var(--af-accent);
-        display: flex; align-items: center; justify-content: center;
-        svg{ width: 21px; height: 21px; }
-    }
-    &__txt{
-        flex: 1 1 auto; min-width: 0;
-        b{
-            display: block;
-            font-size: var(--af-t-md); font-weight: 800;
-            color: var(--af-ink); line-height: 1.25;
-        }
-        small{
-            display: block;
-            font-size: var(--af-t-xs); color: var(--af-muted);
-            line-height: 1.35; margin-top: 2px;
-        }
-    }
-    &__ir{
-        flex: 0 0 auto;
-        font-size: 22px; line-height: 1;
-        color: var(--af-muted);
-    }
-}
-
-
-/* En computadora las tarjetas se reparten en dos columnas en vez de dejar
-   media pantalla vacia. Se usa multicolumna y no rejilla porque son tarjetas
-   sueltas de alturas distintas: asi se acomodan solas sin huecos. */
-@media screen and (min-width: 993px){
-    .afPanel--plan{
-        max-width: 1080px;
-        columns: 2;
-        column-gap: 22px;
-    }
-    .afPanel--plan > *{
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-    /* El titulo cruza las dos columnas: es el nombre de la pantalla. */
-    .afPanel--plan > *:first-child{
-        column-span: all;
-    }
+    .cuP__ayuda b{ font-weight: 700; color: var(--n-tinta); }
+    &__fechas{ margin-top: 8px; display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: #55655C; }
+    &__compras{ margin-top: 6px; .cuP__fila{ min-height: 56px; } }
 }

@@ -1,3 +1,4 @@
+import { protegerMapa } from './components/mapa/mapaSeguro';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // La tipografia viaja dentro de la app. Antes se pedia a Google Fonts y, en el
@@ -23,6 +24,9 @@ moment.locale('es');
 
 // Una sesion vencida saca al cliente al ingreso en vez de dejarlo con pantallas vacias.
 vigilarSesion();
+
+/* Que un fallo del mapa al cerrarse no tumbe el app. */
+protegerMapa();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

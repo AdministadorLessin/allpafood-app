@@ -1,102 +1,184 @@
-/* "Mi cuenta" en el app, con las piezas del registro y del inicio nuevo. */
+/* "Yo": la pestaña de la cuenta en el app. Medidas de Yo.dc.html. */
 
-$tinta: #16211B;
-$muted: #55655C;
-$menta: #3CFB9F;
-$menta2: #12C97B;
-$verde: #177A4C;
+.yo{
+    position: relative; overflow: hidden;
+    padding: calc(var(--n-arriba) + 14px) 22px 24px;
+    a, button{ -webkit-tap-highlight-color: transparent; }
+    > *:not(.yo__menta){ position: relative; }
 
-.cuN{
-    padding: 8px 2px 0; color: $tinta;
-}
-/* Solo los iconos propios: un "svg" suelto tambien agrandaba el icono de
-   Cerrar sesion hasta llenar la pantalla. */
-.cuN__ico, .cuN__ir, .cuN__ava i{ svg{ width: 100%; height: 100%; } }
-.cuN__h{
-    margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.035em; color: $tinta;
-    em{
-        font-style: normal;
-        background: linear-gradient(90deg, #12B36E, #0B7A4A);
-        -webkit-background-clip: text; background-clip: text; color: transparent;
+    &__menta{
+        position: absolute; left: 0; right: 0; top: 0; height: 470px; pointer-events: none;
+        background: linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 46%, rgba(246,246,241,0) 100%);
     }
-}
 
-/* --- La ficha --- */
-.cuN__ficha{
-    position: relative; overflow: hidden; margin-top: 18px;
-    border-radius: 28px; background: #fff; box-shadow: 0 18px 40px rgba(22,35,29,.10);
-    padding: 0 0 18px; text-align: center;
-}
-.cuN__cielo{
-    display: block; height: 92px;
-    background: linear-gradient(120deg, #C9F7DF 0%, #E3F4EA 50%, #DCEBFA 100%);
-}
-.cuN__ava{
-    position: relative; display: block; width: 104px; height: 104px; margin: -56px auto 0;
-    border-radius: 50%; padding: 4px; box-sizing: border-box;
-    background: linear-gradient(135deg, $menta, $menta2);
-    box-shadow: 0 14px 30px rgba(18,201,123,.30);
-    img, > span{
-        width: 96px; height: 96px; border-radius: 50%; border: 3px solid #fff; box-sizing: border-box;
-        display: block; object-fit: cover;
+    /* --- Cabecera --- */
+    &__cab{ display: flex; align-items: center; justify-content: space-between; }
+    &__marca{ display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--n-tinta-78); }
+    &__campana{
+        position: relative; flex: 0 0 auto; width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+        background: var(--n-tinta); color: #fff; display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; }
+        i{ position: absolute; top: 9px; right: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--n-coral); border: 2px solid var(--n-tinta); }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 3px; }
     }
-    > span{ display: flex; align-items: center; justify-content: center; background: #EAFBF3;
-        font-size: 34px; font-weight: 700; color: $verde; }
-    i{
-        position: absolute; right: 0; bottom: 4px; width: 30px; height: 30px; border-radius: 50%;
-        border: 3px solid #fff; background: $tinta; color: $menta; box-sizing: border-box; padding: 6px;
-        display: flex;
+
+    /* --- Quien eres --- */
+    &__quien{ margin-top: 14px; display: flex; align-items: center; gap: 16px; }
+    &__ava{
+        position: relative; flex: 0 0 auto; width: 92px; height: 92px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%;
+        img, .yo__inicial{
+            display: block; width: 92px; height: 92px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--n-tinta); box-sizing: border-box;
+        }
+        .yo__inicial{
+            display: flex; align-items: center; justify-content: center; background: var(--n-papel);
+            font-family: var(--n-titular); font-weight: 800; font-size: 38px; color: var(--n-tinta);
+        }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 3px; }
     }
-}
-.cuN__nombre{ display: block; margin-top: 12px; padding: 0 16px; font-size: 21px; line-height: 1.2; letter-spacing: -.025em; }
-.cuN__tel{ display: block; margin-top: 2px; font-size: 13.5px; color: $muted; }
-.cuN__planChip{
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
-    font-size: 12px; font-weight: 600; background: $tinta; color: #fff;
-    padding: 5px 12px 5px 6px; border-radius: 999px;
-    i{ width: 18px; height: 18px; border-radius: 50%; background: $menta; }
-}
-.cuN__avaEt{ margin: 18px 0 8px; font-size: 12px; font-weight: 600; color: $muted; }
-.cuN__avatares{
-    display: flex; gap: 8px; overflow-x: auto; padding: 6px 18px 8px;
-    scroll-snap-type: x proximity; scrollbar-width: none;
-    &::-webkit-scrollbar{ display: none; }
-}
-.cuN__avaOp{
-    flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; padding: 0; cursor: pointer;
-    background: #fff; border: 3px solid #fff; box-sizing: border-box; scroll-snap-align: center;
-    box-shadow: 0 4px 10px rgba(22,35,29,.10); opacity: .82;
-    transition: transform .15s ease, opacity .15s ease;
-    img{ width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover; }
-    &.is-on{ border-color: $menta2; opacity: 1; transform: scale(1.08); box-shadow: 0 8px 18px rgba(18,201,123,.35); }
+    &__lapiz{
+        position: absolute; right: -2px; bottom: -2px; width: 32px; height: 32px; border-radius: 50%;
+        background: var(--n-tinta); color: var(--n-menta); border: 3px solid #8CFCC4; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 14px; height: 14px; }
+    }
+    &__quienTxt{
+        flex: 1; min-width: 0;
+        h1{ font-size: 34px; line-height: 1; letter-spacing: -.03em; overflow-wrap: anywhere; }
+    }
+    &__tel{ display: block; margin-top: 6px; font-size: 13.5px; color: var(--n-tinta-78); }
+    &__desde{ display: block; margin-top: 2px; font-size: 13px; color: var(--n-tinta-78); }
+
+    /* --- Cifras --- */
+    &__cifras{
+        margin-top: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+        padding: 16px 8px; border-radius: 26px; background: rgba(255,255,255,.62);
+        div{ text-align: center; min-width: 0; }
+        b{ display: block; font-weight: 800; font-size: 26px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--n-tinta); }
+        small{ display: block; margin-top: 4px; font-size: 12px; line-height: 1.2; color: rgba(22,33,27,.75); }
+    }
+
+    /* --- Mi plan --- */
+    &__et{
+        font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #55655C;
+        &--claro{ color: rgba(255,255,255,.72); }
+    }
+    &__plan{
+        margin-top: 20px; border-radius: 32px; background: var(--n-papel); padding: 20px;
+        box-shadow: 0 14px 34px rgba(22,33,27,.08);
+    }
+    &__cifras + &__plan{ margin-top: 14px; }
+    &__planCab{ display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+    &__vence{ font-size: 12.5px; font-weight: 600; color: #55655C; white-space: nowrap; }
+    &__quedan{
+        margin-top: 8px; display: flex; align-items: flex-end; gap: 10px;
+        b{ font-family: var(--n-titular); font-weight: 800; font-size: 68px; line-height: .86; letter-spacing: -.04em; font-variant-numeric: tabular-nums; color: var(--n-tinta); }
+        > span{ font-size: 14px; line-height: 1.3; color: #55655C; padding-bottom: 4px; }
+    }
+    &__barra{
+        display: block; margin-top: 14px; height: 8px; border-radius: 4px; background: #ECEDE6; overflow: hidden;
+        i{ display: block; width: 100%; height: 100%; border-radius: 4px; background: var(--n-proteina); transform-origin: left center; }
+    }
+    &__planNota{ display: block; margin-top: 10px; font-size: 13px; line-height: 1.45; color: #55655C; }
+    &__sinPlan{ display: block; margin-top: 10px; font-size: 20px; line-height: 1.15; font-weight: 700; color: var(--n-tinta); }
+    &__planBtns{
+        margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+        &--uno{ grid-template-columns: minmax(0, 1fr); }
+    }
+    &__btn{
+        height: 52px; border-radius: 17px; background: var(--n-tinta); color: #fff !important; font-size: 14.5px; font-weight: 600;
+        display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-align: center;
+        transition: transform .12s ease;
+        &:active{ transform: scale(.97); }
+        &:focus-visible{ outline: 3px solid var(--n-menta); outline-offset: 2px; }
+        &--suave{ background: var(--n-hundido); color: var(--n-tinta) !important; }
+    }
+
+    /* --- Invita --- */
+    &__invita{
+        position: relative; margin-top: 14px; display: block; border-radius: 30px; background: var(--n-tinta); color: #fff;
+        padding: 18px 20px;
+    }
+    &__invitaCab{ display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    &__invitaIr{
+        text-decoration: none;
+        /* Toda la tarjeta lleva a "Invita". */
+        &::after{ content: ''; position: absolute; inset: 0; border-radius: 30px; }
+        &:focus-visible::after{ outline: 3px solid var(--n-menta); outline-offset: 2px; }
+    }
+    &__regalo{
+        display: inline-block; transform: rotate(4deg); flex: 0 0 auto;
+        font-weight: 800; font-size: 12.5px; letter-spacing: .02em; line-height: 1;
+        background: var(--n-menta); color: var(--n-tinta); padding: 5px 8px 4px; border-radius: 6px;
+    }
+    &__codigo{
+        margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 4px 4px 4px 16px; border-radius: 18px; border: 1.5px dashed rgba(60,251,159,.55);
+        b{ min-width: 0; font-weight: 800; font-size: 24px; letter-spacing: .06em; color: #fff; overflow-wrap: anywhere; }
+        button{
+            position: relative; z-index: 1; flex: 0 0 auto; min-height: 44px; padding: 0 10px; border: 0; background: none; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--n-menta);
+            border-radius: 12px;
+            svg{ width: 16px; height: 16px; }
+            &:focus-visible{ outline: 2px solid var(--n-menta); }
+        }
+    }
+    &__invitaTxt{ display: block; margin-top: 10px; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.8); }
+
+    /* --- Las filas: lineas finas, sin cajas --- */
+    &__grupo{
+        margin: 28px 0 0; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #55655C;
+        &--sig{ margin-top: 22px; }
+    }
+    &__lista{ display: block; }
+    &__fila{
+        display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; min-height: 72px;
+        padding: 14px 0; border: 0; background: none; font-family: inherit; text-align: left; cursor: pointer;
+        color: var(--n-tinta); text-decoration: none;
+        border-bottom: 1px solid var(--n-linea);
+        transition: opacity .12s ease;
+        &:last-child{ border-bottom: 0; }
+        &:active{ opacity: .6; }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 2px; border-radius: 14px; }
+    }
+    &__filaIco{
+        width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; background: var(--n-menta-suave); color: var(--n-tinta);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; }
+    }
+    &__filaTxt{
+        flex: 1; min-width: 0;
+        b{ display: block; font-size: 15px; font-weight: 700; color: var(--n-tinta); }
+        small{ display: block; font-size: 12.5px; line-height: 1.35; color: #55655C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
+    &__filaIr{ width: 18px; height: 18px; flex: 0 0 auto; color: #8A968F; display: flex; svg{ width: 100%; height: 100%; } }
+
+    /* --- Salir --- */
+    &__salir{
+        margin-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        border-top: 1px solid var(--n-linea); padding-top: 6px;
+    }
+    &__pie{ margin: 6px 0 0; text-align: center; font-size: 12px; color: #55655C; }
 }
 
-/* --- Las listas --- */
-.cuN__grupo{ margin: 26px 4px 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; color: $muted; }
-.cuN__lista{
-    border-radius: 22px; background: #fff; box-shadow: 0 12px 30px rgba(22,35,29,.08); overflow: hidden;
+/* --- Hoja del avatar --- */
+.yoAva{
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 2px;
+    &__op{
+        padding: 0; border-radius: 50%; aspect-ratio: 1; cursor: pointer; background: #fff; border: 3.5px solid #fff;
+        -webkit-tap-highlight-color: transparent;
+        img{ display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        &.is-on{ border-color: var(--n-tinta); }
+        &:focus-visible{ outline: 3px solid var(--n-menta); outline-offset: 2px; }
+    }
+    &__nota{ margin: 14px 0 0; font-size: 13px; color: #55655C; }
 }
-.cuN__fila{
-    display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box;
-    padding: 12px 14px; border: 0; background: none; font-family: inherit; text-align: left;
-    color: $tinta; text-decoration: none; cursor: pointer;
-    & + &{ border-top: 1px solid #EEF2EF; }
-    &:active{ background: #F6F8F7; }
-}
-.cuN__ico{
-    width: 38px; height: 38px; border-radius: 12px; flex: 0 0 auto; box-sizing: border-box; padding: 9.5px;
-    display: flex;
-    &--menta{ background: #EAFBF3; color: $verde; }
-    &--mentaFuerte{ background: linear-gradient(135deg, $menta, $menta2); color: $tinta; }
-    &--cielo{ background: #E4EFFA; color: #2A5F9E; }
-    &--crema{ background: #FFF1DE; color: #C26A12; }
-    &--gris{ background: #F2F5F3; color: $tinta; }
-}
-.cuN__filaTxt{
-    flex: 1; min-width: 0;
-    b{ display: block; font-size: 14.5px; font-weight: 600; }
-    small{ display: block; font-size: 12.5px; color: $muted; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-}
-.cuN__ir{ width: 16px; height: 16px; flex: 0 0 auto; color: #8A968F; }
 
-.cuN__salir{ margin-top: 22px; }
+@media (prefers-reduced-motion: reduce){
+    .yo__btn, .yo__fila{ transition: none; }
+}
+
+/* Eliminar la cuenta no compite con cerrar sesion: va en gris y mas chico. */
+.yo .yo__salir > *:last-child, .yo .yo__salir > *:last-child *{ color: #8A948D !important; font-weight: 500 !important; font-size: 13px !important; }
+.yo .yo__marca{ font-size: 13px; font-weight: 600; color: var(--n-tinta-78); }
+.yo .yo__fila .rCara{ box-shadow: none; }

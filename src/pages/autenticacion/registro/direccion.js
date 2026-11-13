@@ -16,7 +16,6 @@ import {
 
 import MarcoAuth, { Accion } from './../../../components/auth/Marco/MarcoAuth';
 import { Polygon } from './../../../pages/dashboard/ubicaciones/circulo';
-import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
 import { useAuthContext } from '../../../context/authContext';
 import { esNativo } from '../../../nativo';
 import { direccionDeVisita, guardarDireccionDeVisita, olvidarDireccionDeVisita } from '../../../visita';
@@ -273,9 +272,9 @@ const RegistroDireccionPage = ({ visita = false }) => {
                    volver={visita ? () => navigate('/visita/cuenta') : undefined}>
 
             {visita ?
-                <h1 className="afAuth__titular">¿Dónde te <em>entregaríamos?</em></h1>
+                <h1 className="afAuth__titular">¿Dónde te entregaríamos?</h1>
             : esNativo ?
-                <h1 className="afAuth__titular">Falta lo último, <em>¿dónde te entregamos?</em></h1>
+                <h1 className="afAuth__titular">Falta lo último, ¿dónde te entregamos?</h1>
             :
                 <h1 className="afAuth__titular">
                     <span className="t1">Falta lo último,</span>
@@ -312,17 +311,27 @@ const RegistroDireccionPage = ({ visita = false }) => {
                                 position={centro}
                                 onDragEnd={(e) => handleLocationChange(e.latLng)}
                             >
-                                <span className="ubiPin">
-                                    <img src={icoMarkerPin} alt="" />
+                                {/* El pin a color: circulo menta, pin tinta. La
+                                    punta de abajo es el punto exacto que se
+                                    guarda. */}
+                                <span className="nPin">
+                                    <span className="nPin__c">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                                             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" />
+                                            <circle cx="12" cy="9.5" r="2.5" />
+                                        </svg>
+                                    </span>
+                                    <span className="nPin__p" />
                                 </span>
                             </AdvancedMarker>
                             <Polygon
                                 paths={coverCities}
-                                strokeColor="#5AD178"
-                                strokeOpacity={0.8}
-                                fillColor={"#5AD178"}
-                                strokeWeight={3}
-                                fillOpacity={0.2}
+                                strokeColor="#12A866"
+                                strokeOpacity={0.9}
+                                fillColor={"#3CFB9F"}
+                                strokeWeight={2}
+                                fillOpacity={0.28}
                             />
                         </Map>
 
@@ -348,6 +357,16 @@ const RegistroDireccionPage = ({ visita = false }) => {
                         </div>
                     }
                 </div>
+
+                {/* Ya pago: en cuanto marca un punto dentro de la zona se le
+                    confirma, sin esperar a que toque "Continuar". */}
+                {!visita && esNativo && marcado && enCobertura &&
+                    <p className="rg__ok" role="status">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
+                             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
+                        Sí llegamos a este punto
+                    </p>
+                }
 
                 {visita && marcado && (enCobertura
                     ? <p className="vis__dirOk">
@@ -532,7 +551,7 @@ const RegistroDireccionPage = ({ visita = false }) => {
 
                 {esNativo
                     ? <Accion>
-                        <button type="submit" form="afFormDireccion" className="afBtn afBtn--mint">
+                        <button type="submit" form="afFormDireccion" className="afBtn" disabled={guardando}>
                             {visita ? 'Guardar esta dirección'
                                 : guardando ? 'Guardando…' : (enAltaApp ? 'Continuar' : 'Guardar y entrar')}
                         </button>

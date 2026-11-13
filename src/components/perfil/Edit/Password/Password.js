@@ -1,6 +1,6 @@
-import React,{useEffect,useState} from "react";
-import Grid from '@mui/material/Grid';
+import React,{useState} from "react";
 import './Password.scss';
+import '../campos.scss';
 
 import axios from 'axios';
 import { mensajeError } from '../../../ultil/mensajeError';
@@ -8,21 +8,19 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined';
-import CircularProgress from '@mui/material/CircularProgress';
-import IconButton from '@mui/material/IconButton';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
-import Alert from '@mui/material/Alert';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuthContext } from './../../../../context/authContext';
 import { API_URL } from '../../../../config';
 
+const Ojo = ({ abierto }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+        <circle cx="12" cy="12" r="3" />
+        {!abierto && <path d="M4 4l16 16" />}
+    </svg>
+);
 
-const ProfileChangePassword = ({iconImg,closeModal}) => {
+const ProfileChangePassword = ({closeModal,enHoja,children}) => {
 
     const [loadingForm,setLoadingForm] = useState(false);
     const { token } = useAuthContext();
@@ -44,9 +42,8 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
     const {
             register,
             handleSubmit,
-            formState,
+            watch,
             formState: { errors },
-            reset
         } = useForm({
             mode: "all",
             shouldUnregister: true,
@@ -73,13 +70,10 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
             }
-            ).then((resp)=>{
-                console.log(resp)
-                //updatePrivacity();
+            ).then(()=>{
                 closeModal();
                 setLoadingForm(false);
             }).catch((errr)=>{
-                //console.log('--->',errr);
                 setLoadingForm(false);
                 // Dos fallos encadenados: axios 1.7 no expone errr.status —eso
                 // llego en la 1.8—, asi que esta rama no entraba NUNCA y el
@@ -90,150 +84,70 @@ const ProfileChangePassword = ({iconImg,closeModal}) => {
                     status: true,
                     data: mensajeError(errr, 'No pudimos cambiar tu contraseña. Inténtalo de nuevo.')
                 });
-                
             })
-
     }
 
     const onSubmit = async (data) => {
-        console.log(data)
         updateDataPrivacity(data);
     }
 
     const [showPassword, setShowPassword] = useState(false);
-
     const handleClickShowPassword = () => setShowPassword((show) => !show);
-  
-    const handleMouseDownPassword = (event) => {
-      event.preventDefault();
-    };
 
-    useEffect(()=>{
-    },[])
+    /* Las reglas a la vista, marcandose solas mientras escribe. */
+    const nueva = watch('password') || '';
+    const reglas = [
+        { ok: nueva.length >= 8, txt: 'Al menos 8 caracteres' },
+        { ok: /[a-zA-Z]/.test(nueva), txt: 'Una letra' },
+        { ok: /[0-9]/.test(nueva), txt: 'Un número' },
+    ];
 
+    const campo = (id, nombre, etiqueta, auto, error) => (
+        <label className="cuF__campo" htmlFor={id}>
+            <span className="cuF__et">{etiqueta}</span>
+            <span className="cuF__caja">
+                <input className="cuF__in cuF__in--conOjo" id={id}
+                    type={showPassword ? 'text' : 'password'} autoComplete={auto}
+                    aria-invalid={errors[nombre] ? 'true' : undefined}
+                    {...register(nombre)} />
+                <button type="button" className="cuF__ojo" onClick={handleClickShowPassword}
+                    aria-label={showPassword ? 'Ocultar las contraseñas' : 'Ver las contraseñas'}>
+                    <Ojo abierto={showPassword} />
+                </button>
+            </span>
+            {errors[nombre] && error && <span className="cuF__error" role="alert">{error}</span>}
+        </label>
+    );
 
     return (
-        <div className="profEditBox">
-            <div className="title">
-                <div className="ico">
-                    {iconImg &&
-                        <img src={iconImg} alt="" />
-                    }
-                </div>
-                <h3>Cambiar contraseña</h3>
-            </div>
-            <form onSubmit={handleSubmit(onSubmit)} className={loadingForm ? 'inlineBlock disableForm':'inlineBlock'}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={12} md={12}>
+        <div className={`profEditBox${enHoja ? ' profEditBox--hoja' : ''}`}>
+            <div className="title"><h3>Cambiar contraseña</h3></div>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate
+                className={`cuF${loadingForm ? ' is-guardando' : ''}`}>
 
-                        <div className="textFieldPassword">
-                            <FormControl sx={{width: '100%'}} variant="filled">
-                                <InputLabel htmlFor="standard-adornment-password111">Contraseña Actual</InputLabel>
-                                <Input
-                                    id="standard-adornment-password111"
-                                    type={showPassword ? 'text' : 'password'}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
-                                            >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    {...register("oldPassword")}
-                                    error={errors.oldPassword ? true : false}
-                                />
-                            </FormControl>
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                {campo('clave-actual', 'oldPassword', 'Contraseña actual', 'current-password',
+                    'Escribe tu contraseña actual (8 caracteres o más).')}
+                {campo('clave-nueva', 'password', 'Nueva contraseña', 'new-password', null)}
+                <ul className="cuF__reglas" aria-label="Tu nueva contraseña debe tener">
+                    {reglas.map((r) => (
+                        <li key={r.txt} className={r.ok ? 'is-ok' : undefined}><i aria-hidden="true" />{r.txt}</li>
+                    ))}
+                </ul>
+                {campo('clave-repetida', 'passwordConfirm', 'Repite la nueva contraseña', 'new-password',
+                    'Las contraseñas no coinciden.')}
 
-                        <div className="textFieldPassword">
-                            <FormControl sx={{width: '100%'}} variant="filled">
-                                <InputLabel htmlFor="standard-adornment-password">Nueva Contraseña</InputLabel>
-                                <Input
-                                    id="standard-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
-                                            >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    {...register("password")}
-                                    error={errors.password ? true : false}
-                                />
-                            </FormControl>
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldPassword">
-                            <FormControl sx={{width: '100%'}} variant="filled">
-                                <InputLabel htmlFor="standard-adornment-password">Confirmar contraseña</InputLabel>
-                                <Input
-                                    id="standard-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
-                                            >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    {...register("passwordConfirm")}
-                                    error={errors.passwordConfirm ? true : false}
-                                />
-                            </FormControl>
-                        </div>
-                    </Grid>
+                {respErr.status && <p className="cuF__aviso" role="alert">{respErr.data}</p>}
 
-                    {respErr.status &&
-                        <Grid item xs={12} sm={12} md={12}>
-                            <Alert severity="error">{respErr.data}</Alert>
-                        </Grid>
-                    }
+                {!enHoja &&
+                    <p className="cuF__nota">
+                        Se guarda cifrada: nadie puede verla, ni nosotros.
+                    </p>}
 
-                    {!formState.isValid &&
-                        <Grid item xs={12} sm={12} md={12}>
-                            <div className="formDateValid">
-                                {errors.password?.message ==='Deben tener al menos ocho caracteres.' && <p>(*) Deben tener al menos ocho caracteres</p>}
-                                {errors.password?.message ==='Incluir mayúsculas y minúsculas.' && <p>(*) Incluir mayúsculas y minúsculas</p>}
-                                {errors.password?.message ==='Incluir números.' && <p>(*) Incluir números</p>}
-                                {errors.password?.message ==='Incluir símbolos.' && <p>(*) Incluir símbolos</p>}
-                                {errors.passwordConfirm?.message && <p>(*) Las contraseñas no coinciden.</p>}
-                            </div>
-                        </Grid>
-                    }
-                    <Grid item xs={12} sm={12} md={12}>
-                        <div className="inlineFlex formRow formRowBtn">
-                            {loadingForm ?
-                                <div  className='btnPrimary'>
-                                    Guardando cambios
-                                    <CircularProgress size={18} color={'white'} />
-                                    
-                                </div>
-                            :
-                                <button  type='submit' className='btnPrimary'>
-                                    Guardar cambios
-                                    <SaveAsOutlinedIcon />
-                                </button>
-                            }
-                        </div>
-                    </Grid>
-                </Grid>
+                {children}
 
+                <button type="submit" className="cuF__guardar" disabled={loadingForm}>
+                    {loadingForm ? 'Guardando…' : 'Guardar'}
+                </button>
             </form>
         </div>
     )

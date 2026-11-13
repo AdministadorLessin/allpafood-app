@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './beneficios.scss';
 import axios from 'axios';
-import LayoutDashboard from '../../../components/LayoutDashborad/LayoutDashboard';
+import Pantalla, { Tramo } from '../../../components/perfil/Pantalla/Pantalla';
+import Hoja from '../../../components/perfil/Hoja/Hoja';
 import { useAuthContext } from '../../../context/authContext';
-import { Cascada, Bloque, motion, alToque, Contador } from '../../../components/ultil/Motion/Motion';
 
 /**
  * Allpa+, los convenios que vienen con el plan.
@@ -17,33 +17,27 @@ import { Cascada, Bloque, motion, alToque, Contador } from '../../../components/
  * codigo nuevo es editar esa fila, sin compilar ni desplegar.
  */
 
-/* Cada categoria trae su icono y su par de colores. El degradado no es
-   decoracion: en una lista de diez tarjetas es lo que deja distinguir de un
-   vistazo un gimnasio de una floreria sin leer el titulo. */
+/* Cada categoria trae su icono: en una lista larga deja distinguir de un
+   vistazo un gimnasio de una floreria sin leer el titulo. El color es uno
+   solo, el menta suave de las filas del app. */
 const CATEGORIAS = {
   'Salud & Bienestar': {
     d: 'M12 21s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 12c0 4.6-7 9-7 9z',
-    de: '#DCEFE4', a: '#A8D8BE', 
   },
   'Educación': {
     d: 'M3 8l9-4 9 4-9 4-9-4zM7 11v4c0 1.7 2.2 3 5 3s5-1.3 5-3v-4',
-    de: '#DEE9F7', a: '#AFC9EA',
   },
   'Hogar & Lifestyle': {
     d: 'M4 11l8-6 8 6M6 10v9h12v-9M10 19v-5h4v5',
-    de: '#F5E7D3', a: '#E3C79B',
   },
   Fitness: {
     d: 'M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12',
-    de: '#EFE0EC', a: '#D5B4CE',
   },
   'Alimentación Saludable': {
     d: 'M12 8c-3.5-3-8 .5-6.5 5.5C6.7 18 10 21 12 21s5.3-3 6.5-7.5C20 8.5 15.5 5 12 8zM12 8c0-2 1-3.5 3-4.5',
-    de: '#E2EFD6', a: '#B9DCA2',
   },
   _: {
     d: 'M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6L12 16.8 6.6 19.6l1.2-6L3.3 9.4l6.1-.8L12 3z',
-    de: '#E6E9E7', a: '#C3CAC6',
   },
 };
 
@@ -137,138 +131,87 @@ const Beneficios = () => {
     window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`, '_blank');
   };
 
+  const cuantos = convenios ? convenios.length : 0;
+
   return (
-    <LayoutDashboard>
-      <Cascada className="afPlus">
+    <Pantalla etiqueta="Allpa+ · Incluido en tu plan" titulo="Tu plan también rinde afuera"
+      bajada="Descuentos y acompañamiento en salud, fitness, hogar y formación, solo por ser cliente."
+      volver="/bienestar" clase="bnf">
 
-        <Bloque>
-          <div className="afPlusHero">
-            <span className="afPlusHero__et">Allpa+</span>
-            <h1 className="afPlusHero__tit">
-              Tu plan <em>también rinde afuera</em>
-            </h1>
-            <p className="afPlusHero__baja">
-              Descuentos y acompañamiento en salud, fitness, hogar y formación,
-              solo por ser cliente.
-            </p>
-            {convenios !== null && convenios.length > 0 &&
-              <div className="afPlusHero__cifras">
-                <span><b><Contador valor={convenios.length} /></b> convenios</span>
-                <i />
-                <span><b><Contador valor={grupos.length} /></b> categorías</span>
-              </div>
-            }
-          </div>
-        </Bloque>
+      {cuantos > 0 &&
+        <Tramo className="bnf__cifras">
+          <div><b>{cuantos}</b><small>{cuantos === 1 ? 'convenio' : 'convenios'}</small></div>
+          <div><b>{grupos.length}</b><small>{grupos.length === 1 ? 'categoría' : 'categorías'}</small></div>
+        </Tramo>}
 
-        {error && <Bloque><p className="afPlus__aviso">{error}</p></Bloque>}
-        {convenios === null && <Bloque><p className="afPlus__aviso">Cargando tus beneficios…</p></Bloque>}
-        {convenios !== null && convenios.length === 0 && !error &&
-          <Bloque><p className="afPlus__aviso">Todavía no hay convenios publicados.</p></Bloque>}
+      {error && <Tramo><p className="cuP__aviso" role="alert">{error}</p></Tramo>}
+      {convenios === null && <Tramo><p className="cuP__vacio">Cargando tus beneficios…</p></Tramo>}
+      {convenios !== null && convenios.length === 0 && !error &&
+        <Tramo><p className="cuP__vacio">Todavía no hay convenios publicados.</p></Tramo>}
 
-        {grupos.map(([categoria, items]) => {
-          const e = estilo(categoria);
-          return (
-            <React.Fragment key={categoria}>
-              <Bloque>
-                <p className="afPlus__cat">
-                  <span className="afPlus__catIco" style={{ background: `linear-gradient(140deg,${e.de},${e.a})` }}>
-                    <Glifo d={e.d} />
-                  </span>
-                  {categoria}
-                  <b>{items.length}</b>
-                </p>
-              </Bloque>
-
-              {items.map((c) => (
-                <Bloque key={categoria + c.marca}>
-                  <motion.button
-                    type="button"
-                    className="afConv"
-                    onClick={() => abrir(c)}
-                    {...alToque}
-                  >
-                    <span
-                      className="afConv__ico"
-                      style={{ background: `linear-gradient(140deg,${e.de},${e.a})` }}
-                    >
-                      <Glifo d={e.d} />
-                    </span>
-                    <span className="afConv__txt">
-                      <b>{c.marca}</b>
-                      <small>{c.que}</small>
-                    </span>
-                    <span className="afConv__valor">
-                      <b>{c.beneficio}</b>
-                      <small>{c.detalle}</small>
-                    </span>
-                  </motion.button>
-                </Bloque>
-              ))}
-            </React.Fragment>
-          );
-        })}
-      </Cascada>
-
-      {/* Ficha del convenio: el codigo y el enlace, para usarlo sin escribirle
-          a nadie. Si la marca todavia no tiene codigo cargado, cae de vuelta a
-          WhatsApp en vez de dejar al cliente sin salida. */}
-      {abierto && (() => {
-        const e = estilo(abierto.categoria);
+      {grupos.map(([categoria, items]) => {
+        const e = estilo(categoria);
         return (
-          <div className="afFicha" onClick={cerrar}>
-            <motion.div
-              className="afFicha__caja"
-              onClick={(ev) => ev.stopPropagation()}
-              initial={{ opacity: 0, y: 26 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.28, ease: [0.16, 0.84, 0.44, 1] }}
-            >
-              <button type="button" className="afFicha__x" onClick={cerrar} aria-label="Cerrar">×</button>
-
-              <div className="afFicha__top" style={{ background: `linear-gradient(140deg,${e.de},${e.a})` }}>
-                <span className="afFicha__ico"><Glifo d={e.d} /></span>
-                <p className="afFicha__valor">{abierto.beneficio}</p>
-                <p className="afFicha__detalle">{abierto.detalle}</p>
-              </div>
-
-              <div className="afFicha__cuerpo">
-                <p className="afFicha__marca">{abierto.marca}</p>
-                <p className="afFicha__que">{abierto.que}</p>
-
-                {abierto.codigo
-                  ? <>
-                      <p className="afFicha__lbl">Tu código</p>
-                      <div className="afFicha__codigo">
-                        <span>{abierto.codigo}</span>
-                        <button type="button" onClick={() => copiar(abierto.codigo)}>
-                          {copiado ? 'Copiado' : 'Copiar'}
-                        </button>
-                      </div>
-                    </>
-                  : <p className="afFicha__sinCodigo">
-                      Este convenio todavía se activa por WhatsApp. Escríbenos y
-                      te damos el código al momento.
-                    </p>
-                }
-
-                {abierto.comoUsar && <p className="afFicha__como">{abierto.comoUsar}</p>}
-                {abierto.nota && <span className="afFicha__nota">{abierto.nota}</span>}
-
-                {abierto.url
-                  ? <a className="afFicha__btn" href={abierto.url} target="_blank" rel="noreferrer">
-                      Ir a {abierto.marca}
-                    </a>
-                  : <button type="button" className="afFicha__btn" onClick={() => porWhatsapp(abierto)}>
-                      Escribirnos por WhatsApp
-                    </button>
-                }
-              </div>
-            </motion.div>
-          </div>
+          <Tramo key={categoria}>
+            <p className="cuP__grupo">{categoria}<span>{items.length}</span></p>
+            <div className="cuP__lista">
+              {items.map((c) => (
+                <button type="button" className="cuP__fila" key={categoria + c.marca} onClick={() => abrir(c)}>
+                  <span className="cuP__filaIco" aria-hidden="true"><Glifo d={e.d} /></span>
+                  <span className="cuP__filaTxt">
+                    <b>{c.marca}</b>
+                    <small>{c.que}</small>
+                  </span>
+                  <span className="bnf__valor">
+                    <b>{c.beneficio}</b>
+                    {c.detalle && <small>{c.detalle}</small>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </Tramo>
         );
-      })()}
-    </LayoutDashboard>
+      })}
+
+      {/* Ficha del convenio, en una hoja: el codigo y el enlace, para usarlo
+          sin escribirle a nadie. Si la marca todavia no tiene codigo cargado,
+          cae de vuelta a WhatsApp en vez de dejar al cliente sin salida. */}
+      <Hoja abierta={!!abierto} alCerrar={cerrar}
+        etiqueta="Allpa+ · Incluido en tu plan"
+        titulo={abierto ? [abierto.beneficio, abierto.detalle].filter(Boolean).join(' ') : ''}
+        bajada={abierto ? [abierto.marca, abierto.que].filter(Boolean).join(' · ') : ''}
+        pie={abierto && (abierto.url
+          ? <a className="hoja__btn" href={abierto.url} target="_blank" rel="noreferrer">
+              Ir a {abierto.marca}
+            </a>
+          : <button type="button" className="hoja__btn" onClick={() => porWhatsapp(abierto)}>
+              Escribirnos por WhatsApp
+            </button>)}>
+        {abierto && <>
+          {abierto.codigo
+            ? <div className="bnf__codigo">
+                <span className="bnf__codigoEt">Tu código</span>
+                <div className="afFicha__codigo">
+                  <span>{abierto.codigo}</span>
+                  <button type="button" onClick={() => copiar(abierto.codigo)} aria-live="polite">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      {copiado ? <path d="M5 12l5 5 9-10" /> : <><path d="M9 9h10v11H9z" /><path d="M5 15V4h10" /></>}
+                    </svg>
+                    {copiado ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
+              </div>
+            : <p className="bnf__sinCodigo">
+                Este convenio todavía se activa por WhatsApp. Escríbenos y
+                te damos el código al momento.
+              </p>
+          }
+
+          {abierto.comoUsar && <p className="bnf__como">{abierto.comoUsar}</p>}
+          {abierto.nota && <p className="bnf__nota">{abierto.nota}</p>}
+        </>}
+      </Hoja>
+    </Pantalla>
   );
 };
 

@@ -38,18 +38,18 @@
         b{ color: var(--af-mint); font-weight: 700; }
     }
 
-    /* Ambar, no rojo. El rojo dice "error grave" y dispara alarma; el ambar
-       dice "atencion, algo cambio". La comida viene igual. */
+    /* El retraso es un aviso de tiempo: tinta de fondo y coral claro en lo
+       que cambia. Sin marron ni amarillo. */
     &--retraso{
-        background: #3A2A12;
-        .afHoyPedido__et{ color: #F0B450; }
-        .afHoyPedido__promesa b{ color: #F0B450; }
-        .afPaso__marca--hecho{ background: #F0B450; border-color: #F0B450; }
+        background: var(--n-tinta, #16211B);
+        .afHoyPedido__et{ color: #FF9C8A; }
+        .afHoyPedido__promesa b{ color: #FF9C8A; }
+        .afPaso__marca--hecho{ background: #FF9C8A; border-color: #FF9C8A; }
         .afPaso__marca--actual{
-            border-color: #F0B450;
-            box-shadow: 0 0 0 4px rgba(240,180,80,.18);
+            border-color: #FF9C8A;
+            box-shadow: 0 0 0 4px rgba(255,156,138,.18);
         }
-        .afPaso--activo:not(:last-child)::before{ background: rgba(240,180,80,.4); }
+        .afPaso--activo:not(:last-child)::before{ background: rgba(255,156,138,.4); }
     }
 
     &__aviso{

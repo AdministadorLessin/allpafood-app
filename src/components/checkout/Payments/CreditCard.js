@@ -24,6 +24,8 @@ import { useAuthContext } from './../../../context/authContext';
 import CheckoutPaymentFail from './FailPayment';
 import { useEffect } from "react";
 import { API_URL } from '../../../config';
+import { esNativo } from '../../../nativo';
+import { Accion } from '../../auth/Marco/MarcoAuth';
 
 const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => {
 
@@ -163,8 +165,13 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
     }
 
 
+    /* Solo para escribirlo en el boton del app: el cobro lo calcula el
+       servidor con el plan y los adicionales, no con este numero. */
+    const totalAPagar = [...(cartItems || []), ...(cartAdicionales || [])]
+        .reduce((suma, item) => suma + (parseFloat(item.price) || 0), 0);
+
     return (
-        <form onSubmit={handleSubmit(yapeSubmitForm)}>
+        <form id="afFormTarjeta" onSubmit={handleSubmit(yapeSubmitForm)}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={12} md={8}>
                     <div className="textFieldCheck">
@@ -215,7 +222,16 @@ const CheckoutPaymentCard = ({paymentMetod,handleOpen,setShowLoaderPayment}) => 
                     </div>
                 </Grid>
                 
-                {loadForm ?
+                {/* En el app el boton va fijo abajo, con el total, y envia este
+                    mismo formulario. Mientras se cobra queda apagado, igual
+                    que en la web desaparece. */}
+                {esNativo ?
+                    <Accion>
+                        <button type="submit" form="afFormTarjeta" className="afBtn" disabled={loadForm}>
+                            {loadForm ? 'Procesando tu pago…' : `Pagar S/ ${totalAPagar.toFixed(2)}`}
+                        </button>
+                    </Accion>
+                : loadForm ?
 
                     <Grid item xs={12} sm={12} md={12}>
                         <div  className="btnPrimary btnPayment">

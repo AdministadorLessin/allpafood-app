@@ -5,13 +5,20 @@
    la cuenta— y la de feriado, que avisa que ese dia no se reparte. La
    diferencia no es decoracion: el cliente tiene que distinguir de un vistazo
    un aviso de saldo de uno que le cambia el dia.
+
+   Es una hoja como las demas: sube sobre la pantalla, que queda desenfocada.
    ========================================================================== */
+
+$gris: #55655C;
 
 .afAviso{
     position: fixed; inset: 0; z-index: 1400;
-    background: rgba(22,33,27,.55);
+    background: rgba(22,33,27,.46);
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(9px);
     display: flex; align-items: flex-end; justify-content: center;
-    backdrop-filter: blur(2px);
+    font-family: var(--n-texto);
+    -webkit-font-smoothing: antialiased;
 
     @media (min-width: 640px){
         align-items: center;
@@ -19,122 +26,105 @@
     }
 
     &__caja{
-        width: 100%; max-width: 440px;
-        max-height: 92vh; overflow-y: auto;
-        background: var(--af-paper);
-        border-radius: 24px 24px 0 0;
-        @media (min-width: 640px){ border-radius: 24px; }
+        width: 100%; max-width: 480px; box-sizing: border-box;
+        max-height: 92vh; overflow-y: auto; overscroll-behavior: contain;
+        padding: 12px 22px calc(26px + var(--n-abajo));
+        background: var(--n-fondo); color: var(--n-tinta);
+        border-radius: 36px 36px 0 0;
+        box-shadow: 0 -20px 50px rgba(22,33,27,.25);
+        @media (min-width: 640px){ border-radius: 36px; padding-bottom: 26px; }
+    }
+    &__asa{
+        display: block; width: 44px; height: 5px; border-radius: 3px; background: #C9CEC4; margin: 0 auto;
+        @media (min-width: 640px){ display: none; }
     }
 
-    &__top{
-        text-align: center;
-        padding: 26px 24px 22px;
-        background:
-            radial-gradient(120% 160% at 85% 4%, rgba(60,251,159,.28) 0%, rgba(60,251,159,0) 60%),
-            linear-gradient(150deg, #F0FBF4 0%, #E2F3E9 100%);
-        border-radius: 24px 24px 0 0;
-    }
+    &__top{ padding: 20px 0 0; }
 
     &__iso{
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 48px; height: 48px; border-radius: 16px;
-        background: rgba(255,255,255,.7);
-        color: var(--af-accent);
-        margin-bottom: 12px;
-        svg{ width: 24px; height: 24px; }
+        display: flex; align-items: center; justify-content: center;
+        width: 56px; height: 56px; border-radius: 50%;
+        background: var(--n-menta); color: var(--n-tinta);
+        margin-bottom: 16px;
     }
 
     &__tit{
-        margin: 0 0 6px;
-        font-size: var(--af-t-xl);
-        font-weight: 800;
-        letter-spacing: var(--af-track-titular);
-        color: var(--af-ink);
-        text-wrap: balance;
+        margin: 0;
+        font-family: var(--n-titular); font-weight: 800;
+        font-size: 30px; line-height: 1.04; letter-spacing: -.03em;
+        color: var(--n-tinta);
+        text-wrap: balance; overflow-wrap: anywhere;
     }
 
     &__baja{
-        margin: 0; font-size: var(--af-t-s);
-        color: var(--af-muted); line-height: 1.45;
+        margin: 10px 0 0; font-size: 15px;
+        color: var(--n-tinta-78); line-height: 1.55;
     }
 
-    /* La barra de navegacion flota pegada al borde de abajo, justo donde
-       termina la hoja. La hoja se alarga para pasar por encima de ella: si no,
-       el ultimo boton queda escrito sobre la barra. */
-    &__cuerpo{
-        padding: 20px 20px 26px;
-        @media (max-width: 639px){ padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
-    }
+    &__cuerpo{ padding: 18px 0 0; }
 
     &__otro{
-        margin: 0 0 14px;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: var(--af-accent-soft);
-        font-size: var(--af-t-s);
-        color: var(--af-ink);
+        margin: 0 0 12px;
+        padding: 14px;
+        border-radius: 20px;
+        background: #E9EBE3;
+        font-size: 13.5px;
+        color: var(--n-tinta);
         line-height: 1.45;
     }
 
     &__btn{
-        display: block; width: 100%;
-        font-family: inherit; font-size: var(--af-t-m); font-weight: 700;
-        color: var(--af-mint-ink); background: var(--af-mint);
-        border: 0; border-radius: var(--af-r-pill);
-        padding: 13px 16px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; height: 56px; box-sizing: border-box;
+        font-family: inherit; font-size: 16px; font-weight: 600;
+        color: #fff; background: var(--n-tinta);
+        border: 0; border-radius: 18px;
+        cursor: pointer; margin-top: 6px;
+        -webkit-tap-highlight-color: transparent;
     }
 
     &__btn--suave{
-        margin-top: 10px;
-        color: var(--af-muted); background: none;
-        font-size: var(--af-t-s); font-weight: 600;
-        text-decoration: underline;
-        padding: 8px;
+        margin-top: 0; height: 46px;
+        color: $gris; background: none;
+        font-size: 14px; font-weight: 600;
     }
 
     /* ---- Feriado ------------------------------------------------------- */
 
-    &--feriado &__top{
-        padding: 28px 24px 24px;
-        background:
-            radial-gradient(130% 150% at 15% 0%, rgba(60,251,159,.42) 0%, rgba(60,251,159,0) 58%),
-            linear-gradient(155deg, #E8F7EE 0%, #D5EEE0 100%);
-    }
-
     &__escena{
-        width: 112px; height: 104px;
-        margin: 0 auto 14px;
+        width: 104px; height: 97px;
+        margin: 0 0 14px -6px;
         svg{ width: 100%; height: 100%; display: block; }
     }
 
+    /* Es un aviso de tiempo: lleva coral. */
     &__chip{
         display: inline-block;
         margin-bottom: 10px;
-        padding: 5px 12px;
-        border-radius: var(--af-r-pill);
-        background: rgba(24,58,42,.9);
-        color: #EAFEF3;
-        font-size: var(--af-t-xs);
-        font-weight: 700;
-        letter-spacing: .04em;
-        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #FDE3DE;
+        color: var(--n-coral-texto);
+        font-size: 12px;
+        font-weight: 600;
+        &::first-letter{ text-transform: uppercase; }
     }
 
     &__nota{
-        display: flex; align-items: flex-start; gap: 10px;
-        margin: 0 0 16px;
-        padding: 13px 14px;
-        border-radius: 16px;
-        background: var(--af-accent-soft);
-        color: var(--af-ink);
-        font-size: var(--af-t-s);
+        display: flex; align-items: center; gap: 10px;
+        margin: 0 0 12px;
+        padding: 14px;
+        border-radius: 20px;
+        background: var(--n-menta-suave);
+        color: var(--n-tinta);
+        font-size: 13.5px;
         line-height: 1.4;
         text-align: left;
     }
+    /* El sello, igual que en el resto del app. */
     &__punto{
-        flex: 0 0 auto;
-        width: 8px; height: 8px; margin-top: 6px;
-        border-radius: 50%;
-        background: var(--af-accent);
+        flex: 0 0 auto; display: inline-block; transform: rotate(-4deg);
+        font-weight: 800; font-size: 12.5px; letter-spacing: .02em; line-height: 1;
+        background: var(--n-tinta); color: #fff; padding: 5px 8px 4px; border-radius: 6px;
     }
 }

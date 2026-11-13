@@ -153,7 +153,7 @@ const PerfilPage = (props) => {
   );
 
   return (
-    <LayoutDasboard claseStyle={false}>
+    <LayoutDasboard claseStyle={esNativo ? 'nCaja' : false}>
       {esNativo ? (
         <CuentaNativa
           person={person}
@@ -162,7 +162,9 @@ const PerfilPage = (props) => {
           plan={planInfo?.plan}
           delivery={delivery}
           imagen={imgProfile}
-          abrir={changeSwitch}
+          privacity={privacity}
+          actualizarPersona={getInfo}
+          actualizarPrivacidad={getPrivacity}
           elegirAvatar={(n) => {
             if (!person || String(n) === String(imgProfile)) return;
             vibrar.toque();
@@ -320,8 +322,9 @@ const PerfilPage = (props) => {
       </Cascada>
       )}
 
+      {/* En el app los formularios van en hojas (CuentaNativa). */}
       <Modal
-        open={openEperson}
+        open={!esNativo && openEperson}
         onClose={handleCloseEperson}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -331,9 +334,9 @@ const PerfilPage = (props) => {
             <CloseIcon/>
           </div>
           {switchForm === 0 ?
-            <ProfileChangePerson iconImg={icoInfoPersonal} data={person} closeModal={handleCloseEperson} updatePerson={getInfo}/>
+            (person && <ProfileChangePerson iconImg={icoInfoPersonal} data={person} closeModal={handleCloseEperson} updatePerson={getInfo}/>)
           : switchForm === 1 ?
-            <ProfileChangePrivacity iconImg={icoPrivacidad} data={privacity} updatePrivacity={getPrivacity} closeModal={handleCloseEperson} />
+            (privacity && <ProfileChangePrivacity iconImg={icoPrivacidad} data={privacity} updatePrivacity={getPrivacity} closeModal={handleCloseEperson} />)
           : switchForm === 2 ?
             <ProfileChangePassword iconImg={icoPrivacidad}  closeModal={handleCloseEperson}/>
           :

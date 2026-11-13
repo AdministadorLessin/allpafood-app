@@ -11,7 +11,17 @@ import { iniciarAvisos } from './avisos';
  * Todo esto solo corre dentro del app de Android (y despues de iPhone). En el
  * navegador no hace nada, asi que app.allpafood.com sigue igual que siempre.
  */
-export const esNativo = Capacitor.isNativePlatform();
+/* Solo al programar (npm start): abrir cualquier pantalla con ?nativo deja ver
+   en el navegador lo que solo sale en el app instalado. En el app publicado y
+   en la web esto no existe. */
+const verComoApp = (() => {
+  if (process.env.NODE_ENV === 'production') return false;
+  try {
+    if (window.location.search.includes('nativo')) sessionStorage.setItem('af_ver_nativo', '1');
+    return sessionStorage.getItem('af_ver_nativo') === '1';
+  } catch (e) { return false; }
+})();
+export const esNativo = Capacitor.isNativePlatform() || verComoApp;
 
 const Barras = registerPlugin('Barras');
 
@@ -40,14 +50,16 @@ const aplicarBarras = (colores) => {
 /* Los colores de las franjas del telefono (la de la hora y la de abajo).
    Las pantallas de ingreso y registro son blancas; el panel lleva el mismo
    degradado de marfil a menta que el body en global.scss. */
-const BLANCO = { arriba: '#FFFFFF', abajo: '#FFFFFF' };
-const PANEL = { arriba: '#F7FAF4', abajo: '#E6F2E2' };
+/* Con la identidad nueva todas las pantallas empiezan en menta y terminan en
+   el fondo crema, las del registro y las del panel. */
+const BLANCO = { arriba: '#3CFB9F', abajo: '#F6F6F1' };
+const PANEL = { arriba: '#3CFB9F', abajo: '#F6F6F1' };
 /* El ingreso es oscuro; con la hoja abierta, la franja de abajo toma el
    blanco de la hoja. */
-/* La apertura usa el verde del logo oficial. */
-const APERTURA = { arriba: '#183A2A', abajo: '#183A2A', oscuro: true };
+/* La apertura va sobre el fondo claro del app. */
+const APERTURA = { arriba: '#F6F6F1', abajo: '#F6F6F1' };
 const INGRESO = { arriba: '#0E1713', abajo: '#0E1713', oscuro: true };
-const INGRESO_HOJA = { arriba: '#0E1713', abajo: '#F4F6F5', oscuro: true };
+const INGRESO_HOJA = { arriba: '#0E1713', abajo: '#FFFFFF', oscuro: true };
 
 /* La pantalla de arranque (el logo sobre verde tinta) se queda hasta que hay algo
    que leer. Antes se iba apenas cargaba el codigo y el cliente miraba una

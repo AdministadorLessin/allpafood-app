@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { createPortal } from 'react-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useNavigationType } from 'react-router-dom';
+import { motion, AnimatePresence, useIsPresent, useReducedMotion } from 'motion/react';
 
 import './MarcoAuth.scss';
 import isotipo from '../../../assets/img/isotipo_allpafood.png';
 import { Cascada, Bloque } from './../../ultil/Motion/Motion';
 import { esNativo, vibrar } from '../../../nativo';
+import { resorte } from '../../../movimiento';
 
 /* Las cuatro fases reales entre "quiero probar" y "ya tengo mi plan". Estan
    aqui, en un solo sitio, porque hasta ahora cada pantalla del embudo era una
@@ -92,15 +94,57 @@ const pasoEnApp = (fase, paso) => (
  * midiera contra el y no contra el telefono. Un boton de enviar que quede
  * afuera del <form> necesita el atributo form="id" para seguir enviandolo.
  */
-export const Accion = ({ children }) => (
-  esNativo
-    ? createPortal(<div className="afNatPie" onClickCapture={() => vibrar.toque()}>{children}</div>, document.body)
-    : <>{children}</>
-);
+export const Accion = ({ children }) => {
+  /* Mientras el paso anterior termina de salir, su boton ya no esta: asi no
+     quedan dos pies fijos encimados durante el cambio de paso. */
+  const presente = useIsPresent();
+  if (!esNativo) return <>{children}</>;
+  if (!presente) return null;
+  return createPortal(
+    <motion.div className="afNatPie" onClickCapture={() => vibrar.toque()}
+      initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={resorte.entra}>
+      {children}
+    </motion.div>,
+    document.body
+  );
+};
 
-const MarcoNativo = ({ fase, paso, children, volver, sinVolver }) => {
+/* Cada paso entra desde el lado hacia donde se avanza y el anterior sale por
+   el otro: adelante entra por la derecha, al volver por la izquierda. Solo se
+   mueve y aparece, que es lo unico que el telefono anima sin recalcular la
+   pantalla. */
+const DESLIZA = {
+  entra: (d) => ({ x: d * 64, opacity: 0 }),
+  quieto: { x: 0, opacity: 1, transition: resorte.entra },
+  sale: (d) => ({ x: d * -64, opacity: 0, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }),
+};
+const SIN_DESLIZAR = {
+  entra: { opacity: 0 },
+  quieto: { opacity: 1, transition: { duration: 0.15 } },
+  sale: { opacity: 0, transition: { duration: 0.1 } },
+};
+
+const MarcoNativo = ({ fase, paso, children, volver, sinVolver, clave, orden }) => {
   const navigate = useNavigate();
+  const comoLlego = useNavigationType();
+  const quieto = useReducedMotion();
   const n = pasoEnApp(fase, paso);
+
+  /* Que paso es este, para saber cuando cambia y hacia donde. Una pantalla
+     que no es un paso numerado (fuera de zona) pasa su propia `clave`. */
+  const id = clave || `${fase || 'suelto'}-${paso || 0}`;
+  const lugar = orden ?? n ?? 0;
+  const previo = useRef({ id, lugar });
+  /* Al llegar con "atras" desde otra pantalla, entra por la izquierda. */
+  const dir = useRef(comoLlego === 'POP' ? -1 : 1);
+  if (previo.current.id !== id) {
+    dir.current = lugar >= previo.current.lugar ? 1 : -1;
+    previo.current = { id, lugar };
+  }
+
+  /* Cada paso abre arriba: al cambiar con la pantalla bajada, el titular
+     nuevo quedaba fuera de la vista. */
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   /* Sin un "volver" propio, la flecha regresa a la pantalla anterior; si se
      entro directo (sin historial), a la bienvenida. */
@@ -138,25 +182,36 @@ const MarcoNativo = ({ fase, paso, children, volver, sinVolver }) => {
   };
 
   return (
-    <main className="afAuth afAuth--nat" onTouchStart={alTocar} onTouchEnd={alSoltar}>
+    <main className="afAuth afAuth--nat nPant" onTouchStart={alTocar} onTouchEnd={alSoltar}>
+      <span className="nMenta afNat__menta" aria-hidden="true" />
       <header className="afNat__top">
         {!sinVolver &&
-          <button type="button" className="afNat__volver" onClick={atras} aria-label="Volver">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                 strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <motion.button type="button" className="afNat__volver" onClick={atras} aria-label="Volver"
+            whileTap={quieto ? undefined : { scale: 0.92 }} transition={resorte.toque}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+          </motion.button>
         }
         {n &&
           <>
-            <div className="afNat__barra" role="progressbar" aria-valuemin={1}
-                 aria-valuemax={PASOS_APP} aria-valuenow={n}>
-              <i style={{ transform: `scaleX(${n / PASOS_APP})` }} />
-            </div>
+            <span className="afNat__barra" role="progressbar" aria-label={`Paso ${n} de ${PASOS_APP}`}
+                  aria-valuemin={1} aria-valuemax={PASOS_APP} aria-valuenow={n}>
+              {Array.from({ length: PASOS_APP }, (_, i) => (
+                <i key={i} className={i < n ? 'is-on' : undefined} />
+              ))}
+            </span>
             <span className="afNat__cuenta">{n}/{PASOS_APP}</span>
           </>
         }
       </header>
-      <div className="afAuth__col">{children}</div>
+      <div className="afAuth__col">
+        <AnimatePresence mode="popLayout" custom={dir.current}>
+          <motion.div key={id} className="afNat__paso" custom={dir.current}
+            variants={quieto ? SIN_DESLIZAR : DESLIZA} initial="entra" animate="quieto" exit="sale">
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </main>
   );
 };

@@ -1,15 +1,21 @@
 /* ==========================================================================
-   El ingreso del app instalado. Ver IngresoNativo.js.
+   La entrada al app instalado: bienvenida y hoja de ingreso. Ver
+   IngresoNativo.js. Medidas de las maquetas Bienvenida y Login.
 
-   Se aprobo como maqueta interactiva antes de llegar aqui; los tiempos y
-   las curvas son los de esa maqueta.
+   Lo unico que se mueve es transform y opacity (lo hace `motion`). El
+   desenfoque es una imagen ya desenfocada, nunca un filtro en vivo: en un
+   Android de gama media el ingreso iba a saltos.
    ========================================================================== */
 
-$tinta: #0E1713;
+$tinta: #16211B;
 $menta: #3CFB9F;
-$verde: #177A4C;
-$gris: #4F5E56;
-$curva: cubic-bezier(.2, .8, .2, 1);
+$gris: #55655C;
+$hundido: #F4F5EF;
+$error: #B4372B;
+
+/* Cuanto sube la foto: el plato esta en la mitad de abajo de la imagen y
+   tiene que asomar nitido por encima del texto. */
+$fotoSube: 30%;
 
 .afIngreso{
     position: relative;
@@ -19,177 +25,213 @@ $curva: cubic-bezier(.2, .8, .2, 1);
     overflow: hidden;
     background: $tinta;
     color: #FFFFFF;
-    font-family: var(--poppins);
+    font-family: var(--n-texto);
+    -webkit-font-smoothing: antialiased;
+    button, input{ font-family: inherit; }
 
-    /* ---------------- Bienvenida ---------------- */
+    /* ---------------- La foto ---------------- */
     /* El alto lo fija IngresoNativo.js en pixeles, para que el teclado no
        mueva la foto. */
     &__bienvenida{ position: absolute; left: 0; right: 0; top: 0; }
-
-    /* La foto es mas alta que la pantalla y sube: en un celular alto el plato
-       quedaba abajo, justo donde la foto se difumina, y solo se veia el
-       guante. */
-    /* Sin animacion de acercamiento: el zoom lento obligaba a redibujar la
-       foto en cada cuadro durante ocho segundos, justo cuando el cliente
-       empieza a tocar. */
     &__foto{
-        position: absolute; left: 0; right: 0; top: -38%; bottom: 0; overflow: hidden;
+        position: absolute; left: 0; right: 0; top: -$fotoSube; bottom: 0; overflow: hidden;
         img{
             position: absolute; inset: 0;
             width: 100%; height: 100%; display: block;
             object-fit: cover; object-position: 50% 58%;
         }
     }
-
-    /* Desenfoque progresivo hacia abajo, donde va el texto: la copia
-       desenfocada aparece de a poco con la mascara. Es una imagen fija, el
-       celular la pinta una vez y no la vuelve a calcular. */
+    /* Nitida arriba, desenfocada hacia abajo. Los porcentajes son de la foto
+       (que es mas alta que la pantalla), no de la pantalla. */
     &__borroso{
-        -webkit-mask-image: linear-gradient(180deg, transparent 52%, #000 82%);
-        mask-image: linear-gradient(180deg, transparent 52%, #000 82%);
+        -webkit-mask-image: linear-gradient(180deg, transparent 43%, #000 63%);
+        mask-image: linear-gradient(180deg, transparent 43%, #000 63%);
     }
     &__tinte{
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(14,23,19,.55) 0%, rgba(14,23,19,0) 16%,
-                    rgba(14,23,19,0) 38%, rgba(14,23,19,.62) 62%, rgba(14,23,19,.9) 100%);
+        background: linear-gradient(180deg, rgba(22,33,27,.34) 0%, rgba(22,33,27,.06) 24%,
+                    rgba(22,33,27,.52) 58%, rgba(22,33,27,.90) 100%);
+        &--hoja{ background: rgba(22,33,27,.42); }
     }
 
-    /* El "vidrio" ya no desenfoca lo de atras: sobre la foto desenfocada se
-       ve igual y no le cuesta nada al celular. */
-    &__vidrio{ background: rgba(255,255,255,.14); }
-
-    &__pie{
-        position: absolute; left: 24px; right: 24px; bottom: 28px;
-        display: flex; flex-direction: column; align-items: center;
-        text-align: center; gap: 14px;
+    /* ---------------- La marca ---------------- */
+    /* El isotipo mide 28 px y queda a 22 px del borde y 30 px bajo la zona
+       segura: es donde lo suelta la animacion de apertura, sin salto. */
+    &__cab{
+        position: absolute; left: 22px; right: 22px;
+        top: calc(env(safe-area-inset-top, 0px) + 30px);
+        height: 29px;
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        pointer-events: none;
     }
-
-    &__entra{ animation: afIngDesenfoca .8s $curva both; }
-
+    &__marca{
+        display: flex; align-items: center; gap: 8px; min-width: 0;
+        svg{ flex: 0 0 auto; display: block; }
+        b{
+            font-family: var(--n-titular); font-weight: 800; font-size: 20px;
+            letter-spacing: -.02em; color: #fff; white-space: nowrap;
+        }
+    }
     &__chip{
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 7px 14px 7px 9px; border-radius: 999px;
-        background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
-        font-size: 12.5px; font-weight: 600; letter-spacing: .01em;
+        display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto;
+        padding: 6px 12px; border-radius: 999px;
+        background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.26);
+        font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap;
     }
-    &__bandera{ display: block; border-radius: 3px; flex: 0 0 auto; }
+    &__bandera{ display: block; border-radius: 2px; flex: 0 0 auto; }
 
+    &__frase{
+        position: absolute; left: 24px; right: 24px;
+        top: calc(env(safe-area-inset-top, 0px) + 105px);
+        margin: 0;
+        font-family: var(--n-titular); font-weight: 800;
+        font-size: clamp(30px, 9.8vw, 38px); line-height: 1; letter-spacing: -.035em; color: #fff;
+        em{ font-style: normal; color: $menta; }
+    }
+
+    /* ---------------- Bienvenida ---------------- */
+    &__pie{
+        position: absolute; left: 24px; right: 24px;
+        bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+    }
+    /* El color va explicito: el h1 global del panel lo pintaba de tinta. */
     &__titulo{
-        margin: 4px 0 0;
-        font-size: clamp(38px, 11.5vw, 46px); line-height: 1;
-        font-weight: 800; letter-spacing: -.045em;
-        color: #FFFFFF;   /* el h1 global del panel lo pintaba de tinta */
+        margin: 0;
+        font-size: clamp(40px, 13.3vw, 52px) !important; line-height: .96 !important;
+        letter-spacing: -.04em !important; color: #FFFFFF;
         em{ font-style: normal; color: $menta; }
     }
     &__bajada{
-        margin: 0 0 12px; max-width: 300px;
-        font-size: 15px; line-height: 1.5; color: rgba(255,255,255,.8);
+        margin: 14px 0 0; max-width: 340px;
+        font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,.84);
     }
+    &__puertas{ margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
 
     &__btn{
-        width: 100%; height: 58px; border-radius: 999px;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        font: inherit; font-size: 16px; font-weight: 700;
-        text-decoration: none; cursor: pointer;
-        transition: transform .12s ease;
-        &:active{ transform: scale(.97); }
-        &--menta{ border: 0; background: $menta; color: $tinta; box-shadow: 0 12px 34px rgba(60,251,159,.35); }
-        &--vidrio{ border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); color: #FFFFFF; font-weight: 600; }
-        &--tinta{ border: 0; background: $tinta; color: #FFFFFF; margin-top: 4px;
-                  &:disabled{ opacity: .85; } }
+        width: 100%; height: 58px; border-radius: 19px; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        font-family: inherit; text-decoration: none; cursor: pointer;
+        &--menta{
+            border: 0; background: $menta; color: $tinta;
+            font-size: 16.5px; font-weight: 700;
+            box-shadow: 0 14px 34px rgba(60,251,159,.30);
+        }
+        /* El "vidrio" no desenfoca lo de atras: sobre la foto ya desenfocada
+           se ve igual y no le cuesta nada al celular. */
+        &--vidrio{
+            border: 1px solid rgba(255,255,255,.30); background: rgba(255,255,255,.14); color: #FFFFFF;
+            font-size: 16px; font-weight: 600;
+            &:active{ background: rgba(255,255,255,.22); }
+        }
+        &--tinta{
+            height: 56px; border: 0; border-radius: 18px; background: $tinta; color: #FFFFFF;
+            font-size: 16px; font-weight: 600;
+            &:disabled{ opacity: .85; }
+            svg{ width: 18px; height: 18px; flex: 0 0 auto; }
+        }
     }
 
     /* La tercera puerta: entrar a mirar sin cuenta. Es un enlace y no un
        boton mas, para no competir con los dos de arriba. */
     &__mirar{
-        min-height: 44px; margin-top: -4px; padding: 0 12px;
-        display: inline-flex; align-items: center;
-        font-size: 15px; font-weight: 600; color: #FFFFFF;
-        text-decoration: underline; text-underline-offset: 4px;
-        text-decoration-color: rgba(255,255,255,.45);
+        height: 46px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14.5px; font-weight: 600; color: #FFFFFF;
+        text-decoration: underline; text-underline-offset: 5px;
+        text-decoration-color: rgba(255,255,255,.5);
     }
 
     /* ---------------- Velo y hoja ---------------- */
+    /* El velo solo recibe el toque para cerrar: lo oscuro lo pone el tinte. */
     &__velo{
-        position: absolute; inset: 0; border: 0; padding: 0;
-        background: rgba(8,14,11,.55);
-        opacity: 0; pointer-events: none;
-        transition: opacity .4s ease;
+        position: absolute; inset: 0; border: 0; padding: 0; background: none;
+        pointer-events: none;
     }
-    &--hoja &__velo{ opacity: 1; pointer-events: auto; }
+    &--hoja &__velo{ pointer-events: auto; }
 
-    &__hoja{
+    &__sube{
         position: absolute; left: 0; right: 0; bottom: 0;
-        max-height: 92%; overflow-y: auto;
-        box-sizing: border-box;
-        padding: 12px 24px 28px;
-        /* Fondo solido: con el vidrio, cada cuadro de la subida de la hoja
-           y cada cambio al abrir el teclado recalculaba el desenfoque de
-           toda la pantalla de atras. */
-        background: #FBFCFA;
-        color: #16211B;
-        border-radius: 32px 32px 0 0;
-        box-shadow: 0 -20px 60px rgba(0,0,0,.3);
-        transform: translateY(105%);
-        transition: transform .5s cubic-bezier(.2,.9,.2,1);
+        max-height: 92%;
+        display: flex; flex-direction: column;
         will-change: transform;
-        form{ display: flex; flex-direction: column; gap: 14px; }
     }
-    &--hoja &__hoja{ transform: none; }
+    &__hoja{
+        min-height: 0; overflow-y: auto;
+        box-sizing: border-box;
+        padding: 12px 24px max(24px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+        /* Fondo solido: con vidrio, cada cuadro de la subida y cada cambio al
+           abrir el teclado recalculaba el desenfoque de toda la pantalla. */
+        background: #fff;
+        color: $tinta;
+        border-radius: 36px 36px 0 0;
+        /* La segunda sombra es blanco solido hacia abajo: tapa lo que asomaria
+           si el resorte se pasa un pelo. Es sombra y no una caja para que no
+           agregue alto que se pueda desplazar. */
+        box-shadow: 0 -20px 50px rgba(22,33,27,.30), 0 60px 0 0 #fff;
+        form{ display: flex; flex-direction: column; gap: 12px; }
+    }
 
     &__agarre{
-        width: 40px; height: 5px; border-radius: 3px;
-        background: rgba(22,33,27,.16); margin: 0 auto 22px;
+        width: 44px; height: 5px; border-radius: 3px;
+        background: #DCDFD6; margin: 0 auto;
     }
     &__hojaCab{
-        text-align: center;
-        h2{ margin: 0 0 6px; font-size: 28px; line-height: 1.1; font-weight: 800; letter-spacing: -.04em; }
-        p{ margin: 0; font-size: 14px; color: $gris; }
+        margin-top: 20px;
+        h2{
+            margin: 0;
+            font-family: var(--n-titular); font-weight: 800;
+            font-size: clamp(30px, 9.8vw, 38px); line-height: 1; letter-spacing: -.035em; color: $tinta;
+        }
+        p{ margin: 8px 0 0; font-size: 14.5px; color: $gris; }
     }
+    form &__hojaCab{ margin-bottom: 8px; }
     &__aviso{
-        margin: 0; padding: 12px 14px; border-radius: 14px;
-        background: #FFF6DF; color: #6B4A0E; font-size: 13px; line-height: 1.45;
+        margin: 0; padding: 12px 14px; border-radius: 16px;
+        background: #DDF9EA; color: $tinta; font-size: 13px; line-height: 1.45;
     }
 
-    &__campos{
-        display: flex; flex-direction: column; gap: 12px; margin-top: 6px;
-        &--tiembla{ animation: afIngTiembla .42s cubic-bezier(.36,.07,.19,.97) both; }
-    }
+    &__campos{ display: flex; flex-direction: column; gap: 12px; }
+    &__et{ display: block; margin: 0 2px 6px; font-size: 12.5px; font-weight: 600; color: $gris; }
     &__campo{
         height: 58px; box-sizing: border-box;
-        border-radius: 18px; background: rgba(22,33,27,.05);
-        border: 1.5px solid transparent;
-        display: flex; align-items: center; gap: 12px; padding: 0 8px 0 16px;
-        transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
-        &:focus-within{ border-color: $verde; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(60,251,159,.22); }
-        &--error{ border-color: #E8A39B; }
+        border-radius: 18px; background: $hundido;
+        box-shadow: inset 0 0 0 2px transparent;
+        display: flex; align-items: center; gap: 10px; padding: 0 16px;
+        transition: box-shadow .18s ease;
+        &:focus-within{ box-shadow: inset 0 0 0 2px $tinta; }
+        &--error{ box-shadow: inset 0 0 0 2px rgba(180,55,43,.55); }
+        b{ font-size: 16px; font-weight: 700; color: $tinta; }
+        i{ width: 1px; height: 22px; background: #D4D8CE; flex: 0 0 auto; }
         input{
-            flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
-            font: inherit; font-size: 16px; color: #16211B;
+            flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; padding: 0;
+            font-family: inherit; font-size: 16px; font-weight: 500; color: $tinta;
             -webkit-user-select: text; user-select: text;
-            &::placeholder{ color: #7B8A82; }
+            &::placeholder{ color: #8A968F; }
         }
         .MuiInputAdornment-root{ margin: 0; }
-        .MuiIconButton-root{ color: $gris; margin: 0; }
+        .MuiIconButton-root{ color: $gris; margin: 0 -10px 0 0; width: 44px; height: 44px; }
     }
-    &__prefijo{
-        display: inline-flex; align-items: center; gap: 7px;
-        font-size: 15px; font-weight: 700; color: #16211B;
-        padding-right: 12px; border-right: 1.5px solid rgba(22,33,27,.12);
-    }
-    &__error{ margin: 0; text-align: center; font-size: 13px; font-weight: 500; color: #B42318; }
+    &__error{ margin: 0; font-size: 13px; font-weight: 500; line-height: 1.4; color: $error; }
 
     &__opciones{
-        display: flex; align-items: center; justify-content: space-between;
-        span{ font-size: 12.5px; color: $gris; }
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        span{
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12.5px; color: $gris;
+            svg{ width: 15px; height: 15px; flex: 0 0 auto; }
+        }
         button{
-            border: 0; background: none; padding: 10px 0;
-            font: inherit; font-size: 13px; font-weight: 700; color: $verde; cursor: pointer;
+            border: 0; background: none; padding: 0; min-height: 44px;
+            font-family: inherit; font-size: 13px; font-weight: 600; color: $tinta; cursor: pointer;
+            text-decoration: underline; text-underline-offset: 4px; white-space: nowrap;
         }
     }
     &__primera{
-        margin: 6px 0 0; text-align: center; font-size: 13.5px; color: $gris;
-        a{ font-weight: 700; color: $verde; text-decoration: none; padding: 8px 2px; }
+        margin: 2px 0 0; text-align: center; font-size: 14px; color: $gris;
+        a{
+            display: inline-flex; align-items: center; min-height: 44px;
+            font-weight: 600; color: $tinta; text-decoration: underline; text-underline-offset: 4px;
+        }
     }
     &__giro{
         width: 18px; height: 18px; border-radius: 50%;
@@ -198,133 +240,68 @@ $curva: cubic-bezier(.2, .8, .2, 1);
     }
 
     /* La recuperacion de clave es el mismo componente que en la web
-       (Recuperar.js). Aqui se viste como el resto de la hoja: campos
-       redondeados sin raya, boton tinta, avisos en cajas suaves. */
+       (Recuperar.js). Aqui se viste como el resto de la hoja: la etiqueta
+       encima del campo, boton tinta, avisos en cajas suaves. */
     &__recuperar{
-        .afRecuperar{ display: flex; flex-direction: column; gap: 14px; color: #16211B; margin-top: 6px; }
-        .afAuth__bajada{ margin: -8px 0 6px; text-align: center; font-size: 14px; line-height: 1.45; color: $gris; }
+        .afRecuperar{ display: flex; flex-direction: column; gap: 12px; color: $tinta; }
+        .afAuth__bajada{ margin: 8px 0 8px; font-size: 14.5px; line-height: 1.45; color: $gris; }
         .afCampo{ margin: 0; }
         .MuiTextField-root{ width: 100%; }
-        .MuiFilledInput-root{
-            min-height: 58px; border-radius: 18px;
-            background: rgba(22,33,27,.05);
-            border: 1.5px solid transparent;
-            font-family: var(--poppins); font-size: 16px; color: #16211B;
-            transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
-            &::before, &::after{ display: none; }
-            &:hover{ background: rgba(22,33,27,.07); }
-            &.Mui-focused{ border-color: $verde; background: #FFFFFF; box-shadow: 0 0 0 4px rgba(60,251,159,.22); }
-            input{ -webkit-user-select: text; user-select: text; }
-        }
         .MuiInputLabel-root{
-            font-family: var(--poppins); color: #7B8A82; left: 4px;
-            &.Mui-focused{ color: $verde; }
+            position: static; transform: none !important; max-width: none;
+            margin: 0 2px 6px; font-family: inherit; font-size: 12.5px; font-weight: 600; line-height: 1.3;
+            color: $gris !important;
         }
-        .MuiFormHelperText-root{ font-family: var(--poppins); font-size: 12px; color: $gris; margin: 6px 0 0 16px; }
-        .MuiIconButton-root{ color: $gris; }
+        .MuiFilledInput-root{
+            min-height: 58px; padding: 0 16px; border: 0; border-radius: 18px;
+            background: $hundido !important;
+            box-shadow: inset 0 0 0 2px transparent;
+            font-family: inherit; font-size: 16px; font-weight: 500; color: $tinta;
+            transition: box-shadow .18s ease;
+            &::before, &::after{ display: none !important; }
+            &.Mui-focused{ border: 0; box-shadow: inset 0 0 0 2px $tinta; }
+            input{ padding: 0 !important; font-size: 16px; -webkit-user-select: text; user-select: text; }
+        }
+        .MuiFormHelperText-root{ font-family: inherit; font-size: 12.5px; color: $gris; margin: 6px 2px 0; }
+        .MuiIconButton-root{ color: $gris; margin-right: -10px; width: 44px; height: 44px; }
 
         .afRecuperar__aviso{
-            margin: 0; padding: 12px 14px; border-radius: 14px; opacity: 1;
-            background: rgba(60,251,159,.16); color: #0F5C38;
-            font-size: 13px; line-height: 1.45; text-align: center;
+            margin: 0; padding: 12px 14px; border-radius: 16px; opacity: 1;
+            background: #DDF9EA; color: #0B6B43;
+            font-size: 13px; line-height: 1.45;
         }
         .afAuth__error{
-            margin: 0; padding: 12px 14px; border-radius: 14px;
-            background: #FDECEC; color: #B42318; border: 0;
-            font-size: 13px; line-height: 1.45; text-align: center; justify-content: center;
+            margin: 0; padding: 12px 14px; border-radius: 16px;
+            background: $hundido; color: $error; border: 0;
+            font-size: 13px; line-height: 1.45;
         }
         .afBtn{
-            width: 100%; height: 58px; margin: 4px 0 0; border: 0; border-radius: 999px;
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 56px; margin: 4px 0 0; padding: 0 16px; border: 0; border-radius: 18px;
             background: $tinta; color: #FFFFFF; box-shadow: none;
-            font-family: var(--poppins); font-size: 16px; font-weight: 700;
+            font-family: inherit; font-size: 16px; font-weight: 600;
             &:disabled{ opacity: .85; }
         }
-        .afAuth__pie{ margin: 2px 0 0; text-align: center; }
-        .afEnlace{ font-size: 13.5px; font-weight: 700; color: $verde; padding: 10px 4px; }
+        p.afAuth__pie{ margin: 0; padding: 0; text-align: center; }
+        .afEnlace{
+            min-height: 44px; padding: 0 4px;
+            font-size: 14px; font-weight: 600; color: $tinta;
+            text-decoration: underline; text-underline-offset: 4px;
+        }
     }
-
-    /* ---------------- La marca ---------------- */
-    &__marca{ position: absolute; inset: 0; pointer-events: none; }
-    &--marca &__marca{ pointer-events: auto; }
-    &__marcaFondo{
-        position: absolute; inset: 0; background: $tinta;
-        opacity: 0; transition: opacity .7s ease;
-    }
-    &--marca &__marcaFondo{ opacity: 1; }
-
-    &__aura{
-        position: absolute; left: 50%; top: 45%;
-        width: 280px; height: 280px; margin: -140px 0 0 -140px; border-radius: 50%;
-        background: radial-gradient(circle, $menta 0%, rgba(14,23,19,0) 68%);
-        filter: blur(40px); opacity: 0;
-    }
-    &--marca &__aura{ animation: afIngAura 1s ease .1s forwards, afIngRespira 3.2s ease-in-out 1.1s infinite alternate; }
-
-    /* El logo esta siempre: en la marca al centro y grande, despues en la
-       cabecera y chico. Viaja de un lugar al otro. */
-    /* En el iPhone, debajo de la isla dinamica: arriba al centro es justo
-       donde va la camara. En Android el margen extra es 0. */
-    &__iso{
-        position: absolute; left: 50%; top: calc(22px + env(safe-area-inset-top, 0px));
-        width: 30px; height: auto;
-        transform: translateX(-50%);
-        overflow: visible;
-    }
-    &--marca &__iso{
-        top: calc(45% - 55px); width: 104px;
-        filter: blur(10px); opacity: 0;
-        animation: afIngEnfoca .9s $curva .15s forwards;
-    }
-    &--vuela &__iso{ transition: top .8s cubic-bezier(.75,0,.2,1), width .8s cubic-bezier(.75,0,.2,1); }
-
-    &__traza{
-        &--a{ fill: $menta; stroke: $menta; }
-        &--b{ fill: #FFFFFF; stroke: #FFFFFF; }
-        stroke-width: 1.4; stroke-opacity: 0;
-    }
-    &--marca &__traza{
-        fill-opacity: 0; stroke-opacity: 1;
-        stroke-dasharray: 1; stroke-dashoffset: 1;
-        animation: afIngTrazo 1.3s cubic-bezier(.65,0,.35,1) .6s forwards,
-                   afIngLlena .6s ease 1.55s forwards;
-    }
-    &--marca &__traza--a{ animation-delay: .35s, 1.4s; }
-
-    &__nombre{
-        position: absolute; left: 0; right: 0; top: calc(45% + 70px);
-        display: flex; justify-content: center; gap: 9px;
-        font-size: 30px; font-weight: 600; letter-spacing: -.02em;
-        opacity: 0;
-    }
-    &--marca &__nombre{ opacity: 1; }
-    &--vuela &__nombre{ opacity: 0; filter: blur(10px); transition: opacity .35s ease, filter .35s ease; }
-    &__letra{
-        display: inline-block; opacity: 0; filter: blur(12px); transform: translateY(10px);
-        animation: afIngLetra .7s $curva forwards;
-    }
-
-    /* Mientras la marca se dibuja, la bienvenida espera; entra al despegar el logo. */
-    &--marca &__entra{ animation: none; opacity: 0; }
 }
 
-/* Solo opacidad y movimiento: animar un desenfoque en cada texto costaba mas
-   que todo lo demas de la pantalla junto. */
-@keyframes afIngDesenfoca{
-    from{ opacity: 0; transform: translateY(18px); }
-    to{ opacity: 1; transform: none; }
-}
-@keyframes afIngTiembla{
-    10%, 90%{ transform: translateX(-2px); } 20%, 80%{ transform: translateX(4px); }
-    30%, 50%, 70%{ transform: translateX(-7px); } 40%, 60%{ transform: translateX(7px); }
-}
 @keyframes afIngGira{ to{ transform: rotate(360deg); } }
-@keyframes afIngAura{ to{ opacity: .55; } }
-@keyframes afIngRespira{ from{ transform: scale(1); opacity: .55; } to{ transform: scale(1.18); opacity: .35; } }
-@keyframes afIngEnfoca{ to{ filter: blur(0); opacity: 1; } }
-@keyframes afIngTrazo{ to{ stroke-dashoffset: 0; } }
-@keyframes afIngLlena{ to{ fill-opacity: 1; stroke-opacity: 0; } }
-@keyframes afIngLetra{ to{ opacity: 1; filter: blur(0); transform: none; } }
 
 @media (prefers-reduced-motion: reduce){
-    .afIngreso *{ animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+    .afIngreso__giro{ animation-duration: 1.6s; }
+}
+
+/* Pantallas bajas (un telefono chico, o con el teclado abierto): la
+   bienvenida aprieta un poco para que las tres puertas entren. */
+@media (max-height: 640px){
+    .afIngreso__titulo{ font-size: 40px !important; }
+    .afIngreso__bajada{ margin-top: 10px; font-size: 14.5px; }
+    .afIngreso__puertas{ margin-top: 16px; gap: 8px; }
+    .afIngreso__btn{ height: 54px; }
 }

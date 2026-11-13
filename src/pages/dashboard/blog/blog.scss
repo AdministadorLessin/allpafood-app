@@ -1,313 +1,56 @@
-@import '../../../assets/css/mixin.scss';
+/* Salud y bienestar (las lecturas), con la identidad nueva. */
 
-.blogPageFiltros{
-    background: white;
-    padding: 25px;
-    border-radius: 25px;
-    box-shadow: 0px 0px 20px 0px rgba(0,0,0,.07);
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    flex-direction: column;
-    @include mediaPhone{
-        padding: 15px;
-    }
-}
-
-
-
-.blogPageCat{
-    h4{
-        font-size: 14px;
+.blg{
+    &__barra{ margin-top: 20px; }
+    &__buscar{
         position: relative;
-        margin-bottom: 15px;
-        padding: 0px 0px 0px 23px;
-        &::before{
-            content: '';
-            width: 15px;
-            height: 15px;
-            background: url('../../../assets/img/ico_filtrar.svg') center no-repeat;
-            background-size: 100% 100%;
-            position: absolute;
-            left: 0px;
-            top: 2px;
-            bottom: 0px;
-        }
-        @include mediaPhone{
-            margin-left: 7px;
+        input{
+            display: block; width: 100%; height: 56px; box-sizing: border-box; border-radius: 18px; border: 2px solid transparent;
+            background: var(--n-papel); padding: 0 16px 0 48px; font-family: inherit; font-size: 16px; font-weight: 500; color: var(--n-tinta);
+            outline: none; -webkit-appearance: none; appearance: none;
+            &::placeholder{ color: #8A968F; font-weight: 400; }
+            &:focus{ border-color: var(--n-tinta); }
         }
     }
-    ul{
-        margin: 0px;
-        li{
-            display: inline-block;
-            margin-right: 10px;
-            margin-bottom: 15px;
-            .linkCat,
-            a{
-                background: #c9f9f9;
-                display: inline-block;
-                cursor: pointer;
-                color: white;
-                height: 35px;
-                padding: 0px 20px 0px 35px;
-                border-radius: 30px;
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                font-size: 14px;
-                color: var(--dark-blue);
-                font-weight: bold;
-                position: relative;
-                &::before{
-                    content: '';
-                    width: 22px;
-                    height: 22px;
-                    background: url('../../../assets/img/ico_categoria2.svg') center no-repeat;
-                    background-size: 100% 100%;
-                    position: absolute;
-                    left: 10px;
-                    top: 0px;
-                    bottom: 0px;
-                    margin-top: auto;
-                    margin-bottom: auto;
-                }
-            }
-        }
-        @include mediaPhone{
-            li{
-                margin-bottom: 10px;
-                .linkCat,
-                a{
-                    font-size: 12px;
-                    height: 30px;
-                    padding: 0px 10px 0px 25px;
-                    &::before{
-                        width: 16px;
-                        height: 16px;
-                        left: 7px;
-                    }
-                }
-            }
-        }
-        @include mediaMiniPhone{
-            li{
-                margin-bottom: 7px;
+    &__lupa{ position: absolute; left: 16px; top: 0; bottom: 0; display: flex; align-items: center; color: #55655C; pointer-events: none;
+        svg{ width: 20px; height: 20px; } }
 
-            }
-        }
+    &__cats{
+        margin: 12px -22px 0; padding: 0 22px 4px; display: flex; gap: 8px; overflow-x: auto;
+        scrollbar-width: none; &::-webkit-scrollbar{ display: none; }
     }
-}
-
-.blogPageSearch{
-    width: 100%;
-    max-width: 430px;
-    .MuiFormControl-root{
-        width: 100%;
-        background: #FDFFF8;
-        .MuiInputBase-root{
-            border-radius: 30px;
-            .MuiOutlinedInput-notchedOutline{
-                border-color: #D5E2D6;
-                
-            }
-
-        }
-        .MuiInputAdornment-root{
-            svg{
-                color: #A2BDA4;
-            }
-        }
-    }
-}
-
-.blogPageList{
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 20px 0px 0px 0px;
-    align-items: flex-start;
-}
-
-.blogPageItem{
-    width: calc( 33.3% - 15px );
-    @include mediaTablet{
-        width: calc( 50% - 15px );
-    }
-    @include mediaPhone{
-        width: 100%
-    }
-}
-/* ==========================================================================
-   Salud y bienestar con el lenguaje del panel: buscador y categorias como
-   pildoras, y una tarjeta por articulo con su foto arriba.
-   ========================================================================== */
-.afPanel--blog{
-    @media screen and (min-width: 993px){ max-width: 1100px; }
-}
-
-.afBlog__barra{
-    display: grid;
-    gap: 12px;
-    margin-bottom: 4px;
-}
-
-.afBlog__buscar{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 16px;
-    height: 48px;
-    background: var(--af-paper);
-    border: 1px solid var(--af-line);
-    border-radius: var(--af-r-pill);
-
-    input{
-        flex: 1;
-        min-width: 0;
-        border: 0;
-        outline: none;
-        background: transparent;
-        font-family: inherit;
-        font-size: 14.5px;
-        color: var(--af-ink);
-        &::placeholder{ color: var(--af-muted); }
-    }
-}
-.afBlog__lupa{
-    display: grid;
-    place-items: center;
-    color: var(--af-muted);
-    svg{ width: 18px; height: 18px; }
-}
-
-.afBlog__cats{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-.afBlog__cat{
-    border: 1.5px solid var(--af-line);
-    background: var(--af-paper);
-    border-radius: var(--af-r-pill);
-    padding: 8px 14px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--af-muted);
-    cursor: pointer;
-    transition: background .18s ease, color .18s ease, border-color .18s ease;
-
-    &:hover{ border-color: var(--af-border-strong, rgba(16,31,24,.18)); }
-    &--on{
-        background: var(--af-ink);
-        border-color: var(--af-ink);
-        color: #F1F6F2;
-    }
-}
-
-.afBlog__lista{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-
-    @media screen and (min-width: 700px){ grid-template-columns: 1fr 1fr; }
-    @media screen and (min-width: 993px){ grid-template-columns: repeat(3, 1fr); }
-}
-
-.afNota{
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    min-height: 300px;
-    padding: 18px;
-    border: 0;
-    border-radius: 26px;
-    overflow: hidden;
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
-    isolation: isolate;
-
-    /* La foto manda: ocupa la tarjeta entera y el texto va encima. */
-    background-color: #16211B;
-    background-size: cover;
-    background-position: center;
-    box-shadow: 0 1px 2px rgba(16,31,24,.06), 0 22px 40px -28px rgba(16,31,24,.55);
-    transition: transform .3s cubic-bezier(.16,.84,.44,1), box-shadow .3s ease;
-
-    &:hover{
-        transform: translateY(-3px);
-        box-shadow: 0 1px 2px rgba(16,31,24,.06), 0 30px 50px -28px rgba(16,31,24,.6);
-    }
-
-    /* Sin este velo el titulo blanco desaparece sobre una foto clara. */
-    &__velo{
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        background: linear-gradient(180deg,
-            rgba(10,18,14,.15) 0%,
-            rgba(10,18,14,.35) 45%,
-            rgba(10,18,14,.88) 100%);
-    }
-
     &__cat{
-        position: absolute;
-        top: 14px;
-        left: 14px;
-        padding: 6px 12px;
-        border-radius: var(--af-r-pill);
-        background: rgba(255,255,255,.22);
-        border: 1px solid rgba(255,255,255,.35);
-        color: #FFFFFF;
-        font-size: 11.5px;
-        font-weight: 800;
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
+        flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 0; cursor: pointer; white-space: nowrap;
+        background: var(--n-papel); color: var(--n-tinta); font-family: inherit; font-size: 13.5px; font-weight: 600;
+        &.is-on{ background: var(--n-tinta); color: #fff; }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 2px; }
     }
 
-    &__flecha{
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        background: rgba(255,255,255,.2);
-        border: 1px solid rgba(255,255,255,.35);
-        color: #FFFFFF;
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        svg{ width: 16px; height: 16px; }
+    &__lista{ margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;
+        @media (min-width: 560px){ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    &__nota{
+        position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+        width: 100%; min-height: 220px; box-sizing: border-box; padding: 18px; border: 0; border-radius: 26px; overflow: hidden; cursor: pointer;
+        text-align: left; font-family: inherit; color: #fff;
+        background-color: var(--n-tinta); background-size: cover; background-position: center;
+        &--destacada{ min-height: 300px; @media (min-width: 560px){ grid-column: span 2; } }
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 3px; }
     }
-
-    &__txt{
-        display: block;
-        b{
-            display: block;
-            font-size: 22px;
-            font-weight: 800;
-            line-height: 1.12;
-            letter-spacing: -.02em;
-            color: #FFFFFF;
-            text-wrap: balance;
-        }
-        small{
-            display: block;
-            margin-top: 8px;
-            font-size: 13px;
-            line-height: 1.45;
-            color: rgba(255,255,255,.82);
-        }
+    &__velo{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(22,33,27,0) 30%, rgba(22,33,27,.86) 100%); }
+    &__notaCat{
+        position: absolute; left: 14px; top: 14px; font-size: 11.5px; font-weight: 600; line-height: 1.2;
+        background: var(--n-menta); color: var(--n-tinta); padding: 5px 10px; border-radius: 999px; max-width: calc(100% - 28px);
     }
+    &__notaTxt{
+        position: relative; display: block; min-width: 0; max-width: 100%;
+        b{ display: block; font-size: 19px; font-weight: 700; line-height: 1.18; letter-spacing: -.01em; color: #fff; overflow-wrap: anywhere; }
+        small{ display: block; margin-top: 6px; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,.82); overflow-wrap: anywhere; }
+    }
+    &__nota--destacada &__notaTxt b{ font-size: 23px; }
 
-    /* La primera nota ocupa dos columnas y respira mas: es la portada. */
-    &--destacada{
-        min-height: 340px;
-        @media screen and (min-width: 700px){ grid-column: span 2; }
-        .afNota__txt b{ font-size: 28px; }
+    &__nutri{
+        margin-top: 26px;
+        > b{ display: block; font-size: 17px; font-weight: 700; }
+        > p{ margin: 4px 0 14px; font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.8); }
     }
 }

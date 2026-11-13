@@ -1,5 +1,6 @@
 import React from 'react';
 import { API_URL } from '../../config';
+import Isotipo from './Isotipo';
 
 /* Numero de la oficina, el mismo que usa la pantalla del motorizado. */
 const OFICINA = '51955797697';
@@ -17,6 +18,16 @@ const OFICINA = '51955797697';
  * adivinar sobre los registros del servidor, que de un error del navegador no
  * saben nada.
  */
+let delMapa = [];
+const esDelMapaAlCerrar = (error) => {
+    const pila = String(error?.stack || '');
+    if (!pila.includes('maps.googleapis.com') || !/getRootNode|set map/.test(pila + String(error?.message || ''))) return false;
+    const ahora = Date.now();
+    delMapa = delMapa.filter((t) => ahora - t < 5000);
+    delMapa.push(ahora);
+    return delMapa.length <= 4;
+};
+
 class PantallaError extends React.Component {
 
     constructor(props) {
@@ -25,6 +36,12 @@ class PantallaError extends React.Component {
     }
 
     static getDerivedStateFromError(error) {
+        /* El mapa de Google a veces falla al cerrarse (su marcador intenta
+           soltarse de un mapa que no llego a cargar). Eso pasa cuando la
+           pantalla del mapa YA se esta yendo: no hay nada roto que mostrar,
+           asi que no se tumba el app por eso. Con tope, por si se repitiera
+           sin parar. */
+        if (esDelMapaAlCerrar(error)) return null;
         return { fallo: error };
     }
 
@@ -67,38 +84,56 @@ class PantallaError extends React.Component {
     render() {
         if (!this.state.fallo) return this.props.children;
 
+        /* Estilos en linea a proposito: si lo que se cayo fue la hoja de
+           estilos o una pantalla a medio cargar, esta igual se ve bien. */
+        const texto = "var(--n-texto, 'Figtree Variable', system-ui, -apple-system, sans-serif)";
+        const titular = "var(--n-titular, 'Bricolage Grotesque Variable', system-ui, sans-serif)";
+
         return (
             <main style={{
-                minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '28px', background: '#F3F6F3', fontFamily: 'inherit', color: '#16211B',
+                position: 'relative', minHeight: '100dvh', boxSizing: 'border-box', overflow: 'hidden',
+                display: 'flex', justifyContent: 'center',
+                padding: 'calc(env(safe-area-inset-top, 0px) + 72px) 22px calc(env(safe-area-inset-bottom, 0px) + 30px)',
+                background: '#F6F6F1', fontFamily: texto, color: '#16211B',
+                WebkitFontSmoothing: 'antialiased',
             }}>
-                <div style={{ maxWidth: 360, textAlign: 'center' }}>
-                    <h1 style={{ fontSize: 22, margin: '0 0 10px', lineHeight: 1.25 }}>
+                <span aria-hidden="true" style={{
+                    position: 'absolute', left: 0, right: 0, top: 0, height: 380, pointerEvents: 'none',
+                    background: 'linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 46%, rgba(246,246,241,0) 100%)',
+                }} />
+                <div style={{ position: 'relative', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column' }}>
+                    <Isotipo size={44} />
+                    <h1 style={{
+                        margin: '22px 0 0', fontFamily: titular, fontWeight: 800,
+                        fontSize: 42, lineHeight: 0.98, letterSpacing: '-0.035em',
+                    }}>
                         Algo se nos rompió
                     </h1>
-                    <p style={{ fontSize: 14, lineHeight: 1.5, color: '#61706A', margin: '0 0 22px' }}>
+                    <p style={{ fontSize: 15, lineHeight: 1.5, color: 'rgba(22,33,27,.78)', margin: '14px 0 0' }}>
                         No es tu internet. Vuelve a intentarlo y, si sigue igual,
                         escríbenos y lo resolvemos contigo.
                     </p>
 
-                    <button type="button"
-                        onClick={() => window.location.replace('/')}
-                        style={{
-                            width: '100%', minHeight: 50, border: 0, borderRadius: 999,
-                            background: '#3CFB9F', color: '#08301D', fontFamily: 'inherit',
-                            fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10,
-                        }}>
-                        Volver a intentar
-                    </button>
+                    <div style={{ marginTop: 'auto', paddingTop: 32 }}>
+                        <button type="button"
+                            onClick={() => window.location.replace('/')}
+                            style={{
+                                width: '100%', height: 56, border: 0, borderRadius: 18,
+                                background: '#16211B', color: '#fff', fontFamily: 'inherit',
+                                fontSize: 16, fontWeight: 600, cursor: 'pointer',
+                            }}>
+                            Volver a intentar
+                        </button>
 
-                    <a href={`https://wa.me/${OFICINA}`}
-                        style={{
-                            display: 'block', minHeight: 48, lineHeight: '48px',
-                            borderRadius: 999, border: '1.5px solid #E3E9DF',
-                            color: '#16211B', fontSize: 14, fontWeight: 700, textDecoration: 'none',
-                        }}>
-                        Escribirnos por WhatsApp
-                    </a>
+                        <a href={`https://wa.me/${OFICINA}`}
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', height: 48,
+                                color: '#16211B', fontSize: 14.5, fontWeight: 600,
+                                textDecoration: 'underline', textUnderlineOffset: 4,
+                            }}>
+                            Escribirnos por WhatsApp
+                        </a>
+                    </div>
                 </div>
             </main>
         );

@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from "react";
 
 import './planes.scss';
-import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
+import Pantalla, { Tramo } from './../../../components/perfil/Pantalla/Pantalla';
 import Skeleton from '@mui/material/Skeleton';
 
 import {useAuthContext} from '../../../context/authContext';
@@ -9,12 +9,14 @@ import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
-import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
+import { motion, useReducedMotion } from 'motion/react';
+import { resorte } from '../../../movimiento';
+import { vibrar } from '../../../nativo';
 import PanelNecesidades from './../../../components/dashboard/PanelNecesidades/PanelNecesidades';
 import { API_URL } from '../../../config';
 
 const Tick = () => (
-  <svg className="afPlanCard__tick" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  <svg className="pln__tick" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
        strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
     <path d="m5 12.5 4.5 4.5L19 7.5"/>
   </svg>
@@ -31,7 +33,8 @@ const Tick = () => (
  */
 const PlanesPage = (props) => {
 
-  const { token, addItemToCart, removeLocalstorage } = useAuthContext();
+  const { token, addItemToCart, removeLocalstorage, planInfo } = useAuthContext();
+  const quieto = useReducedMotion();
   let navigate = useNavigate();
 
   const [recomendPlans,setRecomendPlans] = useState();
@@ -97,114 +100,124 @@ const PlanesPage = (props) => {
 
   const nombre = dataUser?.profile?.name || dataUser?.name;
 
+  /* Cual esta marcado. Solo es lo que se ve: la compra sigue siendo
+     paymentNext(plan), igual que antes con un boton por tarjeta. */
+  const [elegidoId, setElegidoId] = useState(null);
+  const planes = recomendPlans || [];
+  const suyo = planInfo?.plan?.planName
+    ? planes.find((p) => String(p.description).toLowerCase() === String(planInfo.plan.planName).toLowerCase())
+    : null;
+  const elegido = planes.find((p) => p.id === elegidoId) || suyo || planes[0] || null;
+  const precioDe = (n) => (Number.isInteger(Number(n)) ? `S/ ${Number(n)}` : `S/ ${Number(n).toFixed(2)}`);
+
   return (
-    <LayoutDasboard claseStyle={false}>
-      <Cascada className="afPanel">
+    <Pantalla
+      etiqueta={nombre ? `Listo, ${String(nombre).split(' ')[0]}.` : 'Planes'}
+      titulo="Elige tu plan"
+      bajada="Marca uno para ver qué trae y cuánto sale cada almuerzo."
+      volver="/" clase="pln">
 
-        <Bloque>
-          <h1 className="afPanel__titular">
-            <span className="afPanel__t1">
-              {nombre ? `Listo, ${String(nombre).split(' ')[0]}.` : 'Ya está tu cálculo.'}
-            </span>
-            Elige tu plan
-          </h1>
-        </Bloque>
+      {/* Por que estos planes y no otros: lo que necesita al dia. */}
+      {Number(dataNeedDay?.bmr) > 0 && dataNeedDay?.macros &&
+        <Tramo as="section" className="cuP__papel pln__necesitas">
+          <span className="pln__et">Lo que necesitas al día</span>
+          <PanelNecesidades datos={dataNeedDay} />
+        </Tramo>
+      }
 
-        {/* Por que estos planes y no otros. El calculo ya existia pero vivia
-            en una tarjeta aparte con cuatro anillos de colores, sin decir en
-            ningun momento que era la razon de la recomendacion. */}
-        {dataNeedDay &&
-          <Bloque>
-            <div className="afCard">
-              <div className="afCard__head">
-                <span className="afCard__title">Lo que necesitas al día</span>
-              </div>
-              <PanelNecesidades datos={dataNeedDay} />
-            </div>
-          </Bloque>
-        }
+      {cargando &&
+        <Tramo>
+          <Skeleton variant="rounded" height={84} sx={{ borderRadius:'22px', mt:'20px' }} />
+          <Skeleton variant="rounded" height={84} sx={{ borderRadius:'22px', mt:'8px' }} />
+          <Skeleton variant="rounded" height={84} sx={{ borderRadius:'22px', mt:'8px' }} />
+        </Tramo>
+      }
 
-        {cargando &&
-          <Bloque>
-            <Skeleton variant="rounded" height={300} sx={{ borderRadius:'22px', mb:'14px' }} />
-            <Skeleton variant="rounded" height={300} sx={{ borderRadius:'22px' }} />
-          </Bloque>
-        }
+      {planes.length > 0 &&
+        <Tramo className="pln__lista" role="radiogroup" aria-label="Planes">
+          {planes.map((item)=>{
+            const precio = Number(item.price);
+            const antes = Number(item.previousPrice);
+            const ahorro = antes > precio ? antes - precio : 0;
+            // El numero real de envios del plan, no un 20 escrito a mano: si
+            // manana se crea un plan de 12, la division seguiria siendo cierta.
+            const envios = item?.benefits?.consumptionTotal || 20;
+            const porUnidad = precio / envios;
+            const destacado = item.id === 3;
+            const on = elegido && elegido.id === item.id;
 
-        {recomendPlans && recomendPlans.map((item)=>{
-          const precio = Number(item.price);
-          const antes = Number(item.previousPrice);
-          const ahorro = antes > precio ? antes - precio : 0;
-          // El numero real de envios del plan, no un 20 escrito a mano: si
-          // manana se crea un plan de 12, la division seguiria siendo cierta.
-          const envios = item?.benefits?.consumptionTotal || 20;
-          const porUnidad = precio / envios;
-          const destacado = item.id === 3;
-
-          return (
-            <Bloque key={item.id}>
-              <div className={`afPlanCard${destacado ? ' afPlanCard--top' : ''}`}>
-
-                {destacado && <span className="afPlanCard__cinta">El que más piden</span>}
-
-                <p className="afPlanCard__nivel">{item.level}</p>
-                <h2 className="afPlanCard__nombre">{item.description}</h2>
-
-                <div className="afPlanCard__precio">
-                  <span className="afPlanCard__pen">S/</span>
-                  {/* El precio real. Antes el ".99" iba escrito a mano y el
-                      cliente veia 295.99 cuando el plan costaba 295.00. */}
-                  <b>{Math.trunc(precio)}</b>
-                  <small>.{String(precio.toFixed(2)).split('.')[1]}</small>
-                  {ahorro > 0 && <em>antes S/ {antes.toFixed(2)}</em>}
-                </div>
+            return (
+              <motion.button type="button" role="radio" aria-checked={!!on} key={item.id}
+                className={`pln__plan${on ? ' is-on' : ''}`}
+                whileTap={{ scale: 0.985 }} transition={resorte.toque}
+                onClick={() => { vibrar.toque(); setElegidoId(item.id); }}>
+                <span className="pln__cab">
+                  <span className="pln__radio" aria-hidden="true">{on && <Tick />}</span>
+                  <span className="pln__txt">
+                    <b>
+                      {item.description}
+                      {suyo && suyo.id === item.id && <span className="cuP__chip">El tuyo</span>}
+                      {destacado && <span className="cuP__chip cuP__chip--gris">El que más piden</span>}
+                    </b>
+                    <small>{item.level}</small>
+                  </span>
+                  <span className="pln__precio">
+                    <b>{precioDe(precio)}</b>
+                    {ahorro > 0 && <small>antes {precioDe(antes)}</small>}
+                  </span>
+                </span>
 
                 {/* El dato que realmente decide: cuanto sale cada almuerzo. */}
-                <p className="afPlanCard__unidad">
-                  {envios} envíos · sale a <b>S/ {porUnidad.toFixed(2)}</b> cada uno
-                  {ahorro > 0 && ` · ahorras S/ ${ahorro.toFixed(2)}`}
-                </p>
+                {on &&
+                  <motion.span className="pln__detalle"
+                    initial={quieto ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                    transition={quieto ? { duration: 0 } : resorte.entra}>
+                    <span className="pln__unidad">
+                      {envios} envíos · sale a <b>S/ {porUnidad.toFixed(2)}</b> cada uno
+                      {ahorro > 0 && ` · ahorras S/ ${ahorro.toFixed(2)}`}
+                    </span>
+                    {item.descriptionList && item.descriptionList.length > 0 &&
+                      <span className="pln__incluye">
+                        {item.descriptionList.map((d, i)=>(
+                          <span key={i}><Tick />{d}</span>
+                        ))}
+                      </span>
+                    }
+                    {item.properties && item.properties.length > 0 &&
+                      <span className="pln__macros">
+                        Cubre aprox. {item.properties.find(p=>p.name==='calorias')?.value} kcal
+                        {' · '}{item.properties.find(p=>p.name==='proteinas')?.value} g de proteína al día
+                      </span>
+                    }
+                  </motion.span>}
+              </motion.button>
+            );
+          })}
+        </Tramo>}
 
-                {item.descriptionList && item.descriptionList.length > 0 &&
-                  <ul className="afPlanCard__lista">
-                    {item.descriptionList.map((d, i)=>(
-                      <li key={i}><Tick />{d}</li>
-                    ))}
-                  </ul>
-                }
+      {elegido &&
+        <Tramo className="pln__pie">
+          <motion.button
+            type="button"
+            className="cuP__btn"
+            onClick={()=>paymentNext(elegido)}
+            whileTap={{ scale: 0.97 }} transition={resorte.toque}
+          >
+            Elegir {elegido.description} · {precioDe(elegido.price)}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </motion.button>
+          <p className="cuP__nota pln__nota">El pago lo confirmas en la siguiente pantalla.</p>
+        </Tramo>}
 
-                {item.properties && item.properties.length > 0 &&
-                  <p className="afPlanCard__macros">
-                    Cubre aprox. {item.properties.find(p=>p.name==='calorias')?.value} kcal
-                    {' · '}{item.properties.find(p=>p.name==='proteinas')?.value} g de proteína al día
-                  </p>
-                }
+      {!cargando && planes.length === 0 &&
+        <Tramo>
+          <p className="cuP__vacio">
+            No pudimos cargar los planes. Revisa tu conexión y vuelve a entrar.
+          </p>
+        </Tramo>
+      }
 
-                <motion.button
-                  type="button"
-                  className={`afBtn${destacado ? ' afBtn--mint' : ''}`}
-                  onClick={()=>paymentNext(item)}
-                  {...alToque}
-                >
-                  Elegir {item.description}
-                </motion.button>
-              </div>
-            </Bloque>
-          );
-        })}
-
-        {!cargando && (!recomendPlans || recomendPlans.length === 0) &&
-          <Bloque>
-            <div className="afCard">
-              <p className="afMenu__nota afMenu__nota--suelta">
-                No pudimos cargar los planes. Revisa tu conexión y vuelve a entrar.
-              </p>
-            </div>
-          </Bloque>
-        }
-
-      </Cascada>
-    </LayoutDasboard>
+    </Pantalla>
   )
 };
 

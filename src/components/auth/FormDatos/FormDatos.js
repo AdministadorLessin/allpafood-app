@@ -104,7 +104,7 @@ const FormDatos = ({telefono}) => {
         /* Solo lo que de verdad se exige al guardar. La lista pedia ademas
            mayusculas y un simbolo que el formulario nunca reviso: cuatro
            condiciones para una clave asustaban sin proteger nada. */
-        { txt: 'Al menos 8 caracteres', ok: claveEscrita.length >= 8 },
+        { txt: esNativo ? '8 caracteres o más' : 'Al menos 8 caracteres', ok: claveEscrita.length >= 8 },
         { txt: 'Una letra',             ok: /[a-zA-Z]/.test(claveEscrita) },
         { txt: 'Un número',             ok: /[0-9]/.test(claveEscrita) },
     ];
@@ -258,7 +258,8 @@ const FormDatos = ({telefono}) => {
                             variant="filled"
                             id="fdnombre"
                             name="fdnombre"
-                            label={'Nombre:'}
+                            label={esNativo ? 'Nombre' : 'Nombre:'}
+                            placeholder={esNativo ? 'Tu nombre' : undefined}
                             value={bodyFields ? bodyFields.fdnombre : ''}
                             error={errors.fdnombre ? true : false}
                             helperText={errors.fdnombre?.message}
@@ -273,7 +274,8 @@ const FormDatos = ({telefono}) => {
                             variant="filled"
                             id="fdapellidos"
                             name="fdapellidos"
-                            label={'Apellidos:'}
+                            label={esNativo ? 'Apellidos' : 'Apellidos:'}
+                            placeholder={esNativo ? 'Tus apellidos' : undefined}
                             value={bodyFields ? bodyFields.fdapellidos : ''}
                             error={errors.fdapellidos ? true : false}
                             helperText={errors.fdapellidos?.message}
@@ -288,7 +290,8 @@ const FormDatos = ({telefono}) => {
                             variant="filled"
                             id="fdclave"
                             name="fdclave" 
-                            label={'Contraseña:'}
+                            label={esNativo ? 'Contraseña' : 'Contraseña:'}
+                            placeholder={esNativo ? 'Crea tu contraseña' : undefined}
                             type={verClave.type}
                             InputProps={verClave.InputProps}
                             value={bodyFields ? bodyFields.fdclave : ''}

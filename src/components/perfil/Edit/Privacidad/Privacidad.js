@@ -1,45 +1,47 @@
 import React,{useEffect,useState} from "react";
-import Grid from '@mui/material/Grid';
 import './Privacidad.scss';
-import TextField from '@mui/material/TextField';
+import '../campos.scss';
+import moment from 'moment';
 
 import axios from 'axios';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined';
-import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthContext } from './../../../../context/authContext';
 import { API_URL } from '../../../../config';
 
-const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
+/**
+ * Documento y celular. El guardado es el de siempre: PUT profile/data/privacy
+ * (el nacimiento y la direccion viajan tal como llegaron).
+ */
+const ProfileChangePrivacity = ({data,closeModal,updatePrivacity,enHoja,children}) => {
 
     const [loadingForm,setLoadingForm] = useState(false);
+    const [fallo,setFallo] = useState(false);
     const { token } = useAuthContext();
 
     const validationSchema = Yup.object().shape({
-        fpdni:Yup.string().min(2, "Deben tener al menos ocho caracteres.").max(150).required(),
-        fpwhatsapp:Yup.string().min(2, "Deben tener al menos ocho caracteres.").max(150).required()
+        fpdni:Yup.string().min(2).max(150).required(),
+        fpwhatsapp:Yup.string().min(2).max(150).required()
     });
 
     const {
             register,
             handleSubmit,
             formState: { errors },
-            reset
         } = useForm({
             mode: "all",
             shouldUnregister: true,
             resolver: yupResolver(validationSchema),
+            defaultValues: { fpdni: data?.documentNumber || '', fpwhatsapp: data?.phoneNumber || '' },
         });
 
-
     const [bodyForm,setBodyForm] = useState({
-        fpdni:'',
-        fpwhatsapp:'',
-        fpfecnac:'',
-        fpdir:'',
+        fpdni: data?.documentNumber || '',
+        fpwhatsapp: data?.phoneNumber || '',
+        fpfecnac: data?.bornDate,
+        fpdir: data?.address,
     });
 
     const handleChangeFields = (e) =>{
@@ -49,9 +51,9 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
         })
     }
 
-
     const updateDataPrivacity = (dataTmp) =>{
         setLoadingForm(true);
+        setFallo(false);
         axios.put(`${API_URL}profile/data/privacy`,
             {
                 documentNumber: dataTmp.fpdni,
@@ -62,124 +64,69 @@ const ProfileChangePrivacity = ({iconImg,data,closeModal,updatePrivacity}) => {
             {
                 headers: {"Authorization" : `Bearer ${token}`} 
             }
-            ).then((resp)=>{
-                //console.log(resp);
+            ).then(()=>{
                 updatePrivacity();
                 closeModal();
                 setLoadingForm(false);
             }).catch((errr)=>{
                 console.log(errr);
+                setFallo(true);
                 setLoadingForm(false);
             })
-
     }
 
-    const onSubmitUpt = async (data) => {
-        console.log(data);
-        updateDataPrivacity(data);
+    const onSubmitUpt = async (datos) => {
+        updateDataPrivacity(datos);
     }
-
 
     useEffect(()=>{
         setBodyForm({
-            fpdni:data.documentNumber,
-            fpwhatsapp:data.phoneNumber,
-            fpfecnac:data.bornDate,
-            fpdir:data.address,
+            fpdni:data?.documentNumber || '',
+            fpwhatsapp:data?.phoneNumber || '',
+            fpfecnac:data?.bornDate,
+            fpdir:data?.address,
         })
-    },[])
+    },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const nacimiento = (() => {
+        const m = moment(bodyForm.fpfecnac, ['YYYY-MM-DD', moment.ISO_8601], true);
+        return m.isValid() ? m.format('D [de] MMMM [de] YYYY') : '';
+    })();
 
     return (
-        <div className="profEditBox">
-            <div className="title">
-                <div className="ico">
-                    {iconImg &&
-                        <img src={iconImg} alt="" />
-                    }
-                </div>
-                <h3>Cambiar datos</h3>
-            </div>
-            <form onSubmit={handleSubmit(onSubmitUpt)} className={loadingForm ? 'inlineBlock disableForm':'inlineBlock'}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldReg2">
-                            <TextField
-                                id="fpdni" 
-                                name="fpdni"
-                                type={'number'}
-                                label={'DNI:'}
-                                variant="filled" 
-                                error={errors.fpdni ? true : false}
-                                {...register("fpdni", { onChange: handleChangeFields })} 
-                                value={bodyForm.fpdni} 
-                            />
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldReg2">
-                            <TextField
-                                id="fpwhatsapp" 
-                                name="fpwhatsapp"
-                                type={'number'}
-                                label={'Whatsapp:'}
-                                variant="filled" 
-                                error={errors.fpwhatsapp ? true : false}
-                                {...register("fpwhatsapp", { onChange: handleChangeFields })} 
-                                value={bodyForm.fpwhatsapp} 
-                            />
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldReg2">
-                            <TextField
-                                id="fpfecnac" 
-                                name="fpfecnac"
-                                type={'text'}
-                                label={'Fecha de nacimiento:'}
-                                variant="filled" 
-                                error={errors.fpfecnac ? true : false}
-                                //{...register("fpfecnac")} 
-                                //onChange={handleChangeFields} 
-                                value={bodyForm.fpfecnac} 
-                                disabled
-                            />
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
-                        <div className="textFieldReg2">
-                            <TextField
-                                id="fpdir" 
-                                name="fpdir"
-                                type={'text'}
-                                label={'Direccion:'}
-                                variant="filled" 
-                                error={errors.fpdir ? true : false}
-                                //{...register("fpdir")} 
-                                //onChange={handleChangeFields} 
-                                value={bodyForm.fpdir} 
-                                disabled
-                            />
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12}>
-                        <div className="inlineFlex formRow formRowBtn">
-                            {loadingForm ?
-                                <div  type='submit' className='btnPrimary'>
-                                    Guardando cambios
-                                    <CircularProgress size={18} color={'white'} />
-                                    
-                                </div>
-                            :
-                                <button  type='submit' className='btnPrimary'>
-                                    Guardar cambios
-                                    <SaveAsOutlinedIcon />
-                                </button>
-                            }
+        <div className={`profEditBox${enHoja ? ' profEditBox--hoja' : ''}`}>
+            <div className="title"><h3>Cambiar datos</h3></div>
+            <form onSubmit={handleSubmit(onSubmitUpt)} noValidate
+                className={`cuF${loadingForm ? ' is-guardando' : ''}`}>
+                <label className="cuF__campo" htmlFor="fpdni">
+                    <span className="cuF__et">Documento</span>
+                    <input className="cuF__in" id="fpdni" type="text" inputMode="numeric" autoComplete="off"
+                        aria-invalid={errors.fpdni ? 'true' : undefined}
+                        {...register("fpdni", { onChange: handleChangeFields })}
+                        value={bodyForm.fpdni} />
+                    {errors.fpdni && <span className="cuF__error" role="alert">Escribe tu número de documento.</span>}
+                </label>
+                <label className="cuF__campo" htmlFor="fpwhatsapp">
+                    <span className="cuF__et">Celular (WhatsApp)</span>
+                    <input className="cuF__in" id="fpwhatsapp" type="text" inputMode="tel" autoComplete="tel"
+                        aria-invalid={errors.fpwhatsapp ? 'true' : undefined}
+                        {...register("fpwhatsapp", { onChange: handleChangeFields })}
+                        value={bodyForm.fpwhatsapp} />
+                    {errors.fpwhatsapp && <span className="cuF__error" role="alert">Escribe tu celular.</span>}
+                </label>
+                {nacimiento &&
+                    <label className="cuF__campo" htmlFor="fpfecnac">
+                        <span className="cuF__et">Nacimiento</span>
+                        <input className="cuF__in" id="fpfecnac" type="text" value={nacimiento} readOnly disabled />
+                    </label>}
 
-                        </div>
-                    </Grid>
-                </Grid>
+                {fallo && <p className="cuF__aviso" role="alert">No pudimos guardar tus datos. Inténtalo de nuevo.</p>}
+
+                {children}
+
+                <button type="submit" className="cuF__guardar" disabled={loadingForm}>
+                    {loadingForm ? 'Guardando…' : 'Guardar'}
+                </button>
             </form>
         </div>
     )

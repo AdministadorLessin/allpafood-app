@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,6 +6,9 @@ import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboar
 import MenuFlow from './../../../components/dashboard/MenuFlow/MenuFlow';
 import { useAuthContext } from './../../../context/authContext';
 import { API_URL } from '../../../config';
+import { motion } from 'motion/react';
+import Isotipo from '../../../components/ultil/Isotipo';
+import { cascada, sube, resorte } from '../../../movimiento';
 
 const baseUrl = `${API_URL}`;
 
@@ -55,32 +58,48 @@ const MenuPage = () => {
       .catch((e) => console.log(e));
   }, [token]);
 
+  /* Con "lo que tocas queda pedido" el saldo cambia sin salir de la pantalla:
+     se vuelve a leer el plan para que las entregas que quedan sean las de
+     verdad. Si falla, se queda con lo que ya tenia. */
+  const releerPlan = useCallback(() => {
+    axios.get(baseUrl + 'dashboard/plan', { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => setPlan((p) => ({ ...(p || {}), ...(r.data.data || {}), needDay: p?.needDay ?? r.data.data?.needDay })))
+      .catch(() => {});
+  }, [token]);
+
   /* Sin plan no hay nada que elegir. Antes aqui salia "Tu semana esta
      completa" junto a "No pudimos cargar el menu": dos mensajes que no eran
      verdad y ninguna pista de que hacer. */
   if (sinPlan) {
     return (
-      <LayoutDasboard claseStyle={false}>
-        <div className="afPanel afMenu__sinPlan">
-          <h1 className="afPanel__titular">
-            {sinPlan === 'vencido' ? 'Tu plan terminó' : 'Aún no tienes un plan'}
-          </h1>
-          <p className="afMenu__ayuda">
-            {sinPlan === 'vencido'
-              ? 'Aquí eliges tus platos de cada día. Renueva tu plan y sigue donde lo dejaste.'
-              : 'Aquí vas a elegir tus platos de cada día. Primero elige tu plan: te toma un minuto.'}
-          </p>
-          <button type="button" className="afBtn afBtn--mint" onClick={() => navigate('/planes')}>
-            {sinPlan === 'vencido' ? 'Renovar mi plan' : 'Ver los planes'}
-          </button>
+      <LayoutDasboard claseStyle="nCaja">
+        <div className="nPant mnu">
+          <span className="nMenta mnu__menta" aria-hidden="true" />
+          <motion.div className="mnu__dentro mnu__vacio" variants={cascada(0.07)} initial="oculto" animate="visible">
+            <motion.div variants={sube}><Isotipo size={34} /></motion.div>
+            <motion.h1 variants={sube}>
+              {sinPlan === 'vencido' ? 'Tu plan terminó' : 'Aún no tienes un plan'}
+            </motion.h1>
+            <motion.p variants={sube}>
+              {sinPlan === 'vencido'
+                ? 'Aquí eliges tus platos de cada día. Renueva tu plan y sigue donde lo dejaste.'
+                : 'Aquí vas a elegir tus platos de cada día. Primero elige tu plan: te toma un minuto.'}
+            </motion.p>
+            <motion.div variants={sube}>
+              <motion.button type="button" className="mnu__boton" whileTap={{ scale: 0.97 }} transition={resorte.toque}
+                onClick={() => navigate('/planes')}>
+                {sinPlan === 'vencido' ? 'Renovar mi plan' : 'Ver los planes'}
+              </motion.button>
+            </motion.div>
+          </motion.div>
         </div>
       </LayoutDasboard>
     );
   }
 
   return (
-    <LayoutDasboard claseStyle={false}>
-      <MenuFlow plan={plan} alTerminar={() => navigate('/')} />
+    <LayoutDasboard claseStyle="nCaja">
+      <MenuFlow plan={plan} alCambiar={releerPlan} />
     </LayoutDasboard>
   );
 };

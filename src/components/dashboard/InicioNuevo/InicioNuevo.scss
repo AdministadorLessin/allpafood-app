@@ -1,0 +1,111 @@
+.iniN{
+    position: relative; padding: calc(var(--n-arriba) + 14px) 20px 24px; overflow: hidden;
+    a{ color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    > *:not(.iniN__menta){ position: relative; }
+    &__menta{ position: absolute; left: 0; right: 0; top: 0; height: 470px; pointer-events: none;
+        background: linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 46%, rgba(246,246,241,0) 100%); }
+
+    &__cab{ display: flex; align-items: center; gap: 12px; }
+    &__ava{ flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; border: 2.5px solid var(--n-tinta); overflow: hidden; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center; background: var(--n-papel); font-weight: 800; font-size: 18px;
+        img{ width: 100%; height: 100%; object-fit: cover; display: block; } }
+    &__hola{ flex: 1; min-width: 0;
+        b{ display: block; font-size: 16px; font-weight: 700; line-height: 1.2; color: var(--n-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        small{ display: block; margin-top: 1px; font-size: 12.500px; font-weight: 500; color: var(--n-tinta-78); } }
+    &__campana{ position: relative; flex: 0 0 auto; width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+        background: var(--n-tinta); color: #fff; display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; }
+        i{ position: absolute; top: 9px; right: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--n-coral); border: 2px solid var(--n-tinta); } }
+
+    &__titular{ margin: 28px 0 0; font-size: 46px; line-height: 1; }
+    &__linea{ display: block; }
+    /* Cada palabra sube desde detras de su propia linea. */
+    &__corte{ display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; margin-right: .22em;
+        > span{ display: inline-block; } }
+
+    &__semana{ margin-top: 18px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    &__dia{ border: 0; background: none; cursor: pointer; padding: 9px 0 0; text-align: center; color: var(--n-tinta); min-height: 58px;
+        b{ display: block; font-size: 20px; line-height: 1; font-weight: 700; }
+        small{ display: block; margin-top: 3px; font-size: 11.500px; color: rgba(22,33,27,.72); }
+        i{ display: block; width: 6px; height: 6px; margin: 4px auto 0; border-radius: 50%; background: transparent;
+            &.is-on{ background: var(--n-tinta); } &.is-falta{ background: transparent; box-shadow: inset 0 0 0 1.500px var(--n-coral); } }
+        &.is-hoy{ border-radius: 18px; background: #fff; padding: 9px 0 8px; box-shadow: 0 8px 20px rgba(22,33,27,.12);
+            small{ font-weight: 600; color: var(--n-tinta); } }
+    }
+
+    &__card{ display: block; margin-top: 16px; border-radius: 30px; background: #fff; box-shadow: 0 14px 34px rgba(22,33,27,.08); padding: 18px; }
+    &__cardCab{ display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    &__et{ font-size: 11.500px; font-weight: 600; letter-spacing: .1em; color: #55655C; }
+    &__chip{ font-size: 12px; font-weight: 600; color: #0B6B43; background: var(--n-menta-suave); padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+        &--coral{ color: var(--n-coral-texto); background: #FDE3DE; } }
+    &__h{ display: block; margin-top: 12px; font-weight: 700; font-size: 20px; line-height: 1.15; }
+    &__p{ margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: #55655C;
+        &--ic{ display: flex; align-items: center; gap: 6px; svg{ width: 15px; height: 15px; flex: 0 0 auto; } } }
+    &__btn{ margin-top: 16px; height: 54px; border-radius: 18px; background: var(--n-tinta); color: #fff !important; font-size: 15px; font-weight: 600;
+        display: flex; align-items: center; justify-content: center; gap: 8px; svg{ width: 18px; height: 18px; } }
+
+    &__plato{ margin-top: 12px; display: flex; align-items: center; gap: 12px;
+        > span:last-child{ min-width: 0; }
+        b{ display: block; font-weight: 700; font-size: 18px; line-height: 1.15; letter-spacing: -.01em; }
+        small{ display: block; margin-top: 4px; font-size: 12.500px; color: #55655C; } }
+    &__platoIc{ width: 62px; height: 62px; flex: 0 0 auto; border-radius: 20px; background: var(--n-menta); display: flex; align-items: center; justify-content: center;
+        svg{ width: 28px; height: 28px; } }
+    &__pasos{ margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+        span{ height: 7px; border-radius: 4px; background: #ECEDE6; overflow: hidden; }
+        i{ display: block; height: 100%; border-radius: 4px; background: var(--n-tinta); transform-origin: left center; } }
+    &__pasosTxt{ margin-top: 6px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 11.500px; font-weight: 600; color: #55655C;
+        span:nth-child(2){ text-align: center; } span:nth-child(3){ text-align: right; } .is-on{ color: var(--n-tinta); } }
+
+    &__ir{ display: inline-flex; align-items: center; gap: 4px; font-size: 12.500px; font-weight: 600; svg{ width: 14px; height: 14px; } }
+    &__kcalNum{ margin-top: 8px; display: flex; align-items: flex-end; gap: 10px;
+        b{ font-family: var(--n-titular); font-weight: 800; font-size: 58px; line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+        em{ font-style: normal; font-weight: 700; font-size: 26px; line-height: 1; color: #BFC4BC; padding-bottom: 4px; } }
+    &__macros{ margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    &__macroCab{ display: flex; justify-content: space-between; font-size: 12px; span{ color: #55655C; } }
+    &__macroBarra{ display: block; margin-top: 6px; height: 7px; border-radius: 4px; background: #ECEDE6; overflow: hidden; i{ display: block; height: 100%; border-radius: 4px; } }
+    &__kcalPie{ margin-top: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    &__pastilla{ display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 12px; border-radius: 22px; background: var(--n-tinta); color: #fff; font-size: 13.500px; font-weight: 600;
+        svg{ width: 16px; height: 16px; color: var(--n-menta); } }
+    &__dato{ display: inline-flex; align-items: center; gap: 8px; font-size: 12.500px; color: #55655C;
+        em{ display: inline-block; transform: rotate(-5deg); font-style: normal; font-weight: 800; font-size: 13px; letter-spacing: .02em; line-height: 1;
+            background: var(--n-menta); color: var(--n-tinta); padding: 5px 8px 4px; border-radius: 6px; } }
+
+    &__tres{ margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    &__mini{ border-radius: 24px; background: #fff; padding: 14px 12px; box-shadow: 0 10px 26px rgba(22,33,27,.07); min-width: 0;
+        > span{ display: flex; align-items: center; justify-content: space-between; font-size: 11.500px; font-weight: 600; opacity: .8; svg{ width: 13px; height: 13px; } }
+        b{ display: block; margin-top: 8px; font-weight: 800; font-size: 24px; line-height: 1; letter-spacing: -.03em; }
+        small{ display: block; margin-top: 4px; font-size: 11.500px; opacity: .8; }
+        &--tinta{ background: var(--n-tinta); color: #fff !important; }
+        &--menta{ background: var(--n-menta-suave); }
+        &:active{ transform: scale(.97); transition: transform .12s; } }
+    &__resto{ margin-top: 20px; }
+}
+
+/* La tarjeta de los casos delicados (retraso, no entregado) con la identidad
+   nueva: tinta, y coral para avisar del tiempo. Sin marron ni amarillo. */
+.iniN .afHoyPedido{
+    margin-top: 16px; border-radius: 30px; font-family: var(--n-texto);
+    box-shadow: 0 18px 40px rgba(22,33,27,.28);
+    &--retraso{
+        background: var(--n-tinta);
+        .afHoyPedido__et{ color: #FF9C8A; }
+        .afHoyPedido__promesa b{ color: #FF9C8A; }
+        .afPaso__marca--hecho{ background: #FF9C8A; border-color: #FF9C8A; }
+        .afPaso__marca--actual{ border-color: #FF9C8A; box-shadow: 0 0 0 5px rgba(255,156,138,.18); }
+        .afPaso--activo:not(:last-child)::before{ background: rgba(255,156,138,.4); }
+    }
+}
+
+/* Con mas peso que las reglas generales de titulares y negritas. */
+.nPant.iniN h1.iniN__titular{ margin: 30px 0 0; }
+.nPant.iniN .iniN__hola b{ color: var(--n-tinta); }
+
+/* Mientras cargan los datos: las mismas formas de la pantalla, respirando. */
+.iniN__espera{ margin-top: 18px; animation: iniNLate 1.4s ease-in-out infinite;
+    i{ display: block; border-radius: 10px; background: rgba(22,33,27,.08); } }
+.iniN__esperaDias{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; i{ height: 58px; border-radius: 18px; background: rgba(255,255,255,.5); } }
+.iniN__esperaCard{ display: block; margin-top: 16px; padding: 18px; border-radius: 30px; background: #fff; box-shadow: 0 14px 34px rgba(22,33,27,.06);
+    i:nth-child(1){ width: 38%; height: 12px; } i:nth-child(2){ margin-top: 16px; height: 62px; border-radius: 20px; } i:nth-child(3){ margin-top: 16px; height: 8px; }
+    &--baja{ i:nth-child(2){ height: 46px; width: 60%; } } }
+@keyframes iniNLate{ 0%, 100%{ opacity: 1; } 50%{ opacity: .55; } }
+@media (prefers-reduced-motion: reduce){ .iniN__espera{ animation: none; } }

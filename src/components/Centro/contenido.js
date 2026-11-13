@@ -19,7 +19,7 @@ export const TEMAS = [
     id: 'plan',
     titulo: 'Cómo funciona mi plan',
     bajada: 'Los envíos, el corte, el relleno',
-    icono: 'lista',
+    icono: 'recibo',
     preguntas: [
       {
         q: '¿Cómo funciona Allpa Food?',
@@ -59,7 +59,7 @@ export const TEMAS = [
     id: 'app',
     titulo: 'Cómo uso el app',
     bajada: 'Elegir, cambiar, pausar, tu dirección',
-    icono: 'telefono',
+    icono: 'calendario',
     preguntas: [
       {
         q: '¿Hasta qué hora elijo o cambio el menú de mañana?',
@@ -98,7 +98,7 @@ export const TEMAS = [
     id: 'hoy',
     titulo: 'Mi pedido de hoy',
     bajada: 'A qué hora llega y qué hacer si no llegó',
-    icono: 'reloj',
+    icono: 'moto',
     preguntas: [
       {
         q: '¿A qué hora llega mi pedido?',

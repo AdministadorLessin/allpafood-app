@@ -1,103 +1,211 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import FotoPlato from '../../ultil/FotoPlato';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from 'axios';
-import { REPARTO } from '../PedidoDeHoy/PedidoDeHoy';
 import moment from 'moment';
-import Skeleton from '@mui/material/Skeleton';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence, LayoutGroup, MotionConfig } from 'motion/react';
 
 import './MenuFlow.scss';
+import Festejo from '../../ultil/Festejo/Festejo';
+import Jalar from '../../ultil/Jalar/Jalar';
+import './MenuNuevo.scss';
+import Hoja from '../../Centro/Hoja';
+import Isotipo from '../../ultil/Isotipo';
+import { REPARTO } from '../PedidoDeHoy/PedidoDeHoy';
 import { useAuthContext } from './../../../context/authContext';
-import { HORA_LIMITE, HORA_LIMITE_TEXTO, tiempoRestante } from './../StatusBanner/estadoPlan';
-import { Cascada, Bloque, BarraAnimada, motion, alToque } from './../../ultil/Motion/Motion';
+import { HORA_LIMITE, HORA_LIMITE_TEXTO, semanaRelevante } from './../StatusBanner/estadoPlan';
 import FranjaEmpresa from './../../empresa/FranjaEmpresa/FranjaEmpresa';
 import { API_URL } from '../../../config';
-import { Link, useLocation } from 'react-router-dom';
+import { resorte, cascada, sube } from '../../../movimiento';
+import { vibrar } from '../../../nativo';
 
 const baseUrl = `${API_URL}`;
 
-const Ico = ({ d, c }) => (
-  <svg className={c || 'afIc'} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
-);
-const PIN = "M12 21.2s6.4-6.2 6.4-11a6.4 6.4 0 1 0-12.8 0c0 4.8 6.4 11 6.4 11Z";
+/* El valor nutricional de un plato. Se busca por el comienzo del nombre:
+   el servidor dice "carbo" en unos platos y "carbohidratos" en otros. */
+const prop = (menu, nombre) => {
+  const p = (menu?.properties || []).find((x) => String(x.name || '').toLowerCase().startsWith(nombre));
+  return Number(p?.value) || 0;
+};
+const ymd = (f) => moment(f).format('YYYY-MM-DD');
+const mayus = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : '');
+const nombreDia = (f) => moment(f).format('dddd D');
 
-const prop = (menu, nombre) =>
-  menu?.properties?.find((p) => p.name === nombre)?.value ?? 0;
+const NOMBRE_COMIDA = { lunch: 'almuerzo', dinner: 'cena', breakfast: 'desayuno' };
+const PARA_COMIDA = { lunch: 'Para el almuerzo', dinner: 'Para la cena', breakfast: 'Para el desayuno' };
+/* Lo que acompana al plato. La entrada salia como "Plato" a secas. */
+const ETIQUETA_EXTRA = { drinks: 'Bebida', snacks: 'Snack', starter: 'Entrada' };
+const ORDEN_TIPOS = ['lunch', 'dinner', 'breakfast', 'starter', 'snacks', 'drinks'];
+
+const MARCA = {
+  listo: 'Listo', cerrado: 'Listo', viaje: 'No recibe', no: 'No recibe',
+  pasado: 'Cerrado', elegir: 'Elegir', falta: 'Falta 1', sinMenu: 'Pronto',
+};
+
+const Palomita = ({ size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2"
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
+);
+/* El pin a color: circulo menta, pin tinta. */
+const Pin = () => (
+  <span className="mnu__pin" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M12 22s7-6.4 7-12a7 7 0 0 0-14 0c0 5.6 7 12 7 12z" fill="#16211B" />
+      <circle cx="12" cy="10" r="2.7" fill="#3CFB9F" />
+    </svg>
+  </span>
+);
+
+/* La foto del plato si existe. Hoy casi ningun plato la trae: el respaldo es
+   un cuadro sobrio con un cubierto, no una foto inventada. */
+const Foto = ({ menu }) => (menu?.imageUrl
+  ? <img className="mnu__foto" src={menu.imageUrl} alt="" loading="lazy" />
+  : (
+    <span className="mnu__foto mnu__foto--sin" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+        strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 2v7a2 2 0 0 0 2 2v11" /><path d="M7 2v6" /><path d="M11 2v6" />
+        <path d="M17 2c-1.4 0-2.5 2-2.5 4.5S15.600 11 17 11s2.500-2 2.500-4.500S18.400 2 17 2z" /><path d="M17 11v11" />
+      </svg>
+    </span>
+  ));
+
+const datoDe = (menu, respaldo) => {
+  const kcal = prop(menu, 'calor');
+  const partes = [];
+  if (kcal) partes.push(`${kcal} kcal`);
+  if (prop(menu, 'prote')) partes.push(`${prop(menu, 'prote')} g de proteína`);
+  if (prop(menu, 'carbo')) partes.push(`${prop(menu, 'carbo')} g de carbos`);
+  if (prop(menu, 'grasa')) partes.push(`${prop(menu, 'grasa')} g de grasa`);
+  return partes.length ? partes.join(' · ') : respaldo;
+};
+
+/* Los dibujos de las opciones del dia. */
+const G = {
+  vaso: ['M7 4h10l-1.200 15a2 2 0 0 1-2 1.800h-3.600a2 2 0 0 1-2-1.800z', 'M7.500 10h9'],
+  rayo: 'M13 3 5 13.500h6L10 21l8-10.500h-6z',
+  mas: 'M12 5v14M5 12h14',
+  no: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M8.500 8.500l7 7M15.500 8.500l-7 7'],
+  si: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M8 12.300l2.700 2.700L16 9.500'],
+  ir: 'M9 6l6 6-6 6',
+  atras: 'M15 6l-6 6 6 6',
+  porMi: ['M3 12a9 9 0 1 0 3-6.700L3 8', 'M3 3v5h5'],
+  viaje: ['M5 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z', 'M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2'],
+};
+const Glifo = ({ d, chico }) => (
+  <span className={chico ? 'mnu__glifo mnu__glifo--chico' : 'mnu__glifo'} aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {[].concat(d).map((x) => <path key={x} d={x} />)}
+    </svg>
+  </span>
+);
+
+/* Las calorias en negrita y cada macro con su punto de color (los mismos de
+   Progreso): se lee de un vistazo, sin recorrer una linea larga. Quien usa
+   lector de pantalla escucha la frase completa. */
+const Macros = ({ menu, respaldo }) => {
+  const kcal = prop(menu, 'calor');
+  const tres = [['p', 'prote'], ['c', 'carbo'], ['g', 'grasa']].filter(([, k]) => prop(menu, k));
+  if (!kcal && !tres.length) return <small>{respaldo}</small>;
+  return (
+    <span className="mnu__macros" role="text" aria-label={datoDe(menu, respaldo)}>
+      {kcal ? <b aria-hidden="true">{kcal} kcal</b> : null}
+      {tres.map(([c, k]) => <i key={c} className={`is-${c}`} aria-hidden="true">{prop(menu, k)} g</i>)}
+    </span>
+  );
+};
+
+/* --- cuentas sobre lo elegido de un dia: { comida: { menuId: cantidad } } --- */
+const totalEn = (menus, comida) =>
+  Object.values(menus?.[comida] || {}).reduce((a, b) => a + b, 0);
 
 /**
- * Elegir el menu, en tres pasos.
+ * Elegir el menu: lo que se toca queda pedido.
  *
- * Reemplaza el programador de una sola pantalla, que mostraba a la vez el
- * selector de dias, las pestañas de comidas, la lista de platos y el resumen.
+ * Antes eran tres pasos —elegir el dia, elegir el plato y "guardar", y despues
+ * confirmar la semana—, y un domingo 17 de 59 clientes se fueron creyendo que
+ * ya habian pedido. Ahora los dias van arriba, los platos del dia debajo, y
+ * tocar un plato manda el pedido de ese dia en el momento, con "Deshacer".
  *
- * Lo importante: la direccion se elige POR DIA. El campo deliveryPointId ya
- * viajaba por pedido y tbl_order ya lo guarda —es de donde sale la ruta—, pero
- * la pantalla anterior aplicaba una sola direccion a toda la semana.
+ * Las reglas no cambiaron y las hace cumplir el servidor: el plazo de las
+ * 22:00 de la vispera, un envio por dia del plan, almuerzo y cena parejos en
+ * Fitfuel, la direccion por dia.
  */
-const MenuFlow = ({ plan, alTerminar }) => {
+const MenuFlow = ({ plan, alCambiar }) => {
 
   const { token, empresa } = useAuthContext();
+  const cab = useMemo(() => ({ headers: { Authorization: `Bearer ${token}` } }), [token]);
 
-  const [paso, setPaso] = useState(1);
   const [dias, setDias] = useState(null);
   /* El menu de la semana INCLUYENDO los dias ya pedidos. Hace falta para poder
      cambiar el plato de un dia programado: la lista de arriba los excluye a
-     proposito, porque sirve para elegir lo que falta. */
+     proposito. */
   const [diasTodos, setDiasTodos] = useState([]);
-  /* El pedido que se esta editando. Cuando esta puesto, guardar hace un PUT
-     sobre ese pedido en vez de crear uno nuevo. */
-  const [editando, setEditando] = useState(null);
+  const [falloCarga, setFalloCarga] = useState(false);
+  const [vuelta, setVuelta] = useState(0);
 
   /* "Me voy de viaje". Sin esto, el cliente que no elegia nada creyendo que
      asi no le llegaba comida se encontraba la semana armada por el proceso
      del domingo —con sus envios descontados— y reclamaba con razon. */
   const [pausas, setPausas] = useState([]);
-  const [pausando, setPausando] = useState(false);
   const [viaje, setViaje] = useState({ desde: '', hasta: '' });
   const [guardandoPausa, setGuardandoPausa] = useState(false);
   const [avisoPausa, setAvisoPausa] = useState('');
-  // Lo que el cliente YA pidio. El endpoint de menus excluye esos dias, asi que
-  // sin esto la pantalla decia "no hay dias para elegir" y nada mas: el cliente
-  // no veia lo que habia pedido ni podia cambiarlo.
+  // Lo que el cliente YA pidio.
   const [pedidos, setPedidos] = useState([]);
-  const [diaAbierto, setDiaAbierto] = useState(null);
   const [cancelando, setCancelando] = useState(false);
-  /* Dias que el cliente reprogramo: su pedido se cancelo y el envio volvio al
-     saldo. Se muestran con nombre propio para que no crea que se "perdio" el
-     pedido ni que le va a llegar igual. */
+  /* Dias que el cliente marco para no recibir: su pedido se cancelo y el envio
+     volvio al saldo, o dijo que no antes de pedir. */
   const [reprogramados, setReprogramados] = useState([]);
-  const [confirmando, setConfirmando] = useState(null);
-  const [avisoReprog, setAvisoReprog] = useState('');
   const [guardandoDir, setGuardandoDir] = useState(false);
   const [puntos, setPuntos] = useState([]);
   /* { fecha: { menus: { comida: { menuId: cantidad } }, puntoId } }
-     La cantidad existe porque hay clientes que piden dos o tres almuerzos el
-     mismo dia, casi siempre el viernes. Cada porcion gasta un envio del plan,
-     y pueden ser del mismo plato o de platos distintos. */
-  /* Se guarda en la sesion del navegador porque desde aqui se puede salir a
-     Mis direcciones a crear un lugar nuevo. Sin esto, el que iba a agregar su
-     oficina volvia y encontraba la semana en blanco. */
+     Lo elegido que TODAVIA no es un pedido. Con un solo principal casi no se
+     usa —tocar ya pide—; con almuerzo y cena guarda la mitad elegida hasta
+     que el dia este completo. Tambien guarda la direccion elegida para un dia
+     sin pedido. Vive en la sesion del navegador porque desde aqui se puede
+     salir a Mis direcciones a crear un lugar nuevo. */
   const [seleccion, setSeleccion] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('af_menu_sel') || '{}'); }
     catch (e) { return {}; }
   });
   const [diaActivo, setDiaActivo] = useState(null);
+  const [sentido, setSentido] = useState(1);
+  /* Al abrir la pantalla el dia no entra de lado: solo cuando se cambia. */
+  const seMovio = useRef(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
+  /* Lo que se acaba de tocar, pintado antes de que responda el servidor. */
+  const [optimista, setOptimista] = useState(null);
+  /* El aviso de "quedo pedido", con lo necesario para deshacerlo. */
+  const [ultimo, setUltimo] = useState(null);
+  /* 'direccion' | 'viaje' | 'porMi' */
+  const [hoja, setHoja] = useState(null);
+  /* Sumar un plato distinto al mismo dia, en vez de reemplazar el elegido. */
+  const [sumando, setSumando] = useState(false);
 
   useEffect(() => {
     try { sessionStorage.setItem('af_menu_sel', JSON.stringify(seleccion)); }
     catch (e) { /* modo privado: no es critico, solo se pierde al navegar */ }
   }, [seleccion]);
 
-  /* Aviso al cerrar con una eleccion sin confirmar.
-     El domingo 27, 59 clientes abrieron el menu y solo 42 confirmaron: 17
-     eligieron sus platos, se salieron creyendo que ya estaba pedido, y esa
-     noche el automatico les armo la semana con el plato del dia. Desde su
-     lado habian elegido; desde el nuestro no habia llegado nada. */
-  const hayPendiente = Object.keys(seleccion).length > 0;
+  /* Que comidas trae el plan. Fitfuel da almuerzo Y cena, y el servidor
+     exige un plato por cada una: isMenuSelectedValid rechaza el pedido si
+     menuTypeIds.size() != principalBenefits.size(). */
+  const comidas = useMemo(() => {
+    const b = plan?.consumption?.principalBenefits;
+    const lista = Array.isArray(b) && b.length ? b : ['lunch'];
+    // El almuerzo primero: es como el cliente piensa el dia.
+    return [...lista].sort((a) => (a === 'lunch' ? -1 : 1));
+  }, [plan]);
+  const doble = comidas.length > 1;
+
+  /* Aviso al cerrar con una eleccion a medias. Con "un toque" solo puede
+     pasar en los planes de dos comidas: eligio el almuerzo y le falta la
+     cena, y ese dia todavia no esta pedido. */
+  const hayPendiente = doble && Object.keys(seleccion).some(
+    (f) => comidas.some((c) => totalEn(seleccion[f]?.menus, c) > 0));
   useEffect(() => {
-    if (!hayPendiente) return;
+    if (!hayPendiente) return undefined;
     const avisar = (e) => { e.preventDefault(); e.returnValue = ''; return ''; };
     window.addEventListener('beforeunload', avisar);
     return () => window.removeEventListener('beforeunload', avisar);
@@ -119,11 +227,9 @@ const MenuFlow = ({ plan, alTerminar }) => {
   }, []);
 
   useEffect(() => {
-    const cab = { headers: { Authorization: `Bearer ${token}` } };
-
     axios.get(`${baseUrl}dashboard/menus?initDate=${desde}`, cab)
-      .then((r) => setDias(Array.isArray(r.data.data) ? r.data.data : []))
-      .catch(() => { setDias([]); setError('No pudimos cargar el menú. Vuelve a intentarlo.'); });
+      .then((r) => { setDias(Array.isArray(r.data.data) ? r.data.data : []); setFalloCarga(false); })
+      .catch(() => { setDias([]); setFalloCarga(true); });
 
     axios.get(`${baseUrl}dashboard/menus?initDate=${desde}&incluirPedidos=true`, cab)
       .then((r) => setDiasTodos(Array.isArray(r.data.data) ? r.data.data : []))
@@ -146,39 +252,12 @@ const MenuFlow = ({ plan, alTerminar }) => {
       .catch(() => setReprogramados([]));
 
     axios.get(`${baseUrl}delivery/find/points`, cab)
-      .then((r) => {
-        const lista = Array.isArray(r.data.data) ? r.data.data : [];
-        setPuntos(lista);
-      })
+      .then((r) => setPuntos(Array.isArray(r.data.data) ? r.data.data : []))
       .catch(() => setPuntos([]));
-  }, [token, desde]);
-
-  /* Que comidas trae el plan. Fitfuel da almuerzo Y cena, y el servidor
-     exige un plato por cada una: isMenuSelectedValid rechaza el pedido si
-     menuTypeIds.size() != principalBenefits.size(). Antes esto asumia
-     'lunch' siempre, asi que quien compraba Fitfuel —el plan mas caro— no
-     podia programar un solo dia. */
-  const comidas = useMemo(() => {
-    const b = plan?.consumption?.principalBenefits;
-    const lista = Array.isArray(b) && b.length ? b : ['lunch'];
-    // El almuerzo primero: es como el cliente piensa el dia.
-    return [...lista].sort((a) => (a === 'lunch' ? -1 : 1));
-  }, [plan]);
-
-  const NOMBRE_COMIDA = { lunch: 'almuerzo', dinner: 'cena', breakfast: 'desayuno' };
-  /* Lo que acompana al plato. La entrada salia como "Plato" a secas. */
-  const ETIQUETA_EXTRA = { drinks: 'Bebida', snacks: 'Snack', starter: 'Entrada' };
+  }, [cab, desde, vuelta]);
 
   const platosDe = (dia, tipo) =>
     dia?.menuTypeGroups?.find((g) => g.type === tipo)?.menuTypes ?? [];
-
-  /** Cuantas porciones de ese plato lleva ese dia. */
-  const cantidadDe = (fecha, comida, menuId) =>
-    seleccion[fecha]?.menus?.[comida]?.[menuId] || 0;
-
-  /** Cuantas porciones de esa comida lleva ese dia, sumando platos distintos. */
-  const totalDe = (fecha, comida) =>
-    Object.values(seleccion[fecha]?.menus?.[comida] || {}).reduce((a, b) => a + b, 0);
 
   /**
    * Un dia esta listo cuando todas las comidas del plan tienen la MISMA
@@ -189,108 +268,341 @@ const MenuFlow = ({ plan, alTerminar }) => {
    * una cena dejaria media racion suelta en cocina y en la bolsa, y el envio
    * extra que se cobra no corresponderia a un dia completo del plan.
    */
-  const diaCompleto = (fecha) => {
-    const totales = comidas.map((c) => totalDe(fecha, c));
+  const completoEn = (menus) => {
+    const totales = comidas.map((c) => totalEn(menus, c));
     return totales.every((n) => n > 0) && new Set(totales).size === 1;
   };
 
-  /* Los dias marcados "no recibo" se descartan aunque tengan plato elegido.
-     El cliente reprogramaba jueves y viernes, apretaba "Revisar y confirmar" y
-     ahi seguian los dos platos esperando confirmacion: la eleccion vieja se
-     quedaba guardada y el resumen la contaba igual. Confirmar habria vuelto a
-     pedir —y a cobrar— los dos dias que acababa de cancelar. */
-  const elegidos = Object.keys(seleccion).filter(diaCompleto);
-
-  /* Dias con algo elegido pero incompleto: el plan trae almuerzo y cena y
-     solo se marco uno de los dos. No cuentan para confirmar, pero el cliente
-     tiene que saber que estan ahi o no entiende por que no puede seguir. */
-  const aMedias = Object.keys(seleccion).filter((f) => !diaCompleto(f)
-    && comidas.some((c) => totalDe(f, c) > 0));
-
   /**
-   * Los envios que gasta todo lo elegido.
+   * Los envios que gasta lo elegido de un dia.
    *
    * Un envio es un DIA del plan, no un plato: quien tiene almuerzo y cena
    * gasta un envio por dia, no dos. Solo suma de mas quien pide porciones
-   * extra, y suma el de la comida que mas repitio —dos almuerzos y una cena
-   * son dos envios: el dia completo y un almuerzo suelto—.
+   * extra, y suma el de la comida que mas repitio.
    */
-  const enviosDe = (fecha) =>
-    Math.max(...comidas.map((c) => totalDe(fecha, c)), 0);
+  const enviosEn = (menus) => Math.max(...comidas.map((c) => totalEn(menus, c)), 0);
 
-  /** Las comidas del plan que no estan parejas con el resto. */
-  const desparejas = (fecha) => {
-    const totales = comidas.map((c) => totalDe(fecha, c));
-    const tope = Math.max(...totales, 0);
-    return comidas.filter((c, i) => totales[i] < tope);
-  };
+  /* El id repetido tantas veces como porciones: asi viaja la cantidad.
+     Dos almuerzos del mismo plato son el mismo id dos veces; dos platos
+     distintos, dos ids. El servidor cobra un envio por cada uno. */
+  const idsDe = (menus) => comidas.flatMap((c) =>
+    Object.entries(menus?.[c] || {}).flatMap(
+      ([menuId, cantidad]) => Array(cantidad).fill(Number(menuId))));
 
-  const enviosElegidos = elegidos.reduce((suma, f) => suma + enviosDe(f), 0);
-
-  /* Cuantos envios le quedan. El servidor tambien lo valida, pero rebotar la
-     semana entera al final —despues de elegir cinco dias— es la peor forma de
-     enterarse. */
+  /* Cuantos envios le quedan. El servidor es quien lo valida. */
   const envios = plan?.consumption?.orders;
   const enviosRestantes = envios && Number.isFinite(envios.total) && Number.isFinite(envios.consumed)
     ? envios.total - envios.consumed
     : null;
-  const seExcede = enviosRestantes !== null && enviosElegidos > enviosRestantes;
-  const restan = tiempoRestante();
 
-  /* ---------- guardar ---------- */
-  const confirmar = () => {
-    setEnviando(true);
-    setError('');
+  const recargar = useCallback(() => {
+    alCambiar && alCambiar();
+    return Promise.all([
+      axios.get(`${baseUrl}dashboard/orders?incluirProxima=true`, cab)
+        .then((r) => setPedidos(Array.isArray(r.data.data) ? r.data.data : []))
+        .catch(() => {}),
+      axios.get(`${baseUrl}dashboard/menus?initDate=${desde}`, cab)
+        .then((r) => setDias(Array.isArray(r.data.data) ? r.data.data : []))
+        .catch(() => {}),
+      axios.get(`${baseUrl}dashboard/menus?initDate=${desde}&incluirPedidos=true`, cab)
+        .then((r) => setDiasTodos(Array.isArray(r.data.data) ? r.data.data : []))
+        .catch(() => {}),
+      axios.get(`${baseUrl}order/reprogramados`, cab)
+        .then((r) => setReprogramados(Array.isArray(r.data?.data) ? r.data.data : (Array.isArray(r.data) ? r.data : [])))
+        .catch(() => {}),
+    ]);
+  }, [cab, desde, alCambiar]);
 
-    const pedidos = elegidos.map((fecha) => {
-      const s = seleccion[fecha];
-      /* El id repetido tantas veces como porciones: asi viaja la cantidad.
-         Dos almuerzos del mismo plato son el mismo id dos veces; dos platos
-         distintos, dos ids. El servidor cobra un envio por cada uno. */
-      const menuTypeIds = comidas.flatMap((c) =>
-        Object.entries(s.menus?.[c] || {}).flatMap(
-          ([menuId, cantidad]) => Array(cantidad).fill(Number(menuId))));
-      const base = { scheduleDate: fecha, menuTypeIds };
-      // Solo se manda si el cliente eligio una: el backend conserva la
-      // direccion anterior cuando llega nula.
-      return s.puntoId ? { ...base, deliveryPointId: s.puntoId } : base;
-    });
-
-    axios.post(`${baseUrl}order/scheduled`, pedidos, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(() => {
-        setEnviando(false);
-        setSeleccion({});
-        alTerminar && alTerminar();
-      })
-      .catch((e) => {
-        setEnviando(false);
-        setError(e?.response?.data?.message || 'No pudimos guardar tu semana. Vuelve a intentarlo.');
-      });
+  const cargarPausas = () => {
+    axios.get(`${baseUrl}plan/pause`, cab)
+      .then((r) => setPausas(Array.isArray(r.data?.data) ? r.data.data : (r.data || [])))
+      .catch(() => {});
   };
 
-  const recargar = () => {
-    const cab = { headers: { Authorization: `Bearer ${token}` } };
-    axios.get(`${baseUrl}dashboard/orders?incluirProxima=true`, cab)
-      .then((r) => setPedidos(Array.isArray(r.data.data) ? r.data.data : []))
-      .catch(() => {});
-    axios.get(`${baseUrl}dashboard/menus?initDate=${desde}`, cab)
-      .then((r) => setDias(Array.isArray(r.data.data) ? r.data.data : []))
-      .catch(() => {});
-    axios.get(`${baseUrl}dashboard/menus?initDate=${desde}&incluirPedidos=true`, cab)
-      .then((r) => setDiasTodos(Array.isArray(r.data.data) ? r.data.data : []))
-      .catch(() => {});
-    axios.get(`${baseUrl}order/reprogramados`, cab)
-      .then((r) => setReprogramados(Array.isArray(r.data?.data) ? r.data.data : (Array.isArray(r.data) ? r.data : [])))
-      .catch(() => {});
+  /* Mismo plazo que para elegir: hasta las 22:00 de la vispera. */
+  const antesDelCierre = (fecha) =>
+    moment().isBefore(moment(fecha).subtract(1, 'day').startOf('day').hour(HORA_LIMITE));
+  const sePuedeCambiar = (o) => {
+    if (['C', 'F', 'X'].includes(o.status)) return false;
+    return antesDelCierre(o.date);
+  };
+
+  const esReprogramado = (fecha) =>
+    reprogramados.some((r) => ymd(r) === ymd(fecha));
+
+  /**
+   * Todo lo que se sabe de un dia, en un solo sitio.
+   *
+   * El mismo dia puede venir en tres listas —dias libres, pedidos y dias sin
+   * envio— y antes cada parte de la pantalla las cruzaba por su cuenta.
+   */
+  const infoDia = (fecha) => {
+    const pedido = pedidos.find((o) => ymd(o.date) === fecha) || null;
+    /* Se busca en la lista completa: cuando el cliente esta CAMBIANDO el plato
+       de un dia ya pedido, ese dia no aparece en la de dias por elegir. */
+    const carta = diasTodos.find((d) => d.localDate === fecha)
+               || (dias || []).find((d) => d.localDate === fecha) || null;
+    /* Cerrado se mide por la HORA, no por si el pedido ya tiene motorizado. */
+    const abierto = antesDelCierre(fecha);
+    const finalizado = pedido ? ['C', 'F', 'X'].includes(pedido.status) : false;
+    const pausa = pausas.find((p) => fecha >= ymd(p.start_date) && fecha <= ymd(p.end_date)) || null;
+    const hayPlatos = !!carta && comidas.some((c) => platosDe(carta, c).length > 0);
+    /* Solo con dos comidas puede haber un dia a medias: con una, tocar ya pide. */
+    const aMedias = doble ? comidas.filter((c) => totalEn(seleccion[fecha]?.menus, c) > 0).length : 0;
+
+    let estado;
+    if (pedido) estado = sePuedeCambiar(pedido) ? 'listo' : 'cerrado';
+    else if (pausa) estado = 'viaje';
+    else if (esReprogramado(fecha)) estado = 'no';
+    else if (!abierto) estado = 'pasado';
+    else if (hayPlatos) estado = aMedias > 0 ? 'falta' : 'elegir';
+    else estado = 'sinMenu';
+
+    const marca = estado === 'falta' ? `Falta ${Math.max(1, comidas.length - aMedias)}` : MARCA[estado];
+    return { fecha, pedido, carta, abierto, finalizado, pausa, hayPlatos, estado, marca };
+  };
+
+  /** Lo elegido de un dia: del pedido si ya existe, de la eleccion a medias si no. */
+  const menusDe = (info, sinOptimista) => {
+    if (!sinOptimista && optimista && optimista.fecha === info.fecha) return optimista.menus;
+    if (info.pedido) {
+      /* Repetidos incluidos: si tenia dos almuerzos, salen dos. Solo los
+         platos del plan: la bebida viaja en el pedido pero no se elige. */
+      const menus = {};
+      comidas.forEach((c) => { menus[c] = {}; });
+      (info.pedido.items || []).forEach((i) => {
+        if (!i?.id || !comidas.includes(i.type)) return;
+        menus[i.type][i.id] = (menus[i.type][i.id] || 0) + 1;
+      });
+      return menus;
+    }
+    /* Con una sola comida no existe "elegido sin pedir": si quedo algo
+       guardado de una sesion vieja, no se pinta como si estuviera pedido. */
+    return doble ? (seleccion[info.fecha]?.menus || {}) : {};
+  };
+
+  /* ---------- la ventana de semanas ---------- */
+  /* La semana que le importa al cliente y la siguiente, de lunes a viernes.
+     Si llega algun dato mas alla (o en fin de semana), tambien entra. */
+  const semanas = (() => {
+    const base = semanaRelevante().lunes.clone().startOf('day');
+    /* Sabado y domingo no hay reparto: solo entran si de verdad hay un
+       pedido ese dia, no porque la carta traiga algo publicado. */
+    const habil = (f) => moment(f).isoWeekday() <= 5;
+    const conDatos = [
+      ...(dias || []).map((d) => d.localDate).filter(habil),
+      ...diasTodos.map((d) => d.localDate).filter(habil),
+      ...pedidos.map((o) => ymd(o.date)),
+      ...reprogramados.map(ymd).filter(habil),
+    ].filter((f) => f >= base.format('YYYY-MM-DD'));
+    const ultima = conDatos.reduce((m, f) => (f > m ? f : m), '');
+    const cuantas = Math.min(4, Math.max(2,
+      ultima ? moment(ultima).startOf('isoWeek').diff(base, 'weeks') + 1 : 2));
+    return Array.from({ length: cuantas }, (_, i) => {
+      const lunes = base.clone().add(i, 'weeks');
+      const fechas = new Set([0, 1, 2, 3, 4].map((n) => lunes.clone().add(n, 'days').format('YYYY-MM-DD')));
+      const fin = lunes.clone().add(6, 'days').format('YYYY-MM-DD');
+      conDatos.forEach((f) => { if (f >= lunes.format('YYYY-MM-DD') && f <= fin) fechas.add(f); });
+      return { lunes, fechas: [...fechas].sort() };
+    });
+  })();
+
+  const indiceSemana = Math.max(0, semanas.findIndex((s) => s.fechas.includes(diaActivo)));
+  const semana = semanas[indiceSemana];
+  const infos = semana.fechas.map(infoDia);
+  const porElegir = infos.filter((i) => i.estado === 'elegir' || i.estado === 'falta');
+
+  /* El momento de completar la semana se celebra: papelitos y vibracion. Solo
+     cuando el ultimo dia se resuelve estando en esa misma semana, no al
+     cambiar de semana ni al abrir una que ya estaba completa. */
+  const [festejo, setFestejo] = useState(0);
+  const antesFaltaban = useRef({ semana: null, faltan: null });
+  const semanaVista = infos[0]?.fecha || null;
+  const cuantosFaltan = porElegir.length;
+  const hayAlgunoPedido = infos.some((i) => i.estado === 'listo');
+  useEffect(() => {
+    const a = antesFaltaban.current;
+    if (a.semana === semanaVista && a.faltan > 0 && cuantosFaltan === 0 && hayAlgunoPedido) {
+      setFestejo((n) => n + 1);
+      vibrar.exito();
+    }
+    antesFaltaban.current = { semana: semanaVista, faltan: cuantosFaltan };
+  }, [semanaVista, cuantosFaltan, hayAlgunoPedido]);
+  const listos = infos.filter((i) => ['listo', 'cerrado', 'no', 'viaje'].includes(i.estado)).length;
+  const sinPublicar = infos.every((i) => i.estado === 'sinMenu');
+
+  /* El dia con el que conviene abrir una semana: el primero por elegir; si no
+     hay, el primero que todavia se puede cambiar; si no, el primero. */
+  const mejorDia = (s) => {
+    const lista = s.fechas.map(infoDia);
+    return (lista.find((i) => i.estado === 'elegir' || i.estado === 'falta')
+         || lista.find((i) => i.estado === 'listo')
+         || lista.find((i) => i.abierto)
+         || lista[0]).fecha;
+  };
+
+  /* Mueve la pantalla a otro dia, sabiendo hacia que lado va. */
+  const saltar = (fecha) => {
+    seMovio.current = true;
+    setSentido(fecha > (diaActivo || '') ? 1 : -1);
+    setDiaActivo(fecha);
+  };
+
+  const irADia = (fecha) => {
+    if (!fecha || fecha === diaActivo) return;
+    saltar(fecha);
+    setSumando(false);
+    setError('');
+    vibrar.toque();
+  };
+
+  /* Desde el inicio del app se toca un dia y "Elegir mi plato del viernes":
+     llega con ese dia y se abre directo en sus platos. Si no viene ninguno,
+     se abre en el primer dia que falta elegir. Una sola vez. */
+  const location = useLocation();
+  const diaPedido = location.state?.dia;
+  const diaYaAbierto = useRef(false);
+  useEffect(() => {
+    if (diaYaAbierto.current || dias === null) return;
+    diaYaAbierto.current = true;
+    const todas = semanas.flatMap((s) => s.fechas);
+    if (diaPedido && todas.includes(diaPedido)) { setDiaActivo(diaPedido); return; }
+    const libres = dias.map((d) => d.localDate).filter((f) => todas.includes(f)).sort();
+    setDiaActivo(libres[0] || mejorDia(semanas[0]));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dias, diaPedido]);
+
+  /* El aviso de "quedo pedido" se va solo; "Deshacer" no tiene que quedarse
+     en pantalla para siempre. */
+  useEffect(() => {
+    if (!ultimo) return undefined;
+    const t = setTimeout(() => setUltimo(null), 9000);
+    return () => clearTimeout(t);
+  }, [ultimo]);
+
+  /* ---------- guardar ---------- */
+  const quitarDeSeleccion = (fechas, conservarPunto) => setSeleccion((s) => {
+    const r = { ...s };
+    fechas.forEach((f) => {
+      if (conservarPunto && r[f]?.puntoId) r[f] = { puntoId: r[f].puntoId };
+      else delete r[f];
+    });
+    return r;
+  });
+
+  const mensajeDe = (e, respaldo) => e?.response?.data?.message || respaldo;
+
+  /**
+   * Deja el dia con esos platos.
+   *
+   * Si el dia ya tiene pedido es un cambio (PUT sobre ese pedido); si no lo
+   * tiene y quedo completo, se crea (POST, el mismo que antes mandaba la
+   * semana entera al confirmar, ahora con un solo dia). Si el plan trae dos
+   * comidas y solo hay una elegida, todavia no se manda nada.
+   */
+  const aplicar = (fecha, menus, texto) => {
+    const info = infoDia(fecha);
+    const antes = menusDe(info, true);
+
+    if (!info.pedido && !completoEn(menus)) {
+      setSeleccion((s) => ({ ...s, [fecha]: { ...s[fecha], menus } }));
+      setUltimo(null);
+      setError('');
+      vibrar.toque();
+      return;
+    }
+
+    setEnviando(true);
+    setSumando(false);
+    setError('');
+    setUltimo(null);
+    setOptimista({ fecha, menus });
+    vibrar.toque();
+
+    const menuTypeIds = idsDe(menus);
+    const puntoId = info.pedido ? info.pedido.deliveryPointId : seleccion[fecha]?.puntoId;
+    const base = { scheduleDate: fecha, menuTypeIds };
+    const llamada = info.pedido
+      ? axios.put(`${baseUrl}order/scheduled`,
+          { orderId: info.pedido.id, menuTypeIds, deliveryPointId: puntoId }, cab)
+      // La direccion solo se manda si el cliente eligio una: el backend usa
+      // la de siempre cuando llega nula.
+      : axios.post(`${baseUrl}order/scheduled`,
+          [puntoId ? { ...base, deliveryPointId: puntoId } : base], cab);
+
+    llamada
+      .then(() => recargar())
+      .then(() => {
+        quitarDeSeleccion([fecha]);
+        vibrar.exito();
+        setUltimo({
+          fecha,
+          texto: texto || (info.pedido
+            ? `Listo. Cambiaste tu pedido del ${nombreDia(fecha)}.`
+            : (doble ? `Listo. Tu almuerzo y tu cena del ${nombreDia(fecha)} quedaron pedidos.` : `Listo. Tu almuerzo del ${nombreDia(fecha)} quedó pedido.`)),
+          tipo: info.pedido ? 'cambio' : 'pedido',
+          antes,
+          /* Si el dia estaba en "no recibe", deshacer lo devuelve ahi. */
+          eraNo: info.estado === 'no',
+        });
+        /* Recien pedido: pasa solo al siguiente dia que falta. */
+        if (!info.pedido) {
+          const faltan = porElegir.map((i) => i.fecha).filter((f) => f !== fecha);
+          const sigue = faltan.find((f) => f > fecha) || faltan[0];
+          if (sigue) saltar(sigue);
+        }
+      })
+      .catch((e) => setError(mensajeDe(e, info.pedido
+        ? 'No pudimos cambiar tu plato. Vuelve a intentarlo.'
+        : 'No pudimos guardar tu pedido. Vuelve a intentarlo.')))
+      .finally(() => { setEnviando(false); setOptimista(null); });
+  };
+
+  /** Tocar un plato. */
+  const elegir = (fecha, comida, id) => {
+    if (enviando || cancelando) return;
+    const info = infoDia(fecha);
+    const menus = menusDe(info);
+    const deLaComida = menus[comida] || {};
+    const cantidad = deLaComida[id] || 0;
+    let nueva;
+
+    if (sumando) {
+      /* El tope de 5 por plato no es una regla del negocio, es un freno al
+         dedo torpe: la cuenta real la lleva el plan. */
+      nueva = { ...deLaComida, [id]: Math.min(5, cantidad + 1) };
+    } else if (cantidad > 0 && Object.keys(deLaComida).length === 1) {
+      /* Ya es el elegido. Con dos comidas y sin pedido todavia, tocarlo de
+         nuevo lo suelta; con pedido no hay nada que hacer: para no recibir
+         esta "No recibir este día". */
+      if (!doble || info.pedido) return;
+      nueva = {};
+    } else {
+      /* Reemplaza. Con dos comidas conserva cuantas porciones llevaba, para
+         que almuerzo y cena sigan parejos. */
+      nueva = { [id]: doble ? Math.max(totalEn(menus, comida), 1) : 1 };
+    }
+    aplicar(fecha, { ...menus, [comida]: nueva });
+  };
+
+  /** Porciones de un plato ya elegido. Cada una gasta un envio del plan. */
+  const ponerCantidad = (fecha, comida, id, cantidad) => {
+    if (enviando || cancelando) return;
+    const info = infoDia(fecha);
+    const menus = menusDe(info);
+    const deLaComida = { ...(menus[comida] || {}) };
+    const n = Math.max(0, Math.min(5, cantidad));
+    if (n === 0) delete deLaComida[id];
+    else deLaComida[id] = n;
+    if (!Object.keys(deLaComida).length) return;
+    const nuevos = { ...menus, [comida]: deLaComida };
+    const total = enviosEn(nuevos);
+    aplicar(fecha, nuevos,
+      `${total} ${total === 1 ? 'porción' : 'porciones'} para el ${nombreDia(fecha)}.`);
   };
 
   /**
    * Cambia a que direccion va un dia ya pedido.
-   *
-   * Es lo unico que los clientes cambian de verdad —se mueven—, asi que no se
-   * ofrece cambiar el plato aunque el endpoint lo permita.
    *
    * menuTypeIds va con los mismos platos: el servidor valida que el menu siga
    * siendo valido para ese dia, y omitirlos haria fallar la peticion.
@@ -309,53 +621,22 @@ const MenuFlow = ({ plan, alTerminar }) => {
       orderId: pedido.id,
       menuTypeIds,
       deliveryPointId: puntoId,
-    }, { headers: { Authorization: `Bearer ${token}` } })
-      .then(() => {
-        setDiaAbierto((d) => (d ? { ...d, deliveryPointId: puntoId } : d));
-        recargar();
-      })
-      .catch((e) => setError(
-        e?.response?.data?.message || 'No pudimos cambiar la dirección de este día.'))
+    }, cab)
+      .then(() => recargar())
+      .then(() => setHoja(null))
+      .catch((e) => setError(mensajeDe(e, 'No pudimos cambiar la dirección de este día.')))
       .finally(() => setGuardandoDir(false));
   };
 
-  /**
-   * Abre el dia ya pedido en la pantalla de platos, con lo que pidio marcado.
-   *
-   * Hasta ahora, un dia programado solo se podia cancelar entero y volver a
-   * pedirlo. Eso bastaba mientras el cliente elegia siempre, pero desde que la
-   * semana puede venir armada por defecto —el domingo por la noche, o cuando
-   * operaciones la prepara— el plato que aparece no lo eligio el, y cancelar
-   * para volver a pedir es un rodeo que ademas le mueve el consumo.
-   */
-  const editarPlatos = (pedido) => {
-    const dia = diasTodos.find((d) => d.localDate === pedido.date);
-    if (!dia) {
-      setError('El menú de ese día ya no está disponible para cambios.');
+  /** La direccion de un dia: sobre el pedido si existe, anotada si aun no. */
+  const elegirDireccion = (info, puntoId) => {
+    if (info.pedido) {
+      if (info.pedido.deliveryPointId !== puntoId) cambiarDireccion(info.pedido, puntoId);
+      else setHoja(null);
       return;
     }
-
-    /* Se precarga lo que pidio, repetidos incluidos: si tenia dos almuerzos,
-       la pantalla se abre con dos. */
-    const menus = {};
-    comidas.forEach((c) => { menus[c] = {}; });
-    (pedido.items || []).forEach((i) => {
-      if (!i?.id || !comidas.includes(i.type)) return;
-      menus[i.type][i.id] = (menus[i.type][i.id] || 0) + 1;
-    });
-
-    setError('');
-    setSeleccion((s) => ({ ...s, [pedido.date]: { menus, puntoId: pedido.deliveryPointId } }));
-    setEditando(pedido);
-    setDiaAbierto(null);
-    setDiaActivo(pedido.date);
-    setPaso(2);
-  };
-
-  const cargarPausas = () => {
-    axios.get(`${baseUrl}plan/pause`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => setPausas(Array.isArray(r.data?.data) ? r.data.data : (r.data || [])))
-      .catch(() => {});
+    setSeleccion((s) => ({ ...s, [info.fecha]: { ...s[info.fecha], puntoId } }));
+    setHoja(null);
   };
 
   const guardarViaje = () => {
@@ -365,8 +646,7 @@ const MenuFlow = ({ plan, alTerminar }) => {
     setError('');
     setAvisoPausa('');
 
-    axios.post(`${baseUrl}plan/pause`, { desde: viaje.desde, hasta: viaje.hasta },
-      { headers: { Authorization: `Bearer ${token}` } })
+    axios.post(`${baseUrl}plan/pause`, { desde: viaje.desde, hasta: viaje.hasta }, cab)
       .then((r) => {
         const d = r.data?.data || r.data || {};
         /* Se le dice exactamente que paso con sus envios y con su
@@ -377,1065 +657,749 @@ const MenuFlow = ({ plan, alTerminar }) => {
         if (d.diasAgregados > 0)
           partes.push(`Tu plan vence ${d.diasAgregados} ${d.diasAgregados === 1 ? 'día' : 'días'} más tarde.`);
         setAvisoPausa(partes.join(' ') || 'Listo, no te enviamos nada esos días.');
-        setPausando(false);
+        setHoja(null);
         setViaje({ desde: '', hasta: '' });
         cargarPausas();
         recargar();
       })
-      .catch((e) => setError(e?.response?.data?.message || 'No pudimos guardar tu viaje.'))
+      .catch((e) => setError(mensajeDe(e, 'No pudimos guardar tu viaje.')))
       .finally(() => setGuardandoPausa(false));
   };
 
   const volviAntes = (pausaId) => {
-    axios.delete(`${baseUrl}plan/pause/${pausaId}`, { headers: { Authorization: `Bearer ${token}` } })
+    axios.delete(`${baseUrl}plan/pause/${pausaId}`, cab)
       .then(() => { setAvisoPausa('Listo, volvemos a prepararte tus días.'); cargarPausas(); recargar(); })
       .catch(() => setError('No pudimos reactivar tu plan.'));
-  };
-
-  /**
-   * Saca el dia de la seleccion al terminar de editarlo.
-   *
-   * Si se quedara, ese dia contaria como "elegido" en la pantalla de la semana
-   * y "Confirmar mi semana" intentaria crearlo de nuevo: el servidor lo
-   * rechazaria por duplicado y el cliente veria un error por algo que ya
-   * estaba bien guardado.
-   */
-  const salirDeEdicion = (fecha) => {
-    setSeleccion((s) => {
-      const resto = { ...s };
-      delete resto[fecha];
-      return resto;
-    });
-    setEditando(null);
-    setPaso(1);
-  };
-
-  /** Guarda el cambio de platos de un dia ya programado. */
-  const guardarPlatos = () => {
-    const s = seleccion[diaActivo];
-    const menuTypeIds = comidas.flatMap((c) =>
-      Object.entries(s?.menus?.[c] || {}).flatMap(
-        ([menuId, cantidad]) => Array(cantidad).fill(Number(menuId))));
-
-    setEnviando(true);
-    setError('');
-
-    axios.put(`${baseUrl}order/scheduled`, {
-      orderId: editando.id,
-      menuTypeIds,
-      deliveryPointId: s?.puntoId,
-    }, { headers: { Authorization: `Bearer ${token}` } })
-      .then(() => {
-        salirDeEdicion(diaActivo);
-        recargar();
-      })
-      .catch((e) => setError(
-        e?.response?.data?.message || 'No pudimos cambiar tu plato. Vuelve a intentarlo.'))
-      .finally(() => setEnviando(false));
   };
 
   // Cancelar devuelve el envio al saldo: el backend descuenta uno del consumo.
   // Solo se puede hasta las 22:00 del dia anterior, la misma regla que aplica
   // al programar; pasada esa hora el servidor responde con su motivo.
   const reprogramarDia = (pedido) => {
+    const fecha = ymd(pedido.date);
+    const antes = menusDe(infoDia(fecha), true);
     setCancelando(true);
     setError('');
-    setAvisoReprog('');
-    axios.post(`${baseUrl}order/reprogram?orderId=${pedido.id}`, null, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    setUltimo(null);
+    axios.post(`${baseUrl}order/reprogram?orderId=${pedido.id}`, null, cab)
+      .then(() => recargar())
       .then(() => {
-        setAvisoReprog(`Listo: el ${moment(pedido.date).format('dddd D')} no te llega nada. `
-          + 'Tu envío volvió a tu saldo y puedes usarlo otro día.');
-        /* Igual que en "No lo quiero": si quedaba una eleccion a medias para
-           ese dia, se va con el pedido. */
-        setSeleccion((sel) => {
-          const limpio = { ...sel };
-          delete limpio[moment(pedido.date).format('YYYY-MM-DD')];
-          return limpio;
+        /* Si quedaba una eleccion a medias para ese dia, se va con el pedido. */
+        quitarDeSeleccion([fecha]);
+        setUltimo({
+          fecha, tipo: 'no', antes, puntoId: pedido.deliveryPointId,
+          texto: `El ${nombreDia(fecha)} no recibes. Tu entrega vuelve a tu saldo.`,
         });
-        setConfirmando(null);
-        setDiaAbierto(null);
-        recargar();
       })
-      .catch((e) => setError(
-        e?.response?.data?.message || 'No pudimos reprogramar este día. Vuelve a intentarlo.'))
+      .catch((e) => setError(mensajeDe(e, 'No pudimos guardar que no recibes este día. Vuelve a intentarlo.')))
       .finally(() => setCancelando(false));
   };
 
-  /* "No quiero este dia" sobre un dia sin pedido. Quien entra por primera
+  /* "No recibir este dia" sobre un dia sin pedido. Quien entra por primera
      vez ve toda la semana por elegir y cree que tiene que pedir todos los
      dias; esto le deja decir que no a uno sin gastar nada de su plan. */
   const marcarSinEnvio = (fecha) => {
     setCancelando(true);
     setError('');
-    setAvisoReprog('');
-    axios.post(`${baseUrl}order/sin-envio?fecha=${fecha}`, null, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    setUltimo(null);
+    axios.post(`${baseUrl}order/sin-envio?fecha=${fecha}`, null, cab)
+      .then(() => recargar())
       .then(() => {
-        setSeleccion((s) => { const r = { ...s }; delete r[fecha]; return r; });
-        setAvisoReprog(`Listo: el ${moment(fecha).format('dddd D')} no te llega nada y no se descuenta de tu plan.`);
-        setPaso(1);
-        recargar();
+        quitarDeSeleccion([fecha]);
+        setUltimo({
+          fecha, tipo: 'no', antes: null,
+          texto: `El ${nombreDia(fecha)} no recibes. No se descuenta de tu plan.`,
+        });
       })
-      .catch((e) => setError(e?.response?.data?.message || 'No pudimos guardar. Vuelve a intentarlo.'))
+      .catch((e) => setError(mensajeDe(e, 'No pudimos guardar. Vuelve a intentarlo.')))
       .finally(() => setCancelando(false));
   };
 
-  /* Mismo plazo que para elegir: hasta las 22:00 de la vispera. */
-  const sePuedeCambiar = (o) => {
-    if (['C', 'F', 'X'].includes(o.status)) return false;
-    const limite = moment(o.date).subtract(1, 'day').startOf('day').hour(HORA_LIMITE);
-    return moment().isBefore(limite);
+  /* Se arrepintio de decir que no: el dia vuelve a estar por elegir, sin
+     crear pedido. */
+  const siQuiero = (fecha) => {
+    setCancelando(true);
+    setError('');
+    setUltimo(null);
+    return axios.delete(`${baseUrl}order/sin-envio?fecha=${fecha}`, cab)
+      .then(() => recargar())
+      .catch((e) => setError(mensajeDe(e, 'No pudimos guardar. Vuelve a intentarlo.')))
+      .finally(() => setCancelando(false));
   };
 
-  const esReprogramado = (fecha) =>
-    reprogramados.some((r) => moment(r).format('YYYY-MM-DD') === moment(fecha).format('YYYY-MM-DD'));
+  /** Deja el dia como estaba antes del ultimo toque. */
+  const deshacer = () => {
+    const u = ultimo;
+    if (!u || enviando || cancelando) return;
+    const pedido = pedidos.find((o) => ymd(o.date) === u.fecha);
+    setUltimo(null);
+    setError('');
+    if (u.fecha !== diaActivo) saltar(u.fecha);
 
-  /* Una fila por dia pedido: tocarla abre el detalle; "Reprogramar" a un lado,
-     con confirmacion en la misma fila para que no se cancele de un toque. */
-  const filaPedido = (o) => {
-    const punto = puntos.find((x) => x.id === o.deliveryPointId);
-    const platos = (o.items || []).map((i) => i?.menu?.name).filter(Boolean).join(' · ');
-    const abierto = sePuedeCambiar(o);
+    let llamada;
+    if (u.tipo === 'pedido' && pedido) {
+      /* Recien creado: se cancela, y como cancelar deja el dia marcado como
+         "no recibe", se le quita esa marca para que vuelva a "Elegir". */
+      llamada = axios.post(`${baseUrl}order/reprogram?orderId=${pedido.id}`, null, cab)
+        .then(() => (u.eraNo ? null
+          : axios.delete(`${baseUrl}order/sin-envio?fecha=${u.fecha}`, cab).catch(() => {})));
+    } else if (u.tipo === 'cambio' && pedido) {
+      llamada = axios.put(`${baseUrl}order/scheduled`,
+        { orderId: pedido.id, menuTypeIds: idsDe(u.antes), deliveryPointId: pedido.deliveryPointId }, cab);
+    } else if (u.tipo === 'no' && u.antes) {
+      const base = { scheduleDate: u.fecha, menuTypeIds: idsDe(u.antes) };
+      llamada = axios.post(`${baseUrl}order/scheduled`,
+        [u.puntoId ? { ...base, deliveryPointId: u.puntoId } : base], cab);
+    } else if (u.tipo === 'no') {
+      llamada = axios.delete(`${baseUrl}order/sin-envio?fecha=${u.fecha}`, cab);
+    } else return;
 
-    if (confirmando === o.id) {
-      return (
-        <div className="afPedidoFila afPedidoFila--confirmar" key={o.id}>
-          <span className="afPedidoFila__txt">
-            <b>¿Reprogramar el {moment(o.date).format('dddd D')}?</b>
-            <small>Ese día no te llega nada y el envío vuelve a tu saldo.</small>
-          </span>
-          <span className="afPedidoFila__acciones">
-            <button type="button" className="afMenu__mini afMenu__mini--si"
-              disabled={cancelando} onClick={() => reprogramarDia(o)}>
-              {cancelando ? '…' : 'Sí'}
-            </button>
-            <button type="button" className="afMenu__mini" onClick={() => setConfirmando(null)}>
-              No
-            </button>
-          </span>
-        </div>
-      );
-    }
-
-    return (
-      <div className="afPedidoFila" key={o.id}>
-        <motion.button type="button" className="afPedidoFila__abrir"
-          onClick={() => { setError(''); setDiaAbierto(o); }} {...alToque}>
-          <span className="afPedidoFila__txt">
-            <b>{moment(o.date).format('dddd D')}</b>
-            <small>{platos}{punto ? ` · ${punto.name || punto.address}` : ''}</small>
-          </span>
-        </motion.button>
-        {abierto
-          ? <button type="button" className="afMenu__mini"
-              onClick={() => { setError(''); setAvisoReprog(''); setConfirmando(o.id); }}>
-              Reprogramar
-            </button>
-          : <span className="afPedidoFila__ir">›</span>}
-      </div>
-    );
+    setEnviando(true);
+    llamada
+      .then(() => recargar())
+      .catch((e) => setError(mensajeDe(e, 'No pudimos deshacerlo. Vuelve a intentarlo.')))
+      .finally(() => setEnviando(false));
   };
 
-  const tarjetaReprogramados = reprogramados.length > 0 && (
-    <Bloque>
-      <div className="afCard">
-        <div className="afCard__head"><span className="afCard__title">Reprogramaste</span></div>
-        {reprogramados.map((f) => (
-          <div className="afSrow" key={f}>
-            <span>{moment(f).format('dddd D')}</span>
-            <b className="afMenu__cancelado">Cancelado · envío devuelto</b>
-          </div>
-        ))}
-      </div>
-    </Bloque>
-  );
-
-  /* "Me voy de viaje" va a un lado y al final: lo del dia a dia es
-     reprogramar un dia puntual, el viaje es para rangos largos. */
-  const viajeUI = (
-        <Bloque>
-          {!pausando ?
-            <button type="button" className="afMenu__viaje" onClick={() => { setPausando(true); setAvisoPausa(''); }}>
-              Me voy de viaje
-            </button>
-          :
-            <div className="afCard">
-              <div className="afCard__head"><span className="afCard__title">¿Qué días no estarás?</span></div>
-              <p className="afMenu__nota afMenu__nota--suelta">
-                No te preparamos nada esos días, te devolvemos los envíos que ya
-                estuvieran programados y tu plan vence más tarde.
-              </p>
-              <div className="afViaje">
-                <label>
-                  Desde
-                  <input type="date" value={viaje.desde}
-                    min={moment().add(1, 'day').format('YYYY-MM-DD')}
-                    onChange={(e) => setViaje((v) => ({ ...v, desde: e.target.value }))} />
-                </label>
-                <label>
-                  Hasta
-                  <input type="date" value={viaje.hasta}
-                    min={viaje.desde || moment().add(1, 'day').format('YYYY-MM-DD')}
-                    onChange={(e) => setViaje((v) => ({ ...v, hasta: e.target.value }))} />
-                </label>
-              </div>
-              <motion.button type="button" className="afBtn afBtn--mint"
-                disabled={guardandoPausa} onClick={guardarViaje} {...alToque}>
-                {guardandoPausa ? 'Guardando…' : 'Avisar mi viaje'}
-              </motion.button>
-              <button type="button" className="afBtn afBtn--fantasma" onClick={() => setPausando(false)}>
-                Volver
-              </button>
-            </div>
-          }
-        </Bloque>
-  );
-
-  /* Desde el inicio del app se toca un dia y "Elegir mi plato del viernes":
-     llega con ese dia y se abre directo en sus platos, sin pasar por la
-     lista de la semana. Una sola vez: al volver se ve la semana. */
-  const location = useLocation();
-  const diaPedido = location.state?.dia;
-  const diaYaAbierto = useRef(false);
-  useEffect(() => {
-    if (!diaPedido || diaYaAbierto.current || dias === null) return;
-    diaYaAbierto.current = true;
-    if (dias.some((d) => d.localDate === diaPedido)) {
-      setDiaActivo(diaPedido);
-      setPaso(2);
-    }
-  }, [dias, diaPedido]);
-
-  if (dias === null) {
-    return (
-      <div className="afPanel">
-        <Skeleton variant="text" width="60%" height={38} />
-        <Skeleton variant="rounded" height={110} sx={{ borderRadius: '20px', mt: 2 }} />
-        <Skeleton variant="rounded" height={70} sx={{ borderRadius: '18px', mt: 1.5 }} />
-      </div>
-    );
-  }
-
-  /* ---------- detalle de un dia ya pedido ---------- */
-  if (diaAbierto) {
-    const punto = puntos.find((x) => x.id === diaAbierto.deliveryPointId);
-
-    /* Los platos con su comida delante y no todos pegados con puntos.
-       Un cliente de almuerzo y cena veia el mismo nombre dos veces seguidas
-       —el menu del dia es el mismo para las dos— y parecia un error del
-       sistema en vez de su almuerzo y su cena. */
-    const porTipo = [];
-    (diaAbierto.items || []).forEach((i) => {
-      if (!i?.menu?.name) return;
-      porTipo.push({ tipo: i.type, nombre: i.menu.name });
+  /* ---------- "Elegir por mi": el primer plato de cada dia que falta ---------- */
+  const porMi = porElegir.map((i) => {
+    const previos = seleccion[i.fecha]?.menus || {};
+    const menus = {};
+    const nombres = [];
+    comidas.forEach((c, k) => {
+      const lista = platosDe(i.carta, c);
+      if (totalEn(previos, c) > 0) menus[c] = previos[c];
+      else {
+        /* Con dos comidas, la segunda toma el siguiente plato de la carta
+           para no repetir lo mismo en el almuerzo y en la cena. */
+        const p = lista[Math.min(k, lista.length - 1)];
+        if (p) menus[c] = { [p.id]: 1 };
+      }
+      Object.keys(menus[c] || {}).forEach((id) => {
+        const p = lista.find((x) => String(x.id) === String(id));
+        if (p?.menu?.name) nombres.push(doble ? `${mayus(NOMBRE_COMIDA[c] || c)}: ${p.menu.name}` : p.menu.name);
+      });
     });
-    const ORDEN = ['lunch', 'dinner', 'breakfast', 'starter', 'snacks', 'drinks'];
-    porTipo.sort((a, b) => ORDEN.indexOf(a.tipo) - ORDEN.indexOf(b.tipo));
+    return { fecha: i.fecha, menus, nombres };
+  }).filter((x) => completoEn(x.menus));
+  const topePorMi = (enviosRestantes === null || plan?.credits)
+    ? porMi.length
+    : Math.max(0, Math.min(porMi.length, enviosRestantes));
+  const porMiPedir = porMi.slice(0, topePorMi);
 
-    /* Cerrado se mide por la HORA, no por si el pedido ya tiene motorizado.
-       Asignar la ruta es trabajo interno y ocurre la noche anterior: cuando
-       eso marcaba el pedido, el cliente abria el lunes desde el sabado y leia
-       que ya habia salido de cocina. La regla real es la misma que para
-       pedir: hasta las 22:00 del dia anterior. */
-    const limite = moment(diaAbierto.date).subtract(1, 'day').startOf('day').hour(HORA_LIMITE);
-    const finalizado = ['C', 'F', 'X'].includes(diaAbierto.status);
-    const cerrado = finalizado || moment().isSameOrAfter(limite);
+  const pedirPorMi = () => {
+    if (!porMiPedir.length || enviando) return;
+    setEnviando(true);
+    setError('');
+    setUltimo(null);
+    const lote = porMiPedir.map((x) => {
+      const base = { scheduleDate: x.fecha, menuTypeIds: idsDe(x.menus) };
+      const puntoId = seleccion[x.fecha]?.puntoId;
+      return puntoId ? { ...base, deliveryPointId: puntoId } : base;
+    });
+    axios.post(`${baseUrl}order/scheduled`, lote, cab)
+      .then(() => recargar())
+      .then(() => {
+        quitarDeSeleccion(porMiPedir.map((x) => x.fecha));
+        vibrar.exito();
+        setHoja(null);
+        setUltimo({
+          fecha: porMiPedir[0].fecha, tipo: 'lote', antes: null,
+          texto: porMiPedir.length === 1
+            ? `Pedido para el ${nombreDia(porMiPedir[0].fecha)}.`
+            : `Pedimos ${porMiPedir.length} días por ti. Puedes cambiar cualquiera.`,
+        });
+      })
+      .catch((e) => setError(mensajeDe(e, 'No pudimos guardar tu semana. Vuelve a intentarlo.')))
+      .finally(() => setEnviando(false));
+  };
 
+  const cerrarHoja = useCallback(() => { setHoja(null); setError(''); }, []);
+
+  /* ---------- cargando ---------- */
+  /* Tambien mientras no se sabe en que dia abrir: asi no se ve un dia y, un
+     instante despues, otro. */
+  if (dias === null || (diaActivo === null && !falloCarga)) {
     return (
-      <Cascada className="afPanel">
-        <Bloque>
-          <button type="button" className="afVolver" onClick={() => setDiaAbierto(null)}>
-            ← Tu semana
-          </button>
-        </Bloque>
-        <Bloque>
-          <h1 className="afPanel__titular">{moment(diaAbierto.date).format('dddd D')}</h1>
-        </Bloque>
-        <Bloque>
-          <p className="afMenu__ayuda">
-            Llega entre las {REPARTO.desde} y la {REPARTO.hasta}
-          </p>
-        </Bloque>
-
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head"><span className="afCard__title">Lo que pediste</span></div>
-            {porTipo.length === 0 &&
-              <div className="afSrow"><span>Plato</span><b>—</b></div>}
-            {porTipo.map((p, i) => (
-              <div className="afSrow" key={i}>
-                <span>{NOMBRE_COMIDA[p.tipo] ? NOMBRE_COMIDA[p.tipo].charAt(0).toUpperCase() + NOMBRE_COMIDA[p.tipo].slice(1) : (ETIQUETA_EXTRA[p.tipo] || 'Plato')}</span>
-                <b>{p.nombre}</b>
-              </div>
+      <div className="nPant mnu" aria-busy="true" aria-label="Cargando tu menú">
+        <span className="nMenta mnu__menta" aria-hidden="true" />
+        <div className="mnu__dentro">
+          <span className="mnu__hueso" style={{ width: '46%', height: 16 }} />
+          <span className="mnu__hueso" style={{ width: '78%', height: 40, marginTop: 14 }} />
+          <div className="mnu__dias" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span className="mnu__hueso mnu__hueso--dia" key={i} />
             ))}
-            {punto &&
-              <div className="afSrow">
-                <span>Entrega</span>
-                <span className="afTag"><Ico d={PIN} c="afTag__ic" />{punto.name || punto.address}</span>
-              </div>}
           </div>
-        </Bloque>
-
-        {error && <Bloque><p className="afMenu__error">{error}</p></Bloque>}
-
-        {cerrado ?
-          <Bloque>
-            <div className="afCard">
-              <p className="afMenu__nota afMenu__nota--suelta">
-                {finalizado
-                  ? 'Este pedido ya se cerró y no se puede cambiar.'
-                  : `Se cerró ayer a las ${HORA_LIMITE_TEXTO} Para cambios, escríbenos.`}
-              </p>
-            </div>
-          </Bloque>
-        :
-          <>
-            {/* Primero de todo: es lo que viene a hacer quien abre un dia que
-                no eligio el. La direccion y la cancelacion quedan debajo. */}
-            <Bloque>
-              <motion.button type="button" className="afBtn afBtn--mint"
-                onClick={() => editarPlatos(diaAbierto)} {...alToque}>
-                Cambiar mi plato
-              </motion.button>
-            </Bloque>
-
-            {puntos.length > 1 &&
-              <>
-                <Bloque><p className="afMenu__label">Cambiar a otra dirección</p></Bloque>
-                {puntos.map((d) => (
-                  <Bloque key={d.id}>
-                    <motion.button type="button"
-                      className={`afDir${diaAbierto.deliveryPointId === d.id ? ' afDir--sel' : ''}`}
-                      onClick={() => diaAbierto.deliveryPointId !== d.id && cambiarDireccion(diaAbierto, d.id)}
-                      disabled={guardandoDir} {...alToque}>
-                      <span className="afDir__ico"><Ico d={PIN} /></span>
-                      <span className="afDir__txt">
-                        <b>{d.name || d.address}</b>
-                        <small>{d.name ? d.address : d.description}</small>
-                      </span>
-                      <span className="afPlato__tick" />
-                    </motion.button>
-                  </Bloque>
-                ))}
-                <Bloque>
-                  <p className="afMenu__nota">
-                    {guardandoDir ? 'Guardando…' : 'El cambio se guarda al tocar.'}
-                  </p>
-                </Bloque>
-              </>
-            }
-
-            <Bloque>
-              <div className="afCard">
-                <p className="afMenu__nota afMenu__nota--suelta">
-                  Si reprogramas, ese día no te llega nada y tu envío vuelve al saldo
-                  para que lo uses otro día. No se pierde.
-                </p>
-              </div>
-            </Bloque>
-            <Bloque>
-              <motion.button type="button" className="afBtn afBtn--fantasma"
-                onClick={() => reprogramarDia(diaAbierto)} disabled={cancelando} {...alToque}>
-                {cancelando ? 'Reprogramando…' : 'Reprogramar este día'}
-              </motion.button>
-            </Bloque>
-          </>
-        }
-      </Cascada>
-    );
-  }
-
-  /* ---------- la semana: lo pedido y lo que falta ---------- */
-  /* La pantalla de "semana completa" NO puede adelantarse a la edicion.
-     Quien esta cambiando el plato de un dia ya pedido tiene, por definicion,
-     ese dia fuera de la lista de dias por elegir; con la semana entera pedida
-     esa lista queda vacia y este corte se llevaba por delante al paso 2: el
-     cliente tocaba "Cambiar mi plato", la pantalla volvia a "Tu semana esta
-     completa" y parecia que el boton no hacia nada. */
-  if (dias.length === 0 && !editando) {
-    return (
-      <Cascada className="afPanel">
-        <Bloque><h1 className="afPanel__titular">Tu semana está completa</h1></Bloque>
-        <Bloque>
-          <p className="afMenu__ayuda">
-            Ya elegiste todos los días disponibles. Los viernes publicamos el menú
-            de la próxima semana y te avisamos.
-          </p>
-        </Bloque>
-
-        {error && <Bloque><p className="afMenu__error">{error}</p></Bloque>}
-        {avisoPausa && <Bloque><p className="afMenu__ok">{avisoPausa}</p></Bloque>}
-        {avisoReprog && <Bloque><p className="afMenu__ok">{avisoReprog}</p></Bloque>}
-
-        {/* Tambien aqui: quien tiene la semana entera pedida es justo quien
-            necesita avisar que se va, y antes este boton solo existia en la
-            pantalla de elegir dias —a la que ya no llega—. */}
-        {pausas.length > 0 &&
-          <Bloque>
-            <div className="afCard">
-              <div className="afCard__head"><span className="afCard__title">No estarás</span></div>
-              {pausas.map((p) => (
-                <div className="afSrow" key={p.id}>
-                  <span>{moment(p.start_date).format('D MMM')} al {moment(p.end_date).format('D MMM')}</span>
-                  <button type="button" className="afMenu__mini" onClick={() => volviAntes(p.id)}>
-                    Ya volví
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Bloque>
-        }
-
-
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head">
-              <span className="afCard__title">Lo que pediste</span>
-              <span className="afCard__label">{pedidos.length} días</span>
-            </div>
-            {pedidos.length === 0 &&
-              <p className="afMenu__nota afMenu__nota--suelta">
-                Todavía no tienes pedidos esta semana.
-              </p>}
-            {pedidos.map(filaPedido)}
-          </div>
-        </Bloque>
-
-        {tarjetaReprogramados}
-        {viajeUI}
-      </Cascada>
-    );
-  }
-
-  /* ---------- paso 1: que dia ---------- */
-  /* Una sola lista con toda la semana.
-     Antes habia tres tarjetas —"Dias disponibles", "Ya pediste" y
-     "Reprogramaste"— y el mismo dia podia aparecer en una u otra segun su
-     estado: el cliente tenia que juntar las piezas para saber que le llega
-     cada dia. Aqui cada fila es un dia, con lo que tiene y lo que puede
-     hacer. */
-  const diasSemana = (() => {
-    const mapa = new Map();
-    (dias || []).forEach((d) => mapa.set(d.localDate, { fecha: d.localDate }));
-    (pedidos || []).forEach((o) => {
-      const f = moment(o.date).format('YYYY-MM-DD');
-      mapa.set(f, { ...(mapa.get(f) || {}), fecha: f, pedido: o });
-    });
-    (reprogramados || []).forEach((r) => {
-      const f = moment(r).format('YYYY-MM-DD');
-      mapa.set(f, { ...(mapa.get(f) || {}), fecha: f, sinEnvio: true });
-    });
-    return [...mapa.values()].sort((a, b) => a.fecha.localeCompare(b.fecha));
-  })();
-
-  const platosDelPedido = (o) =>
-    (o.items || []).map((i) => i?.menu?.name).filter(Boolean).join(' · ');
-
-  if (paso === 1) return (
-    <Cascada className="afPanel afPanel--menu">
-      {/* Va antes del titular a proposito: lo primero que tiene que registrar
-          el colaborador al abrir es quien le esta pagando el almuerzo. */}
-      {empresa?.corporativo && <Bloque><FranjaEmpresa empresa={empresa} /></Bloque>}
-
-      <Bloque><h1 className="afPanel__titular">Tu semana</h1></Bloque>
-      <Bloque>
-        <p className="afMenu__ayuda">
-          Cada día puede llegarte un almuerzo. Elige el plato del día que quieras
-          y marca los que no.
-          {/* Dentro de su propio <span> y no suelto entre el texto: un nodo
-              de texto condicional pegado a otro es justo lo que React no
-              puede reconciliar si el traductor del navegador toco el parrafo. */}
-          {restan && <span> Los cambios para mañana cierran hoy a las {HORA_LIMITE_TEXTO}</span>}
-        </p>
-      </Bloque>
-
-      <div className="afMenu__col afMenu__col--principal">
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head">
-              <span className="afCard__title">Tus días</span>
-              <span className="afCard__label">
-                {diasSemana.filter((d) => d.pedido).length} con plato elegido
+          {[0, 1, 2].map((i) => (
+            <div className="mnu__plato" key={i}>
+              <span className="mnu__platoBtn">
+                <span className="mnu__hueso mnu__hueso--foto" />
+                <span className="mnu__platoTxt">
+                  <span className="mnu__hueso" style={{ width: '82%', height: 15 }} />
+                  <span className="mnu__hueso" style={{ width: '54%', height: 12, marginTop: 8 }} />
+                </span>
               </span>
             </div>
-
-            {diasSemana.length === 0 &&
-              <p className="afMenu__nota afMenu__nota--suelta">
-                No hay días por elegir ahora. Los viernes publicamos el menú de la
-                próxima semana y te avisamos.
-              </p>
-            }
-
-            {diasSemana.map(({ fecha, pedido, sinEnvio }) => {
-              const elegidoSinGuardar = !pedido && diaCompleto(fecha);
-              const abierto = pedido ? sePuedeCambiar(pedido) : true;
-              return (
-                <div className={`afDiaFila${pedido ? ' afDiaFila--listo' : ''}${sinEnvio && !elegidoSinGuardar ? ' afDiaFila--sin' : ''}`} key={fecha}>
-                  <div className="afDiaFila__fecha">
-                    <b>{moment(fecha).format('ddd')}</b>
-                    <span>{moment(fecha).format('D')}</span>
-                  </div>
-
-                  <div className="afDiaFila__txt">
-                    {pedido &&
-                      <>
-                        <b>{platosDelPedido(pedido) || 'Plato elegido'}</b>
-                        <small>Te llega ese día entre las {REPARTO.desde} y la {REPARTO.hasta}</small>
-                      </>
-                    }
-                    {/* Si ya eligio plato, eso es lo que manda: aunque el dia
-                        siga marcado como "no recibo", la eleccion pendiente es
-                        lo ultimo que hizo y lo que va a pasar al confirmar. */}
-                    {elegidoSinGuardar &&
-                      <>
-                        <b>Plato elegido, falta confirmar</b>
-                        <small>Confirma tu semana para que entre a cocina.</small>
-                      </>
-                    }
-                    {!pedido && !elegidoSinGuardar && sinEnvio &&
-                      <>
-                        <b>No recibes este día</b>
-                        <small>Tu envío volvió a tu saldo. Puedes usarlo otro día.</small>
-                      </>
-                    }
-                    {!pedido && !elegidoSinGuardar && !sinEnvio &&
-                      <>
-                        <b>Sin elegir</b>
-                        <small>Elige tu plato o marca que no quieres este día.</small>
-                      </>
-                    }
-                  </div>
-
-                  <div className="afDiaFila__acciones">
-                    {pedido && abierto && confirmando !== pedido.id &&
-                      <>
-                        <button type="button" className="afMenu__mini"
-                          onClick={() => { setError(''); editarPlatos(pedido); }}>
-                          Cambiar plato
-                        </button>
-                        <button type="button" className="afMenu__mini afMenu__mini--no"
-                          onClick={() => { setError(''); setAvisoReprog(''); setConfirmando(pedido.id); }}>
-                          No recibir
-                        </button>
-                      </>
-                    }
-
-                    {pedido && confirmando === pedido.id &&
-                      <span className="afDiaFila__confirma">
-                        <b>¿Seguro?</b>
-                        <button type="button" className="afMenu__mini afMenu__mini--si"
-                          disabled={cancelando} onClick={() => reprogramarDia(pedido)}>
-                          {cancelando ? '…' : 'Sí, no lo quiero'}
-                        </button>
-                        <button type="button" className="afMenu__mini" onClick={() => setConfirmando(null)}>
-                          Volver
-                        </button>
-                      </span>
-                    }
-
-                    {pedido && !abierto &&
-                      <span className="afDiaFila__cerrado">Ya en cocina</span>
-                    }
-
-                    {!pedido &&
-                      <>
-                        <button type="button" className="afMenu__mini afMenu__mini--si"
-                          onClick={() => { setError(''); setAvisoReprog(''); setDiaActivo(fecha); setPaso(2); }}>
-                          {elegidoSinGuardar ? 'Cambiar' : sinEnvio ? 'Sí quiero este día' : 'Elegir plato'}
-                        </button>
-                        {!sinEnvio && !elegidoSinGuardar &&
-                          <button type="button" className="afMenu__mini afMenu__mini--no"
-                            disabled={cancelando} onClick={() => marcarSinEnvio(fecha)}>
-                            No lo quiero
-                          </button>
-                        }
-                      </>
-                    }
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Bloque>
-
-        {avisoPausa && <Bloque><p className="afMenu__ok">{avisoPausa}</p></Bloque>}
-        {avisoReprog && <Bloque><p className="afMenu__ok">{avisoReprog}</p></Bloque>}
-        {error && !diaAbierto && <Bloque><p className="afMenu__error">{error}</p></Bloque>}
+          ))}
+        </div>
       </div>
-
-      <div className="afMenu__col afMenu__col--lateral">
-        {elegidos.length > 0 &&
-          <Bloque>
-            {/* El aviso va ANTES del boton y no debajo: lo que hay que
-                entender es que todavia no esta pedido. */}
-            <p className="afMenu__pendiente">
-              <b>Todavía no está pedido.</b> Elegiste {elegidos.length} día{elegidos.length === 1 ? '' : 's'};
-              falta confirmar para que entre a cocina.
-            </p>
-            <motion.button type="button" className="afBtn" onClick={() => setPaso(3)} {...alToque}>
-              {elegidos.length === 1 ? 'Confirmar mi día' : `Confirmar mis ${elegidos.length} días`}
-            </motion.button>
-          </Bloque>
-        }
-
-        {/* Eligio algo pero le falta la otra comida del dia. Sin esto la
-            pantalla simplemente no muestra el boton y el cliente no sabe por que. */}
-        {elegidos.length === 0 && aMedias.length > 0 &&
-          <Bloque>
-            <p className="afMenu__pendiente afMenu__pendiente--falta">
-              Te falta completar {aMedias.length === 1 ? 'un día' : `${aMedias.length} días`}:
-              tu plan trae {comidas.map((c) => NOMBRE_COMIDA[c] || c).join(' y ')} el mismo día
-              y hay que elegir los dos para poder confirmar.
-            </p>
-          </Bloque>
-        }
-
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head"><span className="afCard__title">Cómo funciona</span></div>
-            <p className="afMenu__nota afMenu__nota--suelta">
-              <b>No tienes que pedir todos los días.</b> El día que marques
-              “No lo quiero” no se prepara y no gasta envío de tu plan.
-            </p>
-            <p className="afMenu__nota afMenu__nota--suelta">
-              Si una semana no eliges nada, te la armamos nosotros con el plato
-              del día para que no te quedes sin almuerzo.
-            </p>
-            <p className="afMenu__nota afMenu__nota--suelta">
-              Tu snack y tu bebida vienen con el plan: no hay que elegirlos.
-            </p>
-          </div>
-        </Bloque>
-
-        {pausas.length > 0 &&
-          <Bloque>
-            <div className="afCard">
-              <div className="afCard__head"><span className="afCard__title">No estarás</span></div>
-              {pausas.map((p) => (
-                <div className="afSrow" key={p.id}>
-                  <span>{moment(p.start_date).format('D MMM')} al {moment(p.end_date).format('D MMM')}</span>
-                  <button type="button" className="afMenu__mini" onClick={() => volviAntes(p.id)}>
-                    Ya volví
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Bloque>
-        }
-
-        {viajeUI}
-      </div>
-
-      {/* Barra fija abajo mientras haya algo sin confirmar.
-          El boton vivia en la columna lateral: en el telefono queda debajo de
-          la lista de dias, o sea fuera de la pantalla mientras el cliente
-          elige. Aqui no se puede perder de vista. */}
-      {elegidos.length > 0 && paso === 1 &&
-        <div className="afConfirmaFija">
-          <span>
-            <b>{elegidos.length} día{elegidos.length === 1 ? '' : 's'} sin confirmar</b>
-            <small>Si sales ahora, no queda pedido</small>
-          </span>
-          <button type="button" onClick={() => setPaso(3)}>Confirmar</button>
-        </div>
-      }
-    </Cascada>
-  );
-
-  /* ---------- paso 2: plato y direccion ---------- */
-  if (paso === 2) {
-    /* Se busca en la lista completa: cuando el cliente esta CAMBIANDO el plato
-       de un dia ya pedido, ese dia no aparece en la de dias por elegir. */
-    const dia = diasTodos.find((d) => d.localDate === diaActivo)
-             || dias.find((d) => d.localDate === diaActivo);
-    const sel = seleccion[diaActivo] || {};
-
-    // Las calorias del dia: cada porcion suma, tambien la segunda del mismo plato.
-    const kcal = comidas.reduce((suma, c) => suma + platosDe(dia, c).reduce(
-      (s, p) => s + prop(p.menu, 'calorias') * cantidadDe(diaActivo, c, p.id), 0), 0);
-    const meta = plan?.needDay?.bmr ? Math.round(plan.needDay.bmr) : null;
-
-    const marcar = (campo, valor) =>
-      setSeleccion((s) => ({ ...s, [diaActivo]: { ...s[diaActivo], [campo]: valor } }));
-
-    /**
-     * Pone en cuantas porciones queda ese plato. Cero lo saca de la eleccion.
-     *
-     * El tope de 5 por plato no es una regla del negocio, es un freno al dedo
-     * torpe: la cuenta real la lleva el plan y cada porcion le gasta un envio.
-     */
-    const ponerCantidad = (comida, id, cantidad) =>
-      setSeleccion((s) => {
-        const delDia = s[diaActivo] || {};
-        const deLaComida = { ...(delDia.menus?.[comida] || {}) };
-        const n = Math.max(0, Math.min(5, cantidad));
-        if (n === 0) delete deLaComida[id];
-        else deLaComida[id] = n;
-        return { ...s, [diaActivo]: { ...delDia, menus: { ...(delDia.menus || {}), [comida]: deLaComida } } };
-      });
-
-    const faltan = comidas.filter((c) => totalDe(diaActivo, c) === 0);
-    /* Las que estan elegidas pero por debajo de otra: ahi el cliente ya
-       entendio como funciona y solo le falta emparejar. */
-    const cojas = desparejas(diaActivo).filter((c) => !faltan.includes(c));
-    const listo = faltan.length === 0 && cojas.length === 0;
-
-    return (
-      <Cascada className="afPanel afPanel--menu">
-        {!editando &&
-          <Bloque>
-            <button type="button" className="afVolver" onClick={() => { setError(''); setPaso(1); }}>
-              ← Tus días
-            </button>
-          </Bloque>
-        }
-        <Bloque><p className="afMenu__paso">Paso 2 de 3</p></Bloque>
-        <Bloque>
-          <h1 className="afPanel__titular">{moment(diaActivo).format('dddd D')}</h1>
-        </Bloque>
-        {/* El horario sale de REPARTO, no escrito a mano. Aqui decia "entre
-            14:00 y 16:00", un rango inventado que contradecia al resto de la
-            app —el panel y los avisos ya usaban la constante— y prometia al
-            cliente una hora que la operacion no cumple. */}
-        <Bloque>
-          <p className="afMenu__ayuda">
-            Llega entre las {REPARTO.desde} y la {REPARTO.hasta}
-          </p>
-        </Bloque>
-
-        {/* En computadora: los platos a la izquierda y, a la derecha, a donde
-            va, como queda el dia y el boton de guardar —siempre a la vista,
-            sin bajar—. En el telefono es la misma lista de siempre. */}
-        <div className="afMenu__col afMenu__col--principal">
-        {/* Un bloque por comida del plan. Con un solo principal se ve igual que
-            antes; con dos aparecen "Tu almuerzo" y "Tu cena". */}
-        {comidas.map((comida) => {
-          const platos = platosDe(dia, comida);
-          return (
-            <React.Fragment key={comida}>
-              <Bloque>
-                <p className="afMenu__label">
-                  {comidas.length > 1
-                    ? `Tu ${NOMBRE_COMIDA[comida] || comida}`
-                    : 'Elige tu plato'}
-                  {totalDe(diaActivo, comida) > 1 &&
-                    ` · ${totalDe(diaActivo, comida)} porciones`}
-                </p>
-              </Bloque>
-
-              {platos.length === 0 &&
-                <Bloque>
-                  <p className="afMenu__nota afMenu__nota--suelta">
-                    Todavía no hay {NOMBRE_COMIDA[comida] || comida} publicada para este día.
-                  </p>
-                </Bloque>
-              }
-
-              {platos.map((p) => {
-                const cantidad = cantidadDe(diaActivo, comida, p.id);
-                return (
-                  <Bloque key={comida + '-' + p.id}>
-                    <div className={`afPlato${cantidad ? ' afPlato--sel' : ''}`}>
-                      {/* Tocar el plato lo elige o lo saca. El contador solo
-                          aparece cuando ya esta elegido: quien pide uno —casi
-                          todos— no tiene que ver ningun control nuevo. */}
-                      <motion.button type="button" className="afPlato__cuerpo"
-                        onClick={() => ponerCantidad(comida, p.id, cantidad ? 0 : 1)} {...alToque}>
-                        <FotoPlato menu={p.menu} tipo={comida} />
-                        <span className="afPlato__txt">
-                          <b>{p.menu.name}</b>
-                          <small>
-                            {prop(p.menu, 'calorias')} kcal · {prop(p.menu, 'proteinas')} P
-                            · {prop(p.menu, 'carbo')} C · {prop(p.menu, 'grasas')} G
-                          </small>
-                        </span>
-                        <span className="afPlato__tick" />
-                      </motion.button>
-
-                      {cantidad > 0 &&
-                        <div className="afCant">
-                          <button type="button" className="afCant__btn"
-                            aria-label={`Quitar una porción de ${p.menu.name}`}
-                            onClick={() => ponerCantidad(comida, p.id, cantidad - 1)}>−</button>
-                          <span className="afCant__n">
-                            {cantidad} {cantidad === 1 ? 'porción' : 'porciones'}
-                          </span>
-                          <button type="button" className="afCant__btn"
-                            aria-label={`Agregar una porción de ${p.menu.name}`}
-                            disabled={cantidad >= 5}
-                            onClick={() => ponerCantidad(comida, p.id, cantidad + 1)}>+</button>
-                        </div>
-                      }
-                    </div>
-                  </Bloque>
-                );
-              })}
-            </React.Fragment>
-          );
-        })}
-
-        {/* Lo que viene fijo con el plan.
-            Antes solo se leia "tu snack y tu bebida vienen con el plan", sin
-            decir cuales, y encima en la pantalla anterior —donde todavia no
-            hay un dia elegido, asi que no se podia saber—. Como la bebida y
-            el snack ya estan programados por dia, mostrarlos es gratis y
-            "Refresco de Jamaica" da mas ganas que una frase generica. */}
-        {(() => {
-          /* Lo que acompana al plato, segun SU plan: los extras que trae el
-             paquete mas los adicionales que se le hayan marcado en el panel.
-             No se puede listar lo que ese dia esta programado y ya: la entrada
-             del dia es del paquete de una empresa, y mostrarsela a todos seria
-             ofrecer algo que no les llega. */
-          const suyos = [
-            ...(plan?.consumption?.extraBenefits || []),
-            ...(plan?.consumption?.additional || []),
-          ];
-          const fijos = [...new Set(suyos)]
-            .flatMap((t) => platosDe(dia, t))
-            .filter((x) => !comidas.includes(x.type));
-          if (!fijos.length) return null;
-          return (
-            <>
-              <Bloque><p className="afMenu__label">Incluido este día</p></Bloque>
-              {fijos.map((x) => (
-                <Bloque key={'fijo-' + x.id}>
-                  <div className="afPlato afPlato--fijo">
-                    <FotoPlato menu={x.menu} tipo={x.type} />
-                    <span className="afPlato__txt">
-                      <b>{x.menu.name}</b>
-                      <small>{prop(x.menu, 'calorias')} kcal · viene con tu plan</small>
-                    </span>
-                  </div>
-                </Bloque>
-              ))}
-            </>
-          );
-        })()}
-
-        </div>
-
-        <div className="afMenu__col afMenu__col--lateral">
-        {/* Arriba, antes de los platos: quien no quiere este dia no tiene que
-            recorrer la carta para descubrir que puede decir que no. */}
-        {!editando &&
-          <Bloque>
-            {esReprogramado(diaActivo) ?
-              <p className="afMenu__nota afMenu__nota--suelta">
-                Marcaste que no quieres este día. Si eliges un plato, vuelve a quedar activo.
-              </p>
-            :
-              <button type="button" className="afMenu__noDia"
-                disabled={cancelando} onClick={() => marcarSinEnvio(diaActivo)}>
-                {cancelando ? 'Guardando…' : 'No quiero este día'}
-              </button>
-            }
-          </Bloque>
-        }
-
-
-        <>
-            <Bloque><p className="afMenu__label">Entregar este día en</p></Bloque>
-            {puntos.map((d) => (
-              <Bloque key={d.id}>
-                <motion.button type="button"
-                  className={`afDir${sel.puntoId === d.id ? ' afDir--sel' : ''}`}
-                  onClick={() => marcar('puntoId', d.id)} {...alToque}>
-                  <span className="afDir__ico"><Ico d={PIN} /></span>
-                  {/* El nombre si existe; si no, la calle. Antes se mostraba la
-                      referencia, asi que la etiqueta decia "Frente al parque". */}
-                  <span className="afDir__txt">
-                    <b>{d.name || d.address}</b>
-                    <small>{d.name ? d.address : d.description}</small>
-                  </span>
-                  <span className="afPlato__tick" />
-                </motion.button>
-              </Bloque>
-            ))}
-            {puntos.length === 0 &&
-              <Bloque>
-                <p className="afMenu__nota">
-                  Todavía no tienes ningún lugar guardado. Agrega uno para que el
-                  motorizado sepa dónde dejarte el almuerzo.
-                </p>
-              </Bloque>
-            }
-
-            {/* Antes, quien queria recibir en la oficina tenia que adivinar que
-                la direccion se crea en otra pantalla, salir del menu y volver a
-                empezar. Lo que lleva elegido se conserva. */}
-            <Bloque>
-              <Link className="afMenu__nuevaDir" to="/ubicaciones">
-                + Agregar {puntos.length === 0 ? 'una' : 'otra'} dirección
-              </Link>
-            </Bloque>
-
-            {puntos.length > 0 &&
-              <Bloque>
-                <p className="afMenu__nota">
-                  Puedes recibir cada día en un lugar distinto.
-                </p>
-              </Bloque>
-            }
-          </>
-
-        {kcal > 0 && meta &&
-          <Bloque>
-            <div className="afCard">
-              <div className="afCard__head">
-                <span className="afCard__title">Cómo queda tu día</span>
-              </div>
-              <div className="afFila afFila--top">
-                <span>Calorías</span><span><b>{kcal}</b> / {meta}</span>
-              </div>
-              <BarraAnimada className="afBarra afBarra--sky"
-                porcentaje={Math.min(Math.round((kcal / meta) * 100), 100)} />
-            </div>
-          </Bloque>
-        }
-
-        {/* Almuerzo y cena viajan juntos: si no van parejos, el dia no cierra
-            y quedaria media racion suelta en cocina. Se explica aqui, donde el
-            cliente todavia puede arreglarlo, y no al confirmar la semana. */}
-        {cojas.length > 0 &&
-          <Bloque>
-            <p className="afMenu__nota afMenu__nota--suelta">
-              Tu plan entrega {comidas.map((c) => NOMBRE_COMIDA[c] || c).join(' y ')} el
-              mismo día, así que las cantidades tienen que ir parejas.
-              Pediste {comidas.map((c) =>
-                `${totalDe(diaActivo, c)} ${NOMBRE_COMIDA[c] || c}`).join(' y ')}.
-            </p>
-          </Bloque>
-        }
-
-        <Bloque>
-          <motion.button type="button" className={editando ? 'afBtn afBtn--mint' : 'afBtn'}
-            disabled={!listo || enviando}
-            onClick={() => (editando ? guardarPlatos() : setPaso(1))} {...alToque}>
-            {!listo
-              ? (faltan.length > 0
-                  ? `Elige tu ${NOMBRE_COMIDA[faltan[0]] || faltan[0]} para continuar`
-                  : `Agrega ${enviosDe(diaActivo) - totalDe(diaActivo, cojas[0])} ${NOMBRE_COMIDA[cojas[0]] || cojas[0]} más`)
-              : editando
-                ? (enviando ? 'Guardando…' : 'Guardar este día')
-                : 'Guardar y volver a los días'}
-          </motion.button>
-        </Bloque>
-
-        {/* Salida sin guardar. Sin esto, alguien que entra a cambiar su plato y
-            quita el que tenia se queda encerrado en esta pantalla: el boton de
-            arriba esta bloqueado hasta que el dia vuelva a estar completo. */}
-        {editando &&
-          <Bloque>
-            <button type="button" className="afBtn afBtn--fantasma"
-              onClick={() => { setError(''); salirDeEdicion(diaActivo); recargar(); }}>
-              Volver sin cambiar
-            </button>
-          </Bloque>
-        }
-        </div>
-
-      </Cascada>
     );
   }
 
-  /* ---------- paso 3: confirmar ---------- */
-  const porDireccion = {};
-  elegidos.forEach((f) => {
-    const p = puntos.find((x) => x.id === seleccion[f].puntoId);
-    const clave = p ? (p.name || p.address) : 'Tu dirección habitual';
-    porDireccion[clave] = (porDireccion[clave] || 0) + 1;
-  });
+  /* ---------- no se pudo cargar ---------- */
+  if (falloCarga) {
+    return (
+      <div className="nPant mnu">
+        <span className="nMenta mnu__menta" aria-hidden="true" />
+        <div className="mnu__dentro mnu__vacio">
+          <Isotipo size={34} />
+          <h1>No pudimos cargar el menú</h1>
+          <p>Revisa tu conexión y vuelve a intentarlo. Tus pedidos no cambiaron.</p>
+          <motion.button type="button" className="mnu__boton" whileTap={{ scale: 0.97 }} transition={resorte.toque}
+            onClick={() => { setDias(null); setFalloCarga(false); setVuelta((v) => v + 1); }}>
+            Reintentar
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ---------- la pantalla ---------- */
+  const activo = diaActivo && semana.fechas.includes(diaActivo) ? diaActivo : semana.fechas[0];
+  const info = infoDia(activo);
+  const menus = menusDe(info);
+  const editable = ['listo', 'elegir', 'falta', 'no'].includes(info.estado) && info.abierto && info.hayPlatos;
+  const ocupado = enviando || cancelando;
+
+  const ini = semana.lunes;
+  const fin = moment(semana.fechas[semana.fechas.length - 1]);
+  const rango = ini.month() === fin.month()
+    ? `${ini.format('D')} al ${fin.format('D [de] MMMM')}`
+    : `${ini.format('D [de] MMMM')} al ${fin.format('D [de] MMMM')}`;
+
+  const faltan = porElegir.length;
+  const titular = sinPublicar ? 'Aún no hay menú'
+    : faltan === 0 ? (listos > 0 ? 'Tu semana está lista' : 'Semana cerrada')
+    : listos === 0 ? 'Elige tu semana'
+    : `Te ${faltan === 1 ? 'falta 1 día' : `faltan ${faltan} días`}`;
+
+  /* El plazo, dicho con el dia: "el dia anterior" obliga a hacer la cuenta. */
+  const limite = moment(activo).subtract(1, 'day').startOf('day').hour(HORA_LIMITE);
+  const cuandoCierra = limite.isSame(moment(), 'day') ? 'hoy'
+    : limite.isSame(moment().add(1, 'day'), 'day') ? 'mañana'
+    : `el ${limite.format('dddd')}`;
+
+  /* A donde llega ese dia. */
+  const habitual = puntos.find((p) => p.assigned) || (puntos.length === 1 ? puntos[0] : null);
+  const idPunto = info.pedido ? info.pedido.deliveryPointId : seleccion[activo]?.puntoId;
+  const punto = puntos.find((p) => p.id === idPunto) || (info.pedido ? null : habitual);
+  const esHabitual = !!punto && !!habitual && punto.id === habitual.id;
+
+  /* Lo que acompana al plato, segun SU plan: los extras que trae el paquete
+     mas los adicionales que se le hayan marcado en el panel. No se lista lo
+     que ese dia esta programado y ya: la entrada del dia es del paquete de
+     una empresa, y mostrarsela a todos seria ofrecer algo que no les llega. */
+  const fijos = [...new Set([
+    ...(plan?.consumption?.extraBenefits || []),
+    ...(plan?.consumption?.additional || []),
+  ])].flatMap((t) => platosDe(info.carta, t).map((x) => ({ ...x, tipo: t })))
+    .filter((x) => !comidas.includes(x.tipo));
+
+  // Las calorias del dia: cada porcion suma, tambien la segunda del mismo plato.
+  const kcal = comidas.reduce((suma, c) => suma + platosDe(info.carta, c).reduce(
+    (s, p) => s + prop(p.menu, 'calor') * (menus[c]?.[p.id] || 0), 0), 0);
+  const meta = plan?.needDay?.bmr ? Math.round(plan.needDay.bmr) : null;
+
+  /* Con dos comidas, la misma carta sirve para el almuerzo y para la cena:
+     una fila por plato y un boton por comida. */
+  const filasDobles = (() => {
+    if (!doble) return [];
+    const mapa = new Map();
+    comidas.forEach((c) => platosDe(info.carta, c).forEach((p) => {
+      const clave = String(p.menu?.name || p.id).trim().toLowerCase();
+      const fila = mapa.get(clave) || { clave, menu: p.menu, por: {} };
+      fila.por[c] = p;
+      mapa.set(clave, fila);
+    }));
+    return [...mapa.values()];
+  })();
+  const nombreElegido = (c) => {
+    const ids = Object.keys(menus[c] || {});
+    if (!ids.length) return 'falta elegir';
+    return ids.map((id) => {
+      const p = platosDe(info.carta, c).find((x) => String(x.id) === String(id));
+      const n = menus[c][id];
+      return (p?.menu?.name || 'plato elegido') + (n > 1 ? ` x${n}` : '');
+    }).join(' y ');
+  };
+
+  const cojas = (() => {
+    const totales = comidas.map((c) => totalEn(menus, c));
+    return doble && totales.every((n) => n > 0) && new Set(totales).size > 1;
+  })();
+
+  const unaSola = !doble ? Object.keys(menus[comidas[0]] || {}).length === 1 : false;
+
+  /* Lo que trae un pedido ya cerrado, con su comida delante. */
+  const delPedido = (info.pedido?.items || [])
+    .filter((i) => i?.menu?.name)
+    .map((i) => ({ tipo: i.type, menu: i.menu }))
+    .sort((a, b) => ORDEN_TIPOS.indexOf(a.tipo) - ORDEN_TIPOS.indexOf(b.tipo));
+  const etiquetaTipo = (t) => (NOMBRE_COMIDA[t] ? mayus(NOMBRE_COMIDA[t]) : (ETIQUETA_EXTRA[t] || 'Plato'));
+
+  const usadasSemana = infos.reduce((t, i) => t + (i.pedido ? enviosEn(menusDe(i)) : 0), 0);
 
   return (
-    <Cascada className="afPanel">
-      <Bloque><p className="afMenu__paso">Paso 3 de 3</p></Bloque>
-      <Bloque><h1 className="afPanel__titular">Revisa tu semana</h1></Bloque>
-      <Bloque>
-        <p className="afMenu__ayuda">
-          Nada llega a cocina hasta que confirmes. Puedes cambiarlo hasta
-          las {HORA_LIMITE_TEXTO} del día anterior.
-        </p>
-      </Bloque>
+    <MotionConfig reducedMotion="user">
+    <div className="nPant mnu">
+      <span className="nMenta mnu__menta" aria-hidden="true" />
+      <motion.div className="mnu__dentro" variants={cascada(0.05)} initial="oculto" animate="visible">
 
-      <Bloque>
-        <div className="afCard">
-          <div className="afCard__head">
-            <span className="afCard__title">Lo que pediste</span>
-            <span className="afCard__label">
-              {elegidos.length} {elegidos.length === 1 ? 'día' : 'días'}
-              {enviosElegidos !== elegidos.length && ` · ${enviosElegidos} envíos`}
-            </span>
+        {/* Va antes del titular a proposito: lo primero que tiene que registrar
+            el colaborador al abrir es quien le esta pagando el almuerzo. */}
+        {empresa?.corporativo &&
+          <motion.div className="mnu__empresa" variants={sube}><FranjaEmpresa empresa={empresa} /></motion.div>}
+
+        {/* Arriba, la semana que se esta viendo, con sus flechas para pasar a
+            la anterior o a la siguiente. */}
+        <motion.div className="mnu__cab" variants={sube}>
+          <div className="mnu__semana">
+            <button type="button" aria-label="Semana anterior" disabled={indiceSemana <= 0}
+              onClick={() => irADia(mejorDia(semanas[indiceSemana - 1]))}><Glifo d={G.atras} chico /></button>
+            <span>{rango}</span>
+            <button type="button" aria-label="Semana siguiente" disabled={indiceSemana >= semanas.length - 1}
+              onClick={() => irADia(mejorDia(semanas[indiceSemana + 1]))}><Glifo d={G.ir} chico /></button>
           </div>
-          {elegidos.map((f) => {
-            const dia = dias.find((d) => d.localDate === f);
-            /* "Ají de gallina x2" cuando pidio dos. Sin el numero, el resumen
-               de un viernes doble se lee igual que el de uno simple y el
-               cliente confirma sin darse cuenta de lo que gasta. */
-            const platosDelDia = comidas.flatMap((c) =>
-              platosDe(dia, c)
-                .filter((x) => cantidadDe(f, c, x.id) > 0)
-                .map((x) => {
-                  const n = cantidadDe(f, c, x.id);
-                  return n > 1 ? `${x.menu.name} x${n}` : x.menu.name;
-                }));
-            const punto = puntos.find((x) => x.id === seleccion[f].puntoId);
-            return (
-              <React.Fragment key={f}>
-                <div className="afSrow">
-                  <span>{moment(f).format('ddd D MMM')}</span>
-                  <b>{platosDelDia.join(' · ')}</b>
-                </div>
-                {punto &&
-                  <div className="afSrow afSrow--sub">
-                    <span />
-                    <span className="afTag"><Ico d={PIN} c="afTag__ic" />{punto.name || punto.address}</span>
+          {doble && plan?.planName && <span className="mnu__plan">Plan {plan.planName}</span>}
+        </motion.div>
+        <motion.h1 className="mnu__titular" variants={sube}>{titular}</motion.h1>
+
+        {/* El avance de la semana: un tramo por dia, lleno cuando ese dia ya
+            esta resuelto. */}
+        <motion.div className="mnu__avance" variants={sube}>
+          <span className="mnu__tramos" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${infos.length}, minmax(0, 1fr))` }}>
+            {infos.map((d, i) => (
+              <i key={d.fecha}><motion.i initial={false} animate={{ scaleX: ['listo', 'cerrado', 'no', 'viaje'].includes(d.estado) ? 1 : 0 }}
+                transition={{ ...resorte.suave, delay: i * 0.05 }} /></i>
+            ))}
+          </span>
+          <span className="mnu__listos"><b>{listos}</b> de {infos.length} días listos</span>
+        </motion.div>
+
+        <LayoutGroup id="mnu-dias">
+          <motion.div role="tablist" aria-label="Días de la semana" className="mnu__dias" variants={sube}
+            style={{ gridTemplateColumns: `repeat(${infos.length}, minmax(0, 1fr))` }}>
+            {infos.map((d) => {
+              const on = d.fecha === activo;
+              return (
+                <button type="button" role="tab" key={d.fecha} aria-selected={on}
+                  aria-label={`${mayus(nombreDia(d.fecha))}, ${d.marca}`}
+                  className={`mnu__diaTab is-${d.estado}${on ? ' is-on' : ''}`}
+                  onClick={() => irADia(d.fecha)}>
+                  <small>{moment(d.fecha).format('ddd').replace('.', '')}</small>
+                  <b>
+                    {on && <motion.i layoutId="mnu-dia-on" className="mnu__diaOn" transition={resorte.toque} />}
+                    <span>{moment(d.fecha).format('D')}</span>
+                  </b>
+                  <small className="mnu__marca">{d.marca}</small>
+                </button>
+              );
+            })}
+          </motion.div>
+        </LayoutGroup>
+
+        <motion.div variants={sube}>
+        {/* El dia que llega entra desde el lado hacia el que se avanzo. No se
+            espera a que salga el anterior: lo que se ve y se toca es siempre
+            el dia elegido. */}
+          <motion.div key={sinPublicar ? `sem-${indiceSemana}` : activo} className="mnu__dia"
+            initial={seMovio.current ? { opacity: 0, x: 26 * sentido } : false} animate={{ opacity: 1, x: 0 }} transition={resorte.entra}>
+
+            {sinPublicar ?
+              <div className="mnu__aviso">
+                <b>Esta semana aún no está publicada</b>
+                <p>Los viernes publicamos el menú de la próxima semana y te avisamos para que elijas.</p>
+              </div>
+            :
+            <>
+              <div className="mnu__diaCab">
+                <b>{mayus(nombreDia(activo))}</b>
+                {info.abierto && ['listo', 'elegir', 'falta', 'no'].includes(info.estado)
+                  ? <span className="mnu__cierra">Cierra {cuandoCierra}, {HORA_LIMITE_TEXTO}</span>
+                  : info.estado !== 'sinMenu' && info.estado !== 'viaje' && <span className="mnu__cerro">Ya cerró</span>}
+              </div>
+
+              {doble && editable &&
+                <p className="mnu__resumen">
+                  {comidas.map((c) => `${mayus(NOMBRE_COMIDA[c] || c)}: ${nombreElegido(c)}.`).join(' ')}
+                </p>}
+
+              {info.estado === 'no' &&
+                <p className="mnu__resumen">
+                  Marcaste que no recibes este día.{info.abierto && info.hayPlatos ? ' Si eliges un plato, vuelve a quedar activo.' : ''}
+                </p>}
+
+              {info.estado === 'viaje' &&
+                <div className="mnu__aviso">
+                  <b>Estás de viaje</b>
+                  <p>
+                    Del {moment(info.pausa.start_date).format('D [de] MMMM')} al {moment(info.pausa.end_date).format('D [de] MMMM')} no
+                    te preparamos nada. Tu plan vence más tarde.
+                  </p>
+                  <button type="button" className="mnu__enlace" onClick={() => volviAntes(info.pausa.id)}>Ya volví</button>
+                </div>}
+
+              {info.estado === 'sinMenu' &&
+                <div className="mnu__aviso">
+                  <b>Aún no publicamos este día</b>
+                  <p>Los viernes publicamos el menú de la próxima semana y te avisamos.</p>
+                </div>}
+
+              {info.estado === 'pasado' &&
+                <div className="mnu__aviso">
+                  <b>Este día ya cerró</b>
+                  <p>No quedó pedido para este día. Los pedidos cierran a las {HORA_LIMITE_TEXTO} del día anterior.</p>
+                </div>}
+
+              {info.estado === 'no' && !(info.abierto && info.hayPlatos) &&
+                <div className="mnu__aviso">
+                  <b>No recibes este día</b>
+                  <p>Tu entrega volvió a tu saldo. Puedes usarla otro día.</p>
+                </div>}
+
+              {/* Dia con pedido que ya no se puede cambiar. */}
+              {info.estado === 'cerrado' &&
+                <>
+                  <div className="mnu__lista">
+                    {delPedido.length === 0 &&
+                      <div className="mnu__plato"><span className="mnu__platoBtn">
+                        <Foto /><span className="mnu__platoTxt"><b>Plato elegido</b></span>
+                      </span></div>}
+                    {delPedido.map((p, i) => (
+                      <div className="mnu__plato" key={i}>
+                        <span className="mnu__platoBtn">
+                          <Foto menu={p.menu} />
+                          <span className="mnu__platoTxt">
+                            <b>{p.menu.name}</b>
+                            <small>{etiquetaTipo(p.tipo)}{prop(p.menu, 'calor') ? ` · ${prop(p.menu, 'calor')} kcal` : ''}</small>
+                          </span>
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                }
-              </React.Fragment>
+                  <p className="mnu__nota">
+                    {info.finalizado
+                      ? 'Este pedido ya se cerró y no se puede cambiar.'
+                      : `Ya está en cocina: se cerró a las ${HORA_LIMITE_TEXTO} del día anterior. Para cambios, escríbenos.`}
+                  </p>
+                </>}
+
+              {/* Un plan, una comida: tocar el plato lo pide. */}
+              {editable && !doble &&
+                <LayoutGroup id={`mnu-platos-${activo}`}>
+                  <div className="mnu__lista" role="radiogroup" aria-label="Platos del día">
+                    {platosDe(info.carta, comidas[0]).map((p) => {
+                      const cantidad = menus[comidas[0]]?.[p.id] || 0;
+                      const on = cantidad > 0;
+                      return (
+                        <motion.div layout="position" transition={resorte.entra}
+                          className={`mnu__plato${on ? ' is-on' : ''}`} key={p.id}>
+                          {on && <motion.span className="mnu__marco" aria-hidden="true"
+                            layoutId={unaSola ? 'mnu-marco' : undefined} transition={resorte.entra} />}
+                          <motion.button type="button" role="radio" aria-checked={on} className="mnu__platoBtn"
+                            whileTap={{ scale: 0.985 }} transition={resorte.toque}
+                            onClick={() => elegir(activo, comidas[0], p.id)}>
+                            <Foto menu={p.menu} />
+                            <span className="mnu__platoTxt">
+                              <b>{p.menu?.name}</b>
+                              <Macros menu={p.menu} respaldo={mayus(NOMBRE_COMIDA[comidas[0]] || 'Plato')} />
+                            </span>
+                            <span className={`mnu__radio${on ? ' is-on' : ''}`}>
+                              {on
+                                ? <motion.span initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                    transition={resorte.toque}><Palomita /></motion.span>
+                                : sumando && <span className="mnu__mas" aria-hidden="true">+</span>}
+                            </span>
+                          </motion.button>
+                          {on && info.pedido &&
+                            <motion.div className="mnu__cant" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+                              transition={resorte.entra}>
+                              <span className="mnu__paso">
+                                <button type="button" aria-label={`Quitar una porción de ${p.menu?.name}`}
+                                  disabled={ocupado || (cantidad <= 1 && unaSola)}
+                                  onClick={() => ponerCantidad(activo, comidas[0], p.id, cantidad - 1)}>−</button>
+                                <b aria-live="polite">{cantidad}</b>
+                                <button type="button" aria-label={`Agregar una porción de ${p.menu?.name}`}
+                                  disabled={ocupado || cantidad >= 5}
+                                  onClick={() => ponerCantidad(activo, comidas[0], p.id, cantidad + 1)}>+</button>
+                              </span>
+                              <small>Usa {cantidad} {cantidad === 1 ? 'entrega' : 'entregas'} de tu plan</small>
+                            </motion.div>}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </LayoutGroup>}
+
+              {/* Almuerzo y cena: la misma carta, y el cliente dice que va con que. */}
+              {editable && doble &&
+                <div className="mnu__lista" aria-label="Platos del día">
+                  {filasDobles.map((f) => (
+                    <div className="mnu__plato mnu__plato--doble" key={f.clave}>
+                      <span className="mnu__platoBtn">
+                        <Foto menu={f.menu} />
+                        <span className="mnu__platoTxt">
+                          <b>{f.menu?.name}</b>
+                          <Macros menu={f.menu} respaldo="Viene con tu plan" />
+                        </span>
+                      </span>
+                      <span className="mnu__para">
+                        {comidas.filter((c) => f.por[c]).map((c) => {
+                          const on = (menus[c]?.[f.por[c].id] || 0) > 0;
+                          return (
+                            <motion.button type="button" key={c} aria-pressed={on}
+                              className={`mnu__paraBtn${on ? ' is-on' : ''}`}
+                              whileTap={{ scale: 0.96 }} transition={resorte.toque}
+                              onClick={() => elegir(activo, c, f.por[c].id)}>
+                              {on ? `Es tu ${NOMBRE_COMIDA[c] || c}` : (PARA_COMIDA[c] || `Para ${c}`)}
+                            </motion.button>
+                          );
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>}
+
+              {/* Que significa cada punto de color de los platos. */}
+              {editable &&
+                <p className="mnu__macros mnu__leyenda" aria-hidden="true">
+                  <i className="is-p">Proteína</i><i className="is-c">Carbohidratos</i><i className="is-g">Grasa</i>
+                </p>}
+
+              {/* Lo que resulta de la eleccion, en dos pastillas: que mas llega
+                  ese dia y cuanto suma frente a su meta. Sin parrafos. */}
+              {editable && (fijos.length > 0 || (kcal > 0 && meta)) &&
+                <div className="mnu__pastillas">
+                  {fijos.length > 0 &&
+                    <span><Glifo d={G.vaso} chico />{fijos.map((x) => x.menu?.name).filter(Boolean).join(', ')} incluido</span>}
+                  {kcal > 0 && meta &&
+                    <span><Glifo d={G.rayo} chico /><b>{kcal}</b> de {meta} kcal</span>}
+                </div>}
+
+              {/* Almuerzo y cena viajan juntos: si no van parejos, el dia no
+                  cierra y quedaria media racion suelta en cocina. */}
+              {editable && cojas &&
+                <p className="mnu__nota">
+                  Tu plan entrega {comidas.map((c) => NOMBRE_COMIDA[c] || c).join(' y ')} el
+                  mismo día, así que las cantidades tienen que ir parejas.
+                  Pediste {comidas.map((c) => `${totalEn(menus, c)} ${NOMBRE_COMIDA[c] || c}`).join(' y ')}.
+                </p>}
+
+              {sumando &&
+                <p className="mnu__sumando" role="status">
+                  <span>Toca arriba el plato que quieres agregar. Usa 1 entrega más.</span>
+                  <button type="button" className="mnu__enlace" onClick={() => setSumando(false)}>Cancelar</button>
+                </p>}
+            </>}
+          </motion.div>
+        </motion.div>
+
+        <AnimatePresence>
+          {ultimo &&
+            <motion.div role="status" className="mnu__hecho" key={ultimo.fecha + ultimo.texto}
+              initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={resorte.entra}>
+              <span className="mnu__hechoIc"><Palomita size={14} /></span>
+              <span className="mnu__hechoTxt">{ultimo.texto}</span>
+              {ultimo.tipo !== 'lote' &&
+                <button type="button" onClick={deshacer} disabled={ocupado}>Deshacer</button>}
+            </motion.div>}
+        </AnimatePresence>
+
+        {avisoPausa && <p className="mnu__ok" role="status">{avisoPausa}</p>}
+        {error && !hoja && <p className="mnu__error" role="alert">{error}</p>}
+
+        {/* A donde llega ese dia. */}
+        {!sinPublicar && !['pasado', 'viaje', 'sinMenu'].includes(info.estado) &&
+          <motion.div className="mnu__dir" variants={sube}>
+            <Pin />
+            <span className="mnu__dirTxt">
+              <b>
+                {punto
+                  ? (punto.name ? `${punto.name} · ${punto.address}` : punto.address)
+                  : (puntos.length ? 'Tu dirección habitual' : 'Agrega dónde recibir tu almuerzo')}
+              </b>
+              <small>{punto && !esHabitual ? 'Solo este día · ' : ''}Entre las {REPARTO.desde} y la {REPARTO.hasta}</small>
+            </span>
+            {puntos.length === 0
+              ? <Link className="mnu__enlace" to="/ubicaciones">Agregar</Link>
+              : info.abierto && info.estado !== 'cerrado' &&
+                <button type="button" className="mnu__enlace" onClick={() => { setError(''); setHoja('direccion'); }}>
+                  Cambiar
+                </button>}
+          </motion.div>}
+
+        {/* Lo que se puede hacer, en botones cortos: el nombre basta. Lo que
+            pasa con las entregas lo dice el aviso al tocar o la hoja que abre. */}
+        <motion.div className="mnu__botones" variants={sube}>
+          {editable && !doble && info.pedido && platosDe(info.carta, comidas[0]).length > 1 && !sumando &&
+            <button type="button" disabled={ocupado} onClick={() => setSumando(true)}>
+              <Glifo d={G.mas} /><b>Agregar plato</b>
+            </button>}
+          {editable && info.estado !== 'no' &&
+            <button type="button" disabled={ocupado}
+              onClick={() => (info.pedido ? reprogramarDia(info.pedido) : marcarSinEnvio(activo))}>
+              <Glifo d={G.no} /><b>{cancelando ? 'Guardando…' : 'No recibir'}</b>
+            </button>}
+          {info.estado === 'no' && info.abierto &&
+            <button type="button" disabled={ocupado} onClick={() => siQuiero(activo)}>
+              <Glifo d={G.si} /><b>{cancelando ? 'Guardando…' : 'Sí recibir'}</b>
+            </button>}
+          {porMi.length > 0 &&
+            <button type="button" disabled={ocupado} onClick={() => { setError(''); setHoja('porMi'); }}>
+              <Glifo d={G.porMi} /><b>Elegir por mí</b>
+            </button>}
+          <button type="button" onClick={() => { setError(''); setAvisoPausa(''); setHoja('viaje'); }}>
+            <Glifo d={G.viaje} /><b>Me voy de viaje</b>
+          </button>
+        </motion.div>
+
+        {pausas.length > 0 &&
+          <motion.div className="mnu__pausas" variants={sube}>
+            {pausas.map((p) => (
+              <div key={p.id}>
+                <span>No estarás del {moment(p.start_date).format('D MMM')} al {moment(p.end_date).format('D MMM')}</span>
+                <button type="button" className="mnu__enlace" onClick={() => volviAntes(p.id)}>Ya volví</button>
+              </div>
+            ))}
+          </motion.div>}
+
+        {/* El saldo en una linea. Las reglas, a un toque. */}
+        <motion.div className="mnu__saldoFila" variants={sube}>
+          {usadasSemana > 0 && enviosRestantes !== null
+            ? <span><b>{Math.max(enviosRestantes, 0)}</b> {enviosRestantes === 1 ? 'entrega por usar' : 'entregas por usar'}</span>
+            : <span />}
+          <button type="button" className="mnu__enlace" onClick={() => setHoja('reglas')}>¿Cómo funciona?</button>
+        </motion.div>
+      </motion.div>
+
+      {festejo > 0 && <Festejo key={festejo} />}
+      <Jalar alSoltar={recargar} />
+
+      {/* ---------- hojas ---------- */}
+      <Hoja abierta={hoja === 'direccion'} alCerrar={cerrarHoja} etiqueta="¿Dónde te lo dejamos?" clase="mnuHoja">
+        <span className="mnuHoja__etiqueta">{mayus(nombreDia(activo))}</span>
+        <h1>¿Dónde te lo dejamos?</h1>
+        <p className="mnuHoja__ayuda">Puedes recibir cada día en un lugar distinto.</p>
+        <div role="radiogroup" aria-label="Tus direcciones">
+          {puntos.map((d) => {
+            const on = punto?.id === d.id;
+            return (
+              <button type="button" role="radio" aria-checked={on} key={d.id} className="mnuHoja__fila"
+                disabled={guardandoDir} onClick={() => elegirDireccion(info, d.id)}>
+                <Pin />
+                <span className="mnuHoja__filaTxt">
+                  {/* El nombre si existe; si no, la calle. */}
+                  <b>{d.name || d.address}</b>
+                  <small>{d.name ? d.address : d.description}</small>
+                </span>
+                <span className={`mnu__radio${on ? ' is-on' : ''}`}>{on && <Palomita />}</span>
+              </button>
             );
           })}
         </div>
-      </Bloque>
+        {error && <p className="mnu__error" role="alert">{error}</p>}
+        <div className="mnuHoja__pie">
+          <Link className="nHoja__btn mnuHoja__claro" to="/ubicaciones">
+            Agregar {puntos.length === 0 ? 'una' : 'otra'} dirección
+          </Link>
+          <button type="button" className="nHoja__cerrar" onClick={cerrarHoja}>
+            {guardandoDir ? 'Guardando…' : 'Listo'}
+          </button>
+        </div>
+      </Hoja>
 
-      {Object.keys(porDireccion).length > 0 &&
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head"><span className="afCard__title">Tus entregas</span></div>
-            {Object.entries(porDireccion).map(([nombre, n]) => (
-              <div className="afSrow" key={nombre}>
-                <span>{nombre}</span><b>{n} {n === 1 ? 'día' : 'días'}</b>
-              </div>
-            ))}
-          </div>
-        </Bloque>
-      }
+      <Hoja abierta={hoja === 'viaje'} alCerrar={cerrarHoja} etiqueta="¿Qué días no estarás?" clase="mnuHoja">
+        <span className="mnuHoja__etiqueta">Me voy de viaje</span>
+        <h1>¿Qué días no estarás?</h1>
+        <p className="mnuHoja__ayuda">
+          No te preparamos nada esos días, te devolvemos los envíos que ya
+          estuvieran programados y tu plan vence más tarde.
+        </p>
+        <div className="mnuHoja__fechas">
+          <label>
+            Desde
+            <input type="date" value={viaje.desde}
+              min={moment().add(1, 'day').format('YYYY-MM-DD')}
+              onChange={(e) => setViaje((v) => ({ ...v, desde: e.target.value }))} />
+          </label>
+          <label>
+            Hasta
+            <input type="date" value={viaje.hasta}
+              min={viaje.desde || moment().add(1, 'day').format('YYYY-MM-DD')}
+              onChange={(e) => setViaje((v) => ({ ...v, hasta: e.target.value }))} />
+          </label>
+        </div>
+        {error && <p className="mnu__error" role="alert">{error}</p>}
+        <div className="mnuHoja__pie">
+          <motion.button type="button" className="nHoja__btn" whileTap={{ scale: 0.97 }} transition={resorte.toque}
+            disabled={guardandoPausa} onClick={guardarViaje}>
+            {guardandoPausa ? 'Guardando…' : 'Avisar mi viaje'}
+          </motion.button>
+          <button type="button" className="nHoja__cerrar" onClick={cerrarHoja}>Ahora no</button>
+        </div>
+      </Hoja>
 
-      {seExcede &&
-        <Bloque>
-          <p className="afMenu__error">
-            Te quedan {enviosRestantes} {enviosRestantes === 1 ? 'envío' : 'envíos'} y
-            estás pidiendo {enviosElegidos}. Quita alguna porción o renueva tu plan.
-          </p>
-        </Bloque>
-      }
+      <Hoja abierta={hoja === 'reglas'} alCerrar={cerrarHoja} etiqueta="Cómo funciona tu menú" clase="mnuHoja">
+        <span className="mnuHoja__etiqueta">Tu menú</span>
+        <h1>Cómo funciona</h1>
+        <ul className="mnu__reglasHoja">
+          <li><Glifo d={G.si} /><span><b>{doble ? 'Elige almuerzo y cena' : 'Toca un plato y queda pedido'}</b>
+            <small>{doble ? 'El día queda pedido cuando eliges los dos, y gasta una sola entrega.' : 'No hay que confirmar nada más.'}</small></span></li>
+          <li><Glifo d={G.porMi} /><span><b>Puedes cambiarlo</b><small>Hasta las {HORA_LIMITE_TEXTO} del día anterior.</small></span></li>
+          <li><Glifo d={G.no} /><span><b>Si un día no quieres recibir</b><small>Marca "No recibir": no se prepara y no gasta entrega.</small></span></li>
+          <li><Glifo d={G.mas} /><span><b>Si no eliges nada</b><small>Te armamos la semana con el plato del día, para que no te quedes sin almuerzo.</small></span></li>
+        </ul>
+        <div className="mnuHoja__pie">
+          <button type="button" className="nHoja__btn" onClick={cerrarHoja}>Entendido</button>
+        </div>
+      </Hoja>
 
-      {error && <Bloque><p className="afMenu__error">{error}</p></Bloque>}
-
-      <Bloque>
-        <motion.button type="button" className="afBtn afBtn--mint"
-          onClick={confirmar} disabled={enviando || seExcede} {...alToque}>
-          {enviando ? 'Guardando…' : 'Confirmar mi semana'}
-        </motion.button>
-      </Bloque>
-      <Bloque>
-        <button type="button" className="afBtn afBtn--fantasma" onClick={() => setPaso(1)}>
-          Volver a los días
-        </button>
-      </Bloque>
-    </Cascada>
+      <Hoja abierta={hoja === 'porMi'} alCerrar={cerrarHoja} etiqueta="Elegir por mí" clase="mnuHoja">
+        <span className="mnuHoja__etiqueta">Elegir por mí</span>
+        <h1>{porMiPedir.length === 1 ? 'Pedimos este día por ti' : 'Pedimos estos días por ti'}</h1>
+        <p className="mnuHoja__ayuda">
+          Te ponemos el primer plato de la carta en cada día que te falta. Después puedes cambiar cualquiera.
+        </p>
+        <div>
+          {porMiPedir.map((x) => (
+            <div className="mnuHoja__fila mnuHoja__fila--quieta" key={x.fecha}>
+              <span className="mnuHoja__filaTxt">
+                <small>{mayus(nombreDia(x.fecha))}</small>
+                {x.nombres.map((n) => <b key={n}>{n}</b>)}
+              </span>
+            </div>
+          ))}
+        </div>
+        {porMiPedir.length < porMi.length &&
+          <p className="mnu__nota">
+            {porMiPedir.length === 0
+              ? 'No te quedan entregas en tu plan. Renueva para seguir pidiendo.'
+              : `Te quedan ${porMiPedir.length} ${porMiPedir.length === 1 ? 'entrega' : 'entregas'}: pedimos solo ${porMiPedir.length === 1 ? 'el primer día' : `los primeros ${porMiPedir.length} días`}.`}
+          </p>}
+        {error && <p className="mnu__error" role="alert">{error}</p>}
+        <div className="mnuHoja__pie">
+          <motion.button type="button" className="nHoja__btn" whileTap={{ scale: 0.97 }} transition={resorte.toque}
+            disabled={enviando || porMiPedir.length === 0} onClick={pedirPorMi}>
+            {enviando ? 'Guardando…'
+              : porMiPedir.length === 1 ? 'Pedir este día' : `Pedir estos ${porMiPedir.length} días`}
+          </motion.button>
+          <button type="button" className="nHoja__cerrar" onClick={cerrarHoja}>Ahora no</button>
+        </div>
+      </Hoja>
+    </div>
+    </MotionConfig>
   );
 };
 

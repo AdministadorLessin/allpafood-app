@@ -1,14 +1,13 @@
 import React, {useState,useEffect} from "react";
 import './facturacion.scss';
 
-import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
-import Modal from '@mui/material/Modal';
+import Pantalla, { Tramo } from '../../../components/perfil/Pantalla/Pantalla';
+import Hoja from '../../../components/perfil/Hoja/Hoja';
 import Skeleton from '@mui/material/Skeleton';
 import moment from 'moment';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
-import { Cascada, Bloque, motion, alToque } from '../../../components/ultil/Motion/Motion';
 import { API_URL } from '../../../config';
 
 const FacturacionPage = (props) => {
@@ -105,154 +104,132 @@ const FacturacionPage = (props) => {
     X: 'nulo', CANCELLED: 'nulo',
   };
 
+  /* Como se llama la compra: la linea del plan en el comprobante. Si no la
+     trae, su numero. */
+  const nombreDe = (f) => {
+    const linea = (f.details || []).find((d) => /^Plan/i.test(d.name || ''));
+    return linea ? String(linea.name).replace(/^Plan\s+/i, '') : `Comprobante N° ${f.id}`;
+  };
+  const fechaFila = (v) => {
+    const m = moment(v, ['YYYY-MM-DD', moment.ISO_8601], true);
+    return m.isValid() ? m.format('D [de] MMMM') + (m.year() !== moment().year() ? ` de ${m.year()}` : '') : (v || '');
+  };
+  const pagado = (f) => ['C', 'COMPLETED'].includes(f.status);
+
   return (
-    <LayoutDasboard claseStyle={false}>
-      <Cascada className="afPanel">
+    <Pantalla etiqueta="Mis pagos" titulo="Tus comprobantes"
+      bajada="Toca uno para verlo completo o guardarlo." clase="pag">
 
-        <Bloque><h1 className="afPanel__titular">Mis pagos</h1></Bloque>
+      {/* Lo que pago y lo que se ahorro: las cifras que el cliente busca
+          antes de revisar comprobante por comprobante. */}
+      {cargado && facturas.length > 0 &&
+        <Tramo className="pag__cifras">
+          <div><b>{soles(totalPagado)}</b><small>pagado hasta hoy</small></div>
+          {ahorro > 0 && <div><b>{soles(ahorro)}</b><small>en descuentos</small></div>}
+          {plan?.planName &&
+            <div><b className="pag__txt">{plan.planName}</b>
+              <small>{plan.expirationDate ? `vence el ${moment(plan.expirationDate).format('D [de] MMM').replace('.', '')}` : 'tu plan'}</small></div>}
+        </Tramo>}
 
-        {/* Lo que pago y lo que se ahorro: las dos cifras que el cliente busca
-            antes de revisar factura por factura. */}
-        <Bloque>
-          <div className="afPagos__cifras">
-            <div className="afCard afPagos__cifra">
-              <span className="afPagos__et">Pagado hasta hoy</span>
-              <b className="afPagos__n">S/ {totalPagado.toFixed(2)}</b>
-              <small>{facturas.length} {facturas.length === 1 ? 'comprobante' : 'comprobantes'}</small>
-            </div>
-            {ahorro > 0 &&
-              <div className="afCard afPagos__cifra afPagos__cifra--ahorro">
-                <span className="afPagos__et">Te ahorraste</span>
-                <b className="afPagos__n">S/ {ahorro.toFixed(2)}</b>
-                <small>en descuentos aplicados</small>
-              </div>
-            }
-            {plan &&
-              <div className="afCard afPagos__cifra">
-                <span className="afPagos__et">Tu plan</span>
-                <b className="afPagos__n afPagos__n--txt">{plan.planName}</b>
-                <small>
-                  {plan.expirationDate
-                    ? `Vence el ${moment(plan.expirationDate).format('D [de] MMM')}`
-                    : 'Sin fecha de vencimiento'}
-                </small>
-              </div>
-            }
-          </div>
-        </Bloque>
+      <Tramo>
+        {!cargado &&
+          <>
+            <Skeleton variant="rounded" height={58} sx={{ borderRadius: '16px', mt: '22px' }} />
+            <Skeleton variant="rounded" height={58} sx={{ borderRadius: '16px', mt: '10px' }} />
+          </>
+        }
 
-        <Bloque>
-          <div className="afCard">
-            <div className="afCard__head">
-              <span className="afCard__title">Tus comprobantes</span>
-              {facturas.length > 0 &&
-                <span className="afCard__label">{facturas.length}</span>}
-            </div>
-
-            {!cargado &&
-              <>
-                <Skeleton variant="rounded" height={58} sx={{ borderRadius: '14px', mb: 1 }} />
-                <Skeleton variant="rounded" height={58} sx={{ borderRadius: '14px' }} />
-              </>
-            }
-
-            {cargado && facturas.length === 0 &&
-              <p className="afMenu__nota afMenu__nota--suelta">
-                Todavía no tienes pagos registrados. Cuando compres un plan, tu
-                comprobante aparece aquí.
-              </p>
-            }
-
-            {facturas.map((f) => (
-              <motion.button type="button" className="afRecibo" key={f.id}
-                onClick={() => handleOpen(f)} {...alToque}>
-                <span className="afRecibo__txt">
-                  <b>{fechaLarga(f.emissionDate)}</b>
-                  <small>Comprobante N° {f.id}</small>
-                </span>
-                <span className={`afRecibo__estado afRecibo__estado--${TONO_ESTADO[f.status] || 'espera'}`}>
-                  {ESTADOS[f.status] || f.status}
-                </span>
-                <span className="afRecibo__monto">{soles(f.totalPrice)}</span>
-                <span className="afRecibo__ir">›</span>
-              </motion.button>
-            ))}
-          </div>
-        </Bloque>
-
-        <Bloque>
-          <p className="afMenu__nota afMenu__nota--suelta">
-            Son comprobantes internos de Allpa Food. Si necesitas una boleta o
-            factura electrónica, escríbenos y te la enviamos.
+        {cargado && facturas.length === 0 &&
+          <p className="cuP__vacio">
+            Todavía no tienes pagos registrados. Cuando compres un plan, tu
+            comprobante aparece aquí.
           </p>
-        </Bloque>
+        }
 
-      </Cascada>
+        {facturas.length > 0 &&
+          <div className="cuP__lista pag__lista">
+            {facturas.map((f) => (
+              <button type="button" className="cuP__fila" key={f.id} onClick={() => handleOpen(f)}>
+                <span className="cuP__filaTxt">
+                  <b>{nombreDe(f)}</b>
+                  <small>
+                    {[fechaFila(f.emissionDate), f.paymentMethod].filter(Boolean).join(' · ')}
+                    {!pagado(f) &&
+                      <> <span className={`cuP__chip cuP__chip--${TONO_ESTADO[f.status] === 'nulo' ? 'gris' : 'coral'}`}>{ESTADOS[f.status] || f.status}</span></>}
+                  </small>
+                </span>
+                <span className="cuP__filaValor">{soles(f.totalPrice)}</span>
+                <span className="cuP__filaIr" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+                </span>
+              </button>
+            ))}
+          </div>}
+      </Tramo>
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <div className="inlineFlex factModal">
-          <p className="afComp__titulo">Comprobante</p>
+      <Tramo>
+        <p className="cuP__nota">
+          Son comprobantes internos de Allpa Food. Si necesitas una boleta o
+          factura electrónica, escríbenos y te la enviamos.
+        </p>
+      </Tramo>
 
-          {!factura && <p className="afComp__vacio">No pudimos cargar esta factura.</p>}
-
-          {factura &&
-            <div className="afComp" id="afComprobante">
-              <div className="afComp__cab">
-                <div>
-                  <p className="afComp__marca">Allpa Food</p>
-                  <p className="afComp__sub">Comprobante interno de pago</p>
-                </div>
-                <div className="afComp__num">
-                  <span>N°</span>
-                  <b>{factura.id}</b>
-                </div>
-              </div>
-
-              <div className="afComp__datos">
-                {nombreCliente &&
-                  <p><span>Cliente</span><b>{nombreCliente}</b></p>}
-                <p><span>Fecha</span><b>{factura.emissionDate}</b></p>
-                <p><span>Estado</span><b>{ESTADOS[factura.status] || factura.status}</b></p>
-                {factura.paymentMethod &&
-                  <p><span>Medio de pago</span><b>{factura.paymentMethod}</b></p>}
-                {factura.paymentReference &&
-                  <p><span>Referencia</span><b>{factura.paymentReference}</b></p>}
-              </div>
-
-              <div className="afComp__lineas">
-                {(factura.details || []).map((d, i) => (
-                  <p key={i} className={Number(d.value) < 0 ? 'afComp__linea afComp__linea--menos' : 'afComp__linea'}>
-                    <span>{d.name}</span>
-                    <b>{soles(d.value)}</b>
-                  </p>
-                ))}
-              </div>
-
-              <p className="afComp__total">
-                <span>Total</span>
-                <b>{soles(factura.totalPrice)}</b>
-              </p>
-
-              <p className="afComp__pie">
-                Documento interno de Allpa Food. No constituye comprobante
-                electrónico ante SUNAT.
-              </p>
-            </div>
-          }
-
-          {factura &&
-            <button type="button" className="afComp__btn" onClick={() => window.print()}>
+      {/* El comprobante completo, en una hoja. */}
+      <Hoja abierta={open} alCerrar={handleClose}
+        etiqueta={factura ? `Comprobante N° ${factura.id}` : 'Comprobante'}
+        titulo={factura ? soles(factura.totalPrice) : 'No está disponible'}
+        bajada={factura ? null : 'No pudimos cargar este comprobante.'}
+        pie={factura
+          ? <button type="button" className="hoja__btn afComp__btn" onClick={() => window.print()}>
               Imprimir o guardar en PDF
             </button>
-          }
-        </div>
-      </Modal>
-    </LayoutDasboard>
+          : null}>
+        {factura &&
+          <div className="afComp" id="afComprobante">
+            <div className="afComp__cab">
+              <div>
+                <p className="afComp__marca">Allpa Food</p>
+                <p className="afComp__sub">Comprobante interno de pago</p>
+              </div>
+              <div className="afComp__num">
+                <span>N°</span>
+                <b>{factura.id}</b>
+              </div>
+            </div>
+
+            <div className="afComp__datos">
+              {nombreCliente &&
+                <p><span>Cliente</span><b>{nombreCliente}</b></p>}
+              <p><span>Fecha</span><b>{fechaLarga(factura.emissionDate)}</b></p>
+              <p><span>Estado</span><b>{ESTADOS[factura.status] || factura.status}</b></p>
+              {factura.paymentMethod &&
+                <p><span>Medio de pago</span><b>{factura.paymentMethod}</b></p>}
+              {factura.paymentReference &&
+                <p><span>Referencia</span><b>{factura.paymentReference}</b></p>}
+            </div>
+
+            <div className="afComp__lineas">
+              {(factura.details || []).map((d, i) => (
+                <p key={i} className={Number(d.value) < 0 ? 'afComp__linea afComp__linea--menos' : 'afComp__linea'}>
+                  <span>{d.name}</span>
+                  <b>{soles(d.value)}</b>
+                </p>
+              ))}
+            </div>
+
+            <p className="afComp__total">
+              <span>Total</span>
+              <b>{soles(factura.totalPrice)}</b>
+            </p>
+
+            <p className="afComp__pie">
+              Documento interno de Allpa Food. No constituye comprobante
+              electrónico ante SUNAT.
+            </p>
+          </div>
+        }
+      </Hoja>
+    </Pantalla>
   )
 };
 

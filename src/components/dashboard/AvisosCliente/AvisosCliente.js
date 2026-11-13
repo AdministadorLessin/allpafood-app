@@ -6,7 +6,7 @@ import axios from 'axios';
 import './AvisosCliente.scss';
 import { useAuthContext } from '../../../context/authContext';
 import { motion, alToque } from '../../ultil/Motion/Motion';
-import IcoIsotipoSvg from '../../ultil/iconSvg/icoIsotipoSvg';
+import Isotipo from '../../ultil/Isotipo';
 import IlustracionFeriado from './IlustracionFeriado';
 import { API_URL } from '../../../config';
 
@@ -72,10 +72,11 @@ const AvisosCliente = ({ oculto }) => {
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, y: 26 }}
+        initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: [0.16, 0.84, 0.44, 1] }}
+        transition={{ type: 'spring', stiffness: 220, damping: 28 }}
       >
+        <span className="afAviso__asa" aria-hidden="true" />
         <div className="afAviso__top">
           {feriado ? (
             <>
@@ -90,7 +91,7 @@ const AvisosCliente = ({ oculto }) => {
               <span className="afAviso__chip">{cuando.texto}</span>
             </>
           ) : (
-            <span className="afAviso__iso"><IcoIsotipoSvg /></span>
+            <span className="afAviso__iso"><Isotipo size={26} /></span>
           )}
 
           <h2 className="afAviso__tit">{principal.titulo}</h2>
@@ -100,7 +101,7 @@ const AvisosCliente = ({ oculto }) => {
         <div className="afAviso__cuerpo">
           {feriado &&
             <p className="afAviso__nota">
-              <span className="afAviso__punto" />
+              <span className="afAviso__punto" aria-hidden="true">DATO</span>
               <span>Tu envío no se pierde. Queda en tu saldo y puedes usarlo el día que quieras.</span>
             </p>
           }

@@ -1,18 +1,12 @@
 import React,{useState, useEffect, useRef} from "react";
 import './ubicaciones.scss';
-import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
+import Pantalla, { Tramo } from './../../../components/perfil/Pantalla/Pantalla';
+import '../../../components/perfil/Edit/campos.scss';
 
-import icoPreguntasFrecuentes from '../../../assets/img/ico_preguntas_frecuentes.svg';
-import icoMarker from '../../../assets/img/ico_marker.svg';
 // El pin traia el logo antiguo (un arbol). Este es el isotipo actual.
 import icoMarkerPin from '../../../assets/img/isotipo_allpafood.png';
-import { Cascada, Bloque } from './../../../components/ultil/Motion/Motion';
 
-import TextField from '@mui/material/TextField';
 import Skeleton from '@mui/material/Skeleton';
-
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 import {useAuthContext} from '../../../context/authContext';
 import axios from 'axios';
@@ -21,8 +15,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import { AnimatePresence } from "motion/react"
-import * as motion from "motion/react-client"
 
 import { 
     APIProvider,
@@ -410,240 +402,104 @@ const UbicacionesPage = (props) => {
 
     const hayPunto = dataAddPoint.location.latitude !== 0;
 
+    const PIN = (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" /><path d="M12 12a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5z" />
+        </svg>
+    );
+    const campo = (nombre, etiqueta, ejemplo, valor) => (
+        <label className="cuF__campo" htmlFor={nombre}>
+            <span className="cuF__et">{etiqueta}</span>
+            <input className="cuF__in" id={nombre} type="text" placeholder={ejemplo} autoComplete="off"
+                aria-invalid={errors[nombre] ? 'true' : undefined}
+                {...register(nombre, { onChange: changeFields })}
+                value={valor || ''} />
+            {errors[nombre]?.message && <span className="cuF__error" role="alert">{errors[nombre].message}</span>}
+        </label>
+    );
+
     return (
-        <LayoutDasboard claseStyle={false}>
-            <Cascada className="afPanel afPanel--dirs">
+        <Pantalla etiqueta="Mis direcciones" titulo="Dónde te entregamos"
+            bajada="Cada día puede llegarte a un lugar distinto. Lo eliges en el Menú."
+            clase="dir">
 
-                <Bloque><h1 className="afPanel__titular">Mis direcciones</h1></Bloque>
-                <Bloque>
-                    <p className="afMenu__ayuda">
-                        Son los lugares donde te dejamos tu almuerzo. Puedes tener varios
-                        —tu casa, tu oficina— y elegir a cuál llega cada día.
+            {/* Primero lo que ya tiene: es a lo que viene la mayoria, a
+                comprobar o cambiar a donde le llega. */}
+            <Tramo as="section" className="dir__lugares" aria-label="Tus direcciones">
+                {errorUbi && <p className="cuP__aviso" role="alert">{errorUbi}</p>}
+
+                {loadPl &&
+                    <>
+                        <Skeleton variant="rounded" height={78} sx={{ borderRadius: '22px' }} />
+                        <Skeleton variant="rounded" height={78} sx={{ borderRadius: '22px' }} />
+                    </>
+                }
+
+                {!loadPl && (!pointList || pointList.length === 0) &&
+                    <p className="cuP__vacio">
+                        Todavía no tienes ninguna dirección guardada. Agrega la
+                        primera aquí abajo y ahí te dejaremos tu almuerzo.
                     </p>
-                </Bloque>
+                }
 
-                <div className="afDirs__col afDirs__col--principal">
+                {!loadPl && (pointList || []).map((item) => (
+                    <div className={`dir__lugar${item.assigned ? ' is-on' : ''}`} key={item.id}>
+                        <span className="dir__ico" aria-hidden="true">{PIN}</span>
+                        <span className="dir__txt">
+                            <b>
+                                {item.name || item.address}
+                                {item.assigned && <span className="cuP__chip">La de siempre</span>}
+                            </b>
+                            {/* Sin distrito guardado, no se escribe "undefined"
+                                al costado de la calle. */}
+                            <small>{[item.name ? item.address : null, item.district].filter(Boolean).join(' · ')}</small>
+                            {item.description && <small>{item.description}</small>}
+                            {!item.assigned &&
+                                <span className="dir__acciones">
+                                    <button type="button" className="dir__usar" onClick={() => updateUbi(item)}>
+                                        Entregar aquí
+                                    </button>
+                                    <button type="button" className="dir__borrar"
+                                        aria-label={`Borrar ${item.name || item.address}`}
+                                        onClick={() => removeUbi(item)}>
+                                        Borrar
+                                    </button>
+                                </span>}
+                        </span>
+                    </div>
+                ))}
 
-                    {/* Primero lo que ya tiene: es a lo que viene la mayoria, a
-                        comprobar o cambiar a donde le llega. */}
-                    <Bloque>
-                        <div className="afCard">
-                            <div className="afCard__head">
-                                <span className="afCard__title">Tus lugares</span>
-                                {pointList && pointList.length > 0 &&
-                                    <span className="afCard__label">{pointList.length}</span>}
-                            </div>
+                {!loadPl && pointList && pointList.length > 0 &&
+                    <p className="cuP__nota dir__nota">
+                        La dirección marcada es la que usamos por defecto. Para un día
+                        puntual puedes elegir otra desde el Menú.
+                    </p>}
+            </Tramo>
 
-                            {errorUbi && <p className="afMenu__error">{errorUbi}</p>}
+            {/* Agregar una, en el orden en que se usa: primero el punto en el
+                mapa, despues los datos del lugar. Es donde la gente se perdia
+                —el formulario aparecia vacio, sin decir que habia que marcar
+                el mapa primero—. */}
+            <Tramo as="section" className="cuP__bloque dir__nueva">
+                <h2>Agregar otra dirección</h2>
 
-                            {loadPl &&
-                                <>
-                                    <Skeleton variant="rounded" height={74} sx={{ borderRadius: '16px', mb: 1 }} />
-                                    <Skeleton variant="rounded" height={74} sx={{ borderRadius: '16px' }} />
-                                </>
-                            }
-
-                            {!loadPl && (!pointList || pointList.length === 0) &&
-                                <p className="afMenu__nota afMenu__nota--suelta">
-                                    Todavía no tienes ninguna dirección guardada. Agrega la
-                                    primera aquí abajo y ahí te dejaremos tu almuerzo.
-                                </p>
-                            }
-
-                            {!loadPl && (pointList || []).map((item) => (
-                                <div className={`afDir2${item.assigned ? ' afDir2--activa' : ''}`} key={item.id}>
-                                    <span className="afDir2__ico"><img src={icoMarkerPin} alt="" /></span>
-                                    <div className="afDir2__txt">
-                                        <b>{item.name || item.address}</b>
-                                        {/* Sin distrito guardado, no se escribe "undefined"
-                                            al costado de la calle. */}
-                                        <small>{[item.name ? item.address : null, item.district].filter(Boolean).join(' · ')}</small>
-                                        {item.description && <small>{item.description}</small>}
-                                    </div>
-                                    <div className="afDir2__acciones">
-                                        {item.assigned
-                                            ? <span className="afDir2__aqui">Aquí llega tu almuerzo</span>
-                                            : <>
-                                                <button type="button" className="afDir2__usar"
-                                                    onClick={() => updateUbi(item)}>
-                                                    Entregar aquí
-                                                </button>
-                                                <button type="button" className="afDir2__borrar"
-                                                    aria-label={`Borrar ${item.name || item.address}`}
-                                                    onClick={() => removeUbi(item)}>
-                                                    <DeleteIcon />
-                                                </button>
-                                              </>
-                                        }
-                                    </div>
-                                </div>
-                            ))}
-
-                            <p className="afMenu__nota afMenu__nota--suelta">
-                                La dirección marcada es la que usamos por defecto. Para un día
-                                puntual puedes elegir otra desde <b>Mi menú</b>.
-                            </p>
-                        </div>
-                    </Bloque>
-
-                    {/* Agregar una: en tres pasos numerados. Es donde la gente se
-                        perdia —el formulario aparecia vacio, sin decir que habia
-                        que marcar el mapa primero—. */}
-                    <Bloque className="afDirs__forma">
-                        <div className="afCard afDirs__nueva">
-                            <div className="afCard__head">
-                                <span className="afCard__title">Agregar una dirección</span>
-                            </div>
-
-                            <ol className="afPasos3">
-                                <li className={hayPunto ? 'afPasos3__ok' : 'afPasos3__on'}>
-                                    <span className="afPasos3__n">1</span>
-                                    <div>
-                                        <b>Marca el punto en el mapa</b>
-                                        <small>
-                                            Busca tu calle arriba del mapa, toca el punto donde
-                                            queda tu puerta o arrastra el pin. Ahí es donde llega
-                                            el motorizado.
-                                        </small>
-                                        {/* La calle que resolvio el mapa, para que el cliente
-                                            la confirme antes de guardarla.
-
-                                            Antes se mostraba y ya. Nadie la revisaba, y en la
-                                            base terminaron direcciones como "3101" sin calle, o
-                                            la misma avenida escrita dos veces. El mapa acierta
-                                            casi siempre, pero el que sabe donde vive es el
-                                            cliente: verla y poder corregirla vale mas que
-                                            adivinarla mejor. */}
-                                        {hayPunto &&
-                                            <div className="afDirs__calle">
-                                                <label htmlFor="calleConfirmada">
-                                                    Dirección {distrito ? `· ${distrito}` : ''}
-                                                </label>
-                                                <input
-                                                    id="calleConfirmada"
-                                                    value={calleDelMapa || ''}
-                                                    placeholder="Av. Ejemplo 123"
-                                                    onChange={(e) => {
-                                                        setCalleDelMapa(e.target.value);
-                                                        setCalleTocada(true);
-                                                    }}
-                                                />
-                                                <small>
-                                                    {calleTocada
-                                                        ? 'Así va a quedar guardada.'
-                                                        : 'La sacamos del mapa. Corrígela si le falta el número o está mal.'}
-                                                </small>
-                                            </div>
-                                        }
-
-                                        {/* El mapa no siempre devuelve el distrito —en
-                                            varias avenidas grandes contesta "Lima" y nada
-                                            mas—. Sin esto el cliente no tenia como seguir. */}
-                                        {hayPunto && !distrito &&
-                                            <div className="afDirs__calle">
-                                                <label htmlFor="distritoManual">Distrito</label>
-                                                <input
-                                                    id="distritoManual"
-                                                    placeholder="San Isidro"
-                                                    value={distritoManual}
-                                                    onChange={(e) => setDistritoManual(e.target.value)}
-                                                />
-                                                <small>
-                                                    {distritoNoDetectado
-                                                        ? 'No pudimos detectarlo desde el mapa. Escríbelo aquí.'
-                                                        : 'Escribe el distrito donde te entregamos.'}
-                                                </small>
-                                            </div>
-                                        }
-                                    </div>
-                                </li>
-                                <li className={hayPunto ? 'afPasos3__on' : ''}>
-                                    <span className="afPasos3__n">2</span>
-                                    <div>
-                                        <b>Cuéntanos del lugar</b>
-                                        <small>Cómo le llamas, el número o departamento y una referencia.</small>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span className="afPasos3__n">3</span>
-                                    <div>
-                                        <b>Guarda</b>
-                                        <small>Queda en tu lista y la puedes usar cuando quieras.</small>
-                                    </div>
-                                </li>
-                            </ol>
-
-                            <form onSubmit={handleSubmit(onSubmitHandler)}
-                                className={hayPunto ? 'afDirs__form' : 'afDirs__form afDirs__form--espera'}>
-
-                                <div className="textFieldBox">
-                                    <TextField
-                                        id="name"
-                                        name="name"
-                                        label="¿Cómo le llamas a este lugar?"
-                                        placeholder="Casa · Oficina · Casa de mis papás"
-                                        variant="filled"
-                                        error={errors.name ? true : false}
-                                        {...register("name", { onChange: changeFields })}
-                                        value={dataAddPoint.name || ''}
-                                    />
-                                </div>
-
-                                <div className="textFieldBox">
-                                    <TextField
-                                        id="address"
-                                        name="address"
-                                        label="Número, departamento u oficina"
-                                        placeholder="Dpto. 402 · Oficina B · Casa 15"
-                                        variant="filled"
-                                        error={errors.address ? true : false}
-                                        {...register("address", { onChange: changeFields })}
-                                        value={dataAddPoint.address}
-                                    />
-                                </div>
-
-                                <div className="textFieldBox">
-                                    <TextField
-                                        id="description"
-                                        name="description"
-                                        label="Referencia para el motorizado"
-                                        placeholder="Portón verde, al lado de la farmacia"
-                                        variant="filled"
-                                        error={errors.description ? true : false}
-                                        {...register("description", { onChange: changeFields })}
-                                        value={dataAddPoint.description}
-                                    />
-                                </div>
-
-                                <button type="submit" className="afBtn afDirs__guardar" disabled={!hayPunto}>
-                                    Guardar esta dirección
-                                </button>
-
-                                {!hayPunto &&
-                                    <p className="afMenu__nota afMenu__nota--suelta">
-                                        Primero marca el punto en el mapa y estos campos se activan.
-                                    </p>
-                                }
-                            </form>
-                        </div>
-                    </Bloque>
+                <div className="dir__paso">
+                    <span className={`dir__n${hayPunto ? ' is-ok' : ' is-on'}`} aria-hidden="true">
+                        {hayPunto
+                            ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
+                            : 1}
+                    </span>
+                    <div>
+                        <b>Marca el punto en el mapa</b>
+                        <small>
+                            Busca tu calle, toca el punto donde queda tu puerta o arrastra
+                            el pin. La punta del pin es donde llega el motorizado.
+                        </small>
+                    </div>
                 </div>
 
-                <div className="afDirs__col afDirs__col--mapa">
-                    <Bloque>
-                        <div className="afCard afDirs__mapa">
-                            <div className="afCard__head">
-                                <span className="afCard__title">El mapa</span>
-                                <button type="button" className="afMenu__mini" onClick={usarMiUbicacion}>
-                                    {buscandoUbi ? 'Buscando…' : 'Usar mi ubicación'}
-                                </button>
-                            </div>
-                            <p className="afMenu__nota afMenu__nota--suelta">
-                                Toca el mapa donde queda tu puerta o arrastra el pin. La
-                                punta del pin es el punto exacto al que llega el motorizado.
-                            </p>
-                    <div className="ubiPageMapRight">
-                        <div className="inlineFlex ubiPageMapApi">
+                <div className="dir__mapa">
+                    <div className="ubiPageMapApi">
                             <APIProvider apiKey={MAPS_KEY}>
                                 <Map
                                     mapId={MAPS_ID}
@@ -720,20 +576,88 @@ const UbicacionesPage = (props) => {
                                     <PlaceAutocomplete onPlaceSelect={setSelectedPlace} />
                                 </div>
                             </APIProvider>
-                            {!statusUbi &&
+                        {!statusUbi &&
                             <div className="searchNotCobertura">
                                 <p>Todavía no llegamos a esa zona. Prueba con otro punto del mapa.</p>
                             </div>
-                            }
-                        </div>
-
+                        }
                     </div>
-                        </div>
-                    </Bloque>
+                    <button type="button" className="cuP__enlace" onClick={usarMiUbicacion}>
+                        {buscandoUbi ? 'Buscando…' : 'Usar mi ubicación'}
+                    </button>
                 </div>
 
-            </Cascada>
-        </LayoutDasboard>
+                {/* La calle que resolvio el mapa, para que el cliente la
+                    confirme antes de guardarla. El mapa acierta casi siempre,
+                    pero el que sabe donde vive es el cliente: verla y poder
+                    corregirla vale mas que adivinarla mejor. */}
+                {hayPunto &&
+                    <div className="cuF dir__confirma">
+                        <label className="cuF__campo" htmlFor="calleConfirmada">
+                            <span className="cuF__et">Dirección{distrito ? ` · ${distrito}` : ''}</span>
+                            <input className="cuF__in"
+                                id="calleConfirmada"
+                                value={calleDelMapa || ''}
+                                placeholder="Av. Ejemplo 123"
+                                onChange={(e) => {
+                                    setCalleDelMapa(e.target.value);
+                                    setCalleTocada(true);
+                                }}
+                            />
+                            <span className="dir__pista">
+                                {calleTocada
+                                    ? 'Así va a quedar guardada.'
+                                    : 'La sacamos del mapa. Corrígela si le falta el número o está mal.'}
+                            </span>
+                        </label>
+
+                        {/* El mapa no siempre devuelve el distrito —en varias
+                            avenidas grandes contesta "Lima" y nada mas—. Sin
+                            esto el cliente no tenia como seguir. */}
+                        {!distrito &&
+                            <label className="cuF__campo" htmlFor="distritoManual">
+                                <span className="cuF__et">Distrito</span>
+                                <input className="cuF__in"
+                                    id="distritoManual"
+                                    placeholder="San Isidro"
+                                    value={distritoManual}
+                                    onChange={(e) => setDistritoManual(e.target.value)}
+                                />
+                                <span className="dir__pista">
+                                    {distritoNoDetectado
+                                        ? 'No pudimos detectarlo desde el mapa. Escríbelo aquí.'
+                                        : 'Escribe el distrito donde te entregamos.'}
+                                </span>
+                            </label>
+                        }
+                    </div>
+                }
+
+                <div className="dir__paso">
+                    <span className={`dir__n${hayPunto ? ' is-on' : ''}`} aria-hidden="true">2</span>
+                    <div>
+                        <b>Cuéntanos del lugar</b>
+                        <small>Cómo le llamas, el número o departamento y una referencia.</small>
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit(onSubmitHandler)} noValidate
+                    className={`cuF dir__form${hayPunto ? '' : ' is-espera'}`}>
+                    {campo('name', '¿Cómo le llamas a este lugar?', 'Casa · Oficina · Casa de mis papás', dataAddPoint.name)}
+                    {campo('address', 'Número, departamento u oficina', 'Dpto. 402 · Oficina B · Casa 15', dataAddPoint.address)}
+                    {campo('description', 'Referencia para el motorizado', 'Portón verde, al lado de la farmacia', dataAddPoint.description)}
+
+                    <button type="submit" className="cuF__guardar" disabled={!hayPunto}>
+                        Guardar esta dirección
+                    </button>
+                </form>
+                {!hayPunto &&
+                    <p className="cuP__nota">
+                        Primero marca el punto en el mapa y estos campos se activan.
+                    </p>
+                }
+            </Tramo>
+        </Pantalla>
     )
 };
 

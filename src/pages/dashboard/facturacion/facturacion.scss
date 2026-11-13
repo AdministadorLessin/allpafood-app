@@ -1,227 +1,60 @@
-@import '../../../assets/css/mixin.scss';
+/* Mis pagos, con la identidad nueva (maqueta HojaPagos): una fila por
+   comprobante, separadas por lineas, y el comprobante completo en una hoja. */
 
-.facturasTable{
-    background: white;
-    border-radius: 25px !important;
-    overflow: hidden;
-    padding: 10px 20px 0px 20px;
-    box-shadow: 0px 0px 20px 0px rgba(0,0,0,.05);
+.pag{
+    &__cifras{
+        margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; gap: 8px;
+        padding: 16px 8px; border-radius: 26px; background: rgba(255,255,255,.62);
+        div{ text-align: center; min-width: 0; padding: 0 2px; }
+        b{ display: block; font-weight: 800; font-size: 19px; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+            color: var(--n-tinta); overflow-wrap: anywhere; }
+        small{ display: block; margin-top: 4px; font-size: 12px; line-height: 1.25; color: rgba(22,33,27,.75); }
+    }
+    &__lista{ margin-top: 12px; }
 }
 
-.facturasTable{
-    .btnPrimary{
-        padding: 10px 20px 10px 20px;
-        height: auto;
-        margin: 7px 0px 0px 0px;
-    }
-}
-
-
-
-.factModal{
-    background: #f7fff6;
-    width: 550px;
-    padding: 20px 30px 20px 30px;
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    outline: none;
-
-    /* El panel lleva la clase inlineFlex, que reparte a los hijos en FILA.
-       Con el titulo solo daba igual; al meter el comprobante debajo, el
-       titulo se iba al costado y el boton quedaba aplastado en un circulo.
-       Aqui se apilan, y el panel se desplaza si el comprobante es largo. */
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 4px;
-    overflow-y: auto;
-
-    @include mediaTablet{
-        width: 450px;
-    }
-    @include mediaPhone{
-        width: 95%;
-        padding: 15px 10px 15px 10px;
-    }
-}
-/* ==========================================================================
-   Comprobante interno.
-
-   El modal de "Ver detalle" solo tenia un titulo y nada debajo: se abria
-   vacio. Aqui va el comprobante, con el detalle por lineas que el API ya
-   devolvia y que nadie llegaba a mostrar.
-
-   Se imprime con el dialogo del navegador —que en Mac y en el celular
-   incluye "Guardar como PDF"— en vez de sumar una libreria de PDF por un
-   documento de una pagina.
-   ========================================================================== */
+/* --- El comprobante --- */
 .afComp{
-    width: 100%;
-    background: #fff;
-    border: 1px solid var(--af-line, #E4E7E4);
-    border-radius: 14px;
-    padding: 18px 18px 16px;
-    margin-top: 6px;
+    border-radius: 24px; background: var(--n-papel); padding: 18px;
+    font-family: var(--n-texto); color: var(--n-tinta);
+    p{ margin: 0; color: inherit; }
 
-    &__cab{
-        display: flex; align-items: flex-start; justify-content: space-between;
-        gap: 14px; padding-bottom: 12px;
-        border-bottom: 1px solid var(--af-line, #E4E7E4);
-    }
-    &__marca{ margin: 0; font-size: 17px; font-weight: 800; color: var(--af-ink, #142018); }
-    &__sub{ margin: 2px 0 0; font-size: 12px; color: var(--af-muted, #6B7168); }
+    &__cab{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--n-linea); }
+    &__marca{ font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+    &__sub{ margin-top: 2px !important; font-size: 12.5px; color: #55655C !important; }
     &__num{
         text-align: right; flex: 0 0 auto;
-        span{ display: block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--af-muted, #6B7168); }
-        b{ font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        span{ display: block; font-size: 11px; font-weight: 600; letter-spacing: .1em; color: #55655C; }
+        b{ display: block; font-size: 18px; font-weight: 800; color: var(--n-tinta); font-variant-numeric: tabular-nums; }
     }
-
-    &__datos{
-        padding: 12px 0;
-        border-bottom: 1px solid var(--af-line, #E4E7E4);
-        p{
-            display: flex; justify-content: space-between; gap: 12px;
-            margin: 0 0 5px; font-size: 13.5px;
-            span{ color: var(--af-muted, #6B7168); }
-            b{ font-weight: 700; text-align: right; text-transform: capitalize; }
-        }
+    &__datos, &__lineas{
+        padding: 6px 0; border-bottom: 1px solid var(--n-linea);
+        p{ display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 7px 0; font-size: 13.5px; }
+        span{ color: #55655C; flex: 0 1 auto; min-width: 0; }
+        b{ font-weight: 600; color: var(--n-tinta); text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
     }
-
-    &__lineas{ padding: 12px 0 8px; }
-    &__linea{
-        display: flex; justify-content: space-between; gap: 12px;
-        margin: 0 0 6px; font-size: 13.5px;
-        span{ color: var(--af-ink, #142018); }
-        b{ font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-        /* Los descuentos y las lineas en cero se apagan: son parte del
-           calculo pero no de lo que el cliente pago. */
-        &--menos b{ color: var(--af-accent, #0B6B52); }
-    }
-
+    &__lineas span{ color: var(--n-tinta); }
+    &__linea--menos b{ color: #0B6B43; }
     &__total{
-        display: flex; justify-content: space-between; align-items: baseline;
-        gap: 12px; margin: 0; padding-top: 12px;
-        border-top: 2px solid var(--af-ink, #142018);
-        span{ font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-        b{ font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 14px 0 0;
+        span{ font-size: 14px; font-weight: 600; }
+        b{ font-family: var(--n-titular); font-size: 28px; font-weight: 800; letter-spacing: -.03em; color: var(--n-tinta); font-variant-numeric: tabular-nums; }
     }
-
-    &__pie{
-        margin: 14px 0 0; font-size: 11px; line-height: 1.45;
-        color: var(--af-muted, #6B7168);
-    }
-
-    &__vacio{ font-size: 14px; color: var(--af-muted, #6B7168); padding: 14px 0; }
-
-    &__btn{
-        width: 100%; margin-top: 14px;
-        font-family: inherit; font-size: 14px; font-weight: 700;
-        color: #fff; background: var(--af-ink, #142018);
-        border: 0; border-radius: 999px; padding: 11px 16px; cursor: pointer;
-    }
+    &__pie{ margin-top: 12px !important; font-size: 11.5px; line-height: 1.45; color: #55655C !important; }
 }
 
-/* Al imprimir se manda SOLO el comprobante. Sin esto saldrian tambien el menu
-   lateral, la tabla de facturas y el saludo, y el cliente tendria que recortar
-   tres paginas para quedarse con una. */
+/* Al imprimir sale solo el comprobante, sin la hoja que lo contiene. */
 @media print{
     body * { visibility: hidden !important; }
     #afComprobante, #afComprobante * { visibility: visible !important; }
+    .hoja, .hoja__caja, .hoja__cuerpo{
+        position: static !important; transform: none !important; overflow: visible !important;
+        max-height: none !important; box-shadow: none !important;
+    }
+    .hoja__velo, .hoja__cab, .hoja__pie{ display: none !important; }
     #afComprobante{
         position: absolute; left: 0; top: 0;
         width: 100%; border: 0; padding: 0; margin: 0;
     }
     .afComp__btn{ display: none !important; }
-}
-
-/* ==========================================================================
-   Mis pagos, con el lenguaje del resto del panel: tarjetas claras, cifras
-   grandes y una fila por comprobante. Antes era una tabla de sistema con
-   paginador, que no se parecia en nada a la app.
-   ========================================================================== */
-.afPagos__cifras{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-}
-.afPagos__cifra{
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-bottom: 0 !important;
-
-    small{ font-size: 12px; color: var(--af-muted); }
-}
-.afPagos__et{
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--af-muted);
-}
-.afPagos__n{
-    font-size: 30px;
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -.03em;
-    color: var(--af-ink);
-    font-variant-numeric: tabular-nums;
-
-    &--txt{ font-size: 22px; letter-spacing: -.02em; }
-}
-.afPagos__cifra--ahorro .afPagos__n{ color: var(--af-accent); }
-
-/* Una fila por comprobante: fecha, estado, monto. Se toca para ver el
-   detalle completo. */
-.afRecibo{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 13px 0;
-    border: 0;
-    border-bottom: 1px solid var(--af-line);
-    background: none;
-    font-family: inherit;
-    text-align: left;
-    cursor: pointer;
-
-    &:last-child{ border-bottom: 0; }
-
-    &__txt{
-        flex: 1;
-        min-width: 0;
-        b{ display: block; font-size: 14.5px; font-weight: 700; color: var(--af-ink);
-           &::first-letter{ text-transform: uppercase; } }
-        small{ display: block; font-size: 12px; color: var(--af-muted); margin-top: 2px; }
-    }
-    &__estado{
-        flex: 0 0 auto;
-        font-size: 11.5px;
-        font-weight: 800;
-        padding: 4px 10px;
-        border-radius: var(--af-r-pill);
-        white-space: nowrap;
-
-        &--ok{ background: var(--af-accent-soft); color: var(--af-accent); }
-        &--espera{ background: #FDF1E4; color: #8A4A1E; }
-        &--nulo{ background: rgba(16,31,24,.06); color: var(--af-muted); }
-    }
-    &__monto{
-        flex: 0 0 auto;
-        font-size: 15px;
-        font-weight: 800;
-        color: var(--af-ink);
-        font-variant-numeric: tabular-nums;
-    }
-    &__ir{ color: var(--af-muted); font-size: 20px; line-height: 1; }
-}
-
-.afComp__titulo{
-    margin: 0 0 12px;
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--af-ink);
 }

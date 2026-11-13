@@ -61,6 +61,10 @@ $verde: #177A4C;
         background: #FF7A45; border: 2px solid #fff; }
 }
 
+/* Rodrigo: el mismo boton, en tinta, con el isotipo. */
+.inN__rodrigo{ display: flex; align-items: center; justify-content: center; padding: 0; background: #16211B; border-radius: 50%;
+    svg{ width: 20px; height: auto; } }
+
 /* --- Pedido de hoy --- */
 .inN__hoy{
     overflow: hidden; border-radius: 28px; background: $tinta; color: #fff;

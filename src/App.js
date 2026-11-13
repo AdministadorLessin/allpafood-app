@@ -1,6 +1,7 @@
 
 import '../src/assets/css/global.scss';
 import '../src/assets/css/escritorio.scss';
+import '../src/assets/css/identidad.scss';
 import React from 'react'
 
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
@@ -20,6 +21,9 @@ import EmpezarPage from './pages/autenticacion/empezar/empezar';
 import { VisitaInicio, VisitaCuenta } from './pages/visita/Visita';
 import InvitaPage from './pages/dashboard/invita/Invita';
 import InvitacionPage from './pages/invitacion/Invitacion';
+import ProgresoPage from './pages/dashboard/progreso/Progreso';
+import BienestarPage from './pages/dashboard/bienestar/Bienestar';
+import RodrigoPage from './pages/dashboard/rodrigo/Rodrigo';
 import PlanesPage from './pages/dashboard/planes/planes';
 import CheckoutPage from './pages/dashboard/checkout/checkout';
 import MenuPage from './pages/dashboard/menu/menu';
@@ -38,13 +42,17 @@ import PantallaError from './components/ultil/PantallaError';
 import AperturaNativa from './components/ultil/AperturaNativa/AperturaNativa';
 import { esNativo } from './nativo';
 
+/* Solo al programar: ?apertura en la direccion muestra la apertura en el
+   navegador. En el app publicado esto vale siempre false. */
+const verApertura = process.env.NODE_ENV !== 'production' && window.location.search.includes('apertura');
+
 function App() {
 
  
   return (
       <PantallaError>
       {/* Solo en el app instalado: el logo se dibuja al abrir. */}
-      {esNativo && <AperturaNativa />}
+      {(esNativo || verApertura) && <AperturaNativa />}
       <AuthContextProvider>
         <HelmetProvider>
             <BrowserRouter >
@@ -70,6 +78,11 @@ function App() {
                     <Route path='/mi-plan' element={ <MiPlanPage /> } />
                     {/* Invita y come gratis: el codigo del cliente y su escalera. */}
                     <Route path='/invita' element={ <InvitaPage /> } />
+                    {/* Rodrigo, el asistente: conversa, muestra en que trabaja y
+                        pide confirmar con un boton antes de cambiar nada. */}
+                    <Route path='/progreso' element={ <ProgresoPage /> } />
+                    <Route path='/bienestar' element={ <BienestarPage /> } />
+                    <Route path='/rodrigo' element={ <RodrigoPage /> } />
                     <Route path='/registro/perfil' element={ <RegistroPageProfile /> } />
                     <Route path='/registro/direccion' element={ <RegistroDireccionPage /> } />
                     <Route path='/registro/cocina' element={ <RegistroCocinaPage /> } />

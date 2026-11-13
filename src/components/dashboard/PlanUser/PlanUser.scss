@@ -1,13 +1,15 @@
 @import '../../../assets/css/mixin.scss';
 
-/* Crema: en el sistema nuevo cada color dice algo, y el crema es el plan.
-   Antes era un celeste translucido que no significaba nada. */
+/* La tarjeta del plan en el inicio de la web. Antes era crema (amarillo), que
+   la identidad nueva no usa: ahora es papel blanco con tinta, y el menta
+   queda para el punto y lo que esta a favor del cliente. */
 .dashPlanUser{
-    background: var(--af-cream);
+    position: relative;
+    background: var(--n-papel);
     display: flex;
     width: 100%;
-    border-radius: var(--af-r-card);
-    box-shadow: var(--af-shadow-s);
+    border-radius: 30px;
+    box-shadow: 0 14px 34px rgba(22,33,27,.08);
 }
 
 .dashPlanUserBox{
@@ -16,119 +18,88 @@
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
-    height: 190px;
-    padding: 20px 30px 30px 50px;
-    transition: ease-in-out all .3ms;
+    min-height: 190px;
+    padding: 22px 26px 24px 48px;
     h2{
+        font-family: var(--n-titular);
         font-size: 32px;
         font-weight: 800;
         line-height: 1.04;
         letter-spacing: -.03em;
-        color: var(--af-cream-ink) !important;
+        color: var(--n-tinta) !important;
         display: flex;
         flex-direction: column;
         position: relative;
+        overflow-wrap: anywhere;
         &:before{
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: var(--af-accent);
+            background: var(--n-menta);
+            box-shadow: 0 0 0 2px var(--n-tinta);
             content: '';
             position: absolute;
-            top: 15px;
-            left: -30px;
+            top: 10px;
+            left: -28px;
             z-index: 1;
         }
     }
     ul{
-        margin: 0px;
+        margin: 14px 0 0;
+        padding: 14px 0 0;
         display: flex;
         width: 100%;
         justify-content: space-between;
+        gap: 12px;
+        border-top: 1px solid var(--n-linea);
         li{
+            min-width: 0;
             small{
-                font-size: 16px;
-                color: var(--dark-gris);
+                display: block;
+                font-size: 12.5px;
+                color: #55655C;
             }
             p{
-                font-size: 20px;
-                color: var(--dark-blue);
-                display: flex;
-                align-items: center;
-                font-family: "Days One", sans-serif;
-                justify-content: center;
-                small{
-                    font-size: 20px;
-                }
+                margin-top: 2px;
+                font-family: var(--n-texto);
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--n-tinta);
+                font-variant-numeric: tabular-nums;
+                small{ font-size: 18px; }
             }
-        }
-    }
-    @include mediaLaptop{
-        padding: 35px 25px 25px 45px;
-        h2{
-            font-size: 34px;
-            &:before{
-                top: 7px;
-            }
-        }
-        ul{
-            li{
-                small{
-                    font-size: 14px;
-                }
-                p{
-                    font-size: 16px;
-                }
-            }
-        }
-    }
-    @include mediaTablet{
-        padding: 40px 20px 40px 40px;
-        h2{
-            font-size: 33px;
         }
     }
     @include mediaPhone{
-        padding: 20px 18px 18px 40px;
-        height: auto;
+        padding: 20px 18px 18px 42px;
         h2{
             font-size: 28px;
-            margin-bottom: 20px;
-            &:before{
-                top: 5px;
-                left: -25px;
-            }
+            &:before{ top: 8px; left: -24px; }
         }
     }
 }
 
-/* La nota va discreta dentro de la tarjeta crema, no como una etiqueta oscura
-   pegada encima. */
+/* La nota va discreta dentro de la tarjeta, no como una etiqueta pegada
+   encima. */
 .dpubNote{
-    background: rgba(122,90,17,.10);
-    border-radius: 8px;
-    padding: 3px 5px 3px 5px;
-    margin: 10px 0px 5px;
-    width: auto;
+    margin: 8px 0 0;
     display: flex;
     p{
-        color: var(--af-cream-ink) !important;
-        font-size: 10px;
-        color: white;
-        line-height: 1.2;
+        color: #55655C !important;
+        font-size: 13px;
+        line-height: 1.4;
     }
 }
 
-/* Los creditos son buena noticia (el cliente ya pago otro plan): verde solido
-   y legible, no menta claro con texto blanco encima. */
+/* Los envios esperando son buena noticia (el cliente ya pago otro plan). */
 .dpubCredits{
     position: absolute;
     top: 14px;
     right: 14px;
-    background: var(--af-accent);
-    padding: 4px 12px;
-    border-radius: var(--af-r-pill);
-    font-size: 11.5px;
-    font-weight: 700;
-    color: white;
+    background: var(--n-menta-suave);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0B6B43;
 }

@@ -18,25 +18,10 @@
     &__ic{ width: 18px; height: 18px; }
 }
 
-.afSalirDlg{
-    padding: 26px 24px 20px;
-    max-width: 340px;
-
-    h3{
-        font-size: 19px !important;
-        font-weight: 700;
-        margin: 0 0 8px !important;
-        color: var(--af-ink) !important;
-    }
-    p{
-        font-size: 14px;
-        line-height: 1.5;
-        color: var(--af-muted);
-        margin: 0 0 22px;
-    }
-    &__acciones{
-        display: flex;
-        gap: 10px;
-        .afBtn{ margin: 0; flex: 1; }
-    }
+/* En "Yo": una linea de texto al pie de la pantalla. */
+.afSalirEnlace{
+    min-height: 48px; padding: 14px 0; border: 0; background: none; cursor: pointer;
+    font-family: inherit; font-size: 14.5px; font-weight: 600; color: var(--n-tinta);
+    -webkit-tap-highlight-color: transparent;
+    &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 2px; border-radius: 10px; }
 }

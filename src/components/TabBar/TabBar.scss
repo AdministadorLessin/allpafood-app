@@ -6,85 +6,92 @@
     z-index: 90;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
+    font-family: var(--n-texto);
 
-    /* Vidrio: el contenido se intuye detras en vez de cortarse en seco. */
-    background: rgba(18, 30, 24, .84);
+    /* Vidrio oscuro: el contenido se intuye detras en vez de cortarse. */
+    background: rgba(22, 33, 27, .9);
     -webkit-backdrop-filter: blur(22px) saturate(160%);
     backdrop-filter: blur(22px) saturate(160%);
-    border: 1px solid rgba(255,255,255,.09);
-    border-radius: var(--af-r-pill);
+    border-radius: 999px;
     padding: 7px;
     box-shadow: 0 4px 12px rgba(16,31,24,.10), 0 18px 40px -18px rgba(16,31,24,.45);
-    margin-bottom: env(safe-area-inset-bottom, 0px);
+    margin-bottom: var(--n-abajo);
+
+    /* La pildora es una sola y viaja; las pestañas van encima. */
+    &__pildora{
+        position: absolute;
+        left: 0;
+        top: 7px;
+        bottom: 7px;
+        border-radius: 999px;
+        background: var(--n-menta);
+        will-change: transform, width;
+    }
 }
 
 .afTab{
+    position: relative;
+    z-index: 1;
     text-decoration: none;
-    color: rgba(241, 246, 242, .6);
+    color: rgba(241, 246, 242, .62);
     min-width: 0;
-
-    /* La quinta entrada es un boton, no un enlace: hay que quitarle lo que el
-       navegador le pone de fabrica para que no se note la diferencia. */
-    &--centro{
-        border: 0;
-        background: none;
-        padding: 0;
-        font-family: inherit;
-        cursor: pointer;
-    }
+    border-radius: 999px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color .2s ease;
 
     &__caja{
         display: flex;
         align-items: center;
-        gap: 0;
-        padding: 11px;
-        border-radius: var(--af-r-pill);
-        transition: background .28s cubic-bezier(.16,.84,.44,1),
-                    padding .28s cubic-bezier(.16,.84,.44,1);
+        padding: 12px;
+        border-radius: 999px;
     }
-    &__ic{ width: 21px; height: 21px; flex: 0 0 auto; }
-
-    &__caja{ position: relative; }
-    &__punto{
-        position: absolute;
-        top: 4px; right: 4px;
-        min-width: 16px; height: 16px;
-        padding: 0 4px;
-        border-radius: var(--af-r-pill);
-        background: #D8622F;
-        color: #fff;
-        font-size: 10px; font-weight: 800; line-height: 16px;
-        text-align: center;
-        border: 2px solid #121E18;
-    }
+    &__ic{ width: 22px; height: 22px; flex: 0 0 auto; }
     &__txt{
-        font-size: 13.5px;
+        font-size: 14px;
         font-weight: 700;
         white-space: nowrap;
         max-width: 0;
         opacity: 0;
         overflow: hidden;
-        transition: max-width .3s cubic-bezier(.16,.84,.44,1),
-                    opacity .2s ease,
-                    margin-left .3s cubic-bezier(.16,.84,.44,1);
     }
 
     &--on{
-        color: var(--af-ink);
-        .afTab__caja{
-            background: var(--af-mint);
-            padding: 11px 17px 11px 13px;
-        }
+        color: var(--n-tinta);
+        .afTab__caja{ padding: 12px 16px 12px 13px; }
         .afTab__txt{
             max-width: 110px;
             opacity: 1;
-            margin-left: 8px;
+            margin-left: 7px;
+            /* El nombre aparece cuando la pildora ya llego. */
+            animation: afTabTxt .3s .12s both ease-out;
         }
     }
+    &:focus-visible{ outline: 2px solid var(--n-menta); outline-offset: 2px; }
 }
+@keyframes afTabTxt{ from{ opacity: 0; transform: translateX(-4px); } to{ opacity: 1; transform: none; } }
 
-/* La pildora flota sobre el contenido: el espacio va en el contenedor que de
+/* Rodrigo: solo su icono, flotando sobre la barra, a la derecha. */
+.afRodrigo{
+    position: fixed; z-index: 89; right: 24px; bottom: calc(var(--n-abajo) + 90px);
+    a{ display: block; border-radius: 33.4%; -webkit-tap-highlight-color: transparent; }
+    .rCara{ box-shadow: 0 12px 28px rgba(22,33,27,.26), 0 2px 6px rgba(22,33,27,.12); }
+}
+@media (min-width: 992px){ .afRodrigo{ display: none; } }
+
+/* Solo en la web: la campana de avisos, arriba a la derecha. */
+.afCampana{
+    position: fixed; z-index: 89; top: 14px; right: 16px;
+    width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(255,255,255,.92); color: var(--n-tinta); box-shadow: var(--n-sombra);
+    display: flex; align-items: center; justify-content: center;
+    svg{ width: 21px; height: 21px; }
+    i{ position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 9px;
+        background: var(--n-coral); color: #fff; font: 800 10px/18px var(--n-texto); font-style: normal; text-align: center; }
+}
+@media (min-width: 992px){ .afCampana{ display: none; } }
+
+/* La barra flota sobre el contenido: el espacio va en el contenedor que de
    verdad hace scroll. */
 .pageLayout{ padding-bottom: 40px; }
 .mainLayoutBox{ padding-bottom: 110px !important; }
@@ -93,4 +100,7 @@
     .afTabs{ display: none; }
     .pageLayout{ padding-bottom: 0; }
     .mainLayoutBox{ padding-bottom: 30px !important; }
+}
+@media (prefers-reduced-motion: reduce){
+    .afTab--on .afTab__txt{ animation: none; }
 }

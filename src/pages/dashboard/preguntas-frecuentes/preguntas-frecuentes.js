@@ -11,8 +11,9 @@ import './preguntas-frecuentes.scss';
 import Skeleton from '@mui/material/Skeleton';
 import axios from 'axios';
 
-import LayoutDasboard from './../../../components/LayoutDashborad/LayoutDashboard';
-import { Cascada, Bloque, motion, alToque } from './../../../components/ultil/Motion/Motion';
+import { motion, useReducedMotion } from 'motion/react';
+import Pantalla, { Tramo } from './../../../components/perfil/Pantalla/Pantalla';
+import { resorte } from '../../../movimiento';
 
 const WHATSAPP = '51955797697';
 
@@ -32,6 +33,7 @@ const PreguntasFrecuentesPage = () => {
 
     const [faqList, setFaqList] = useState(null);
     const [abierta, setAbierta] = useState(0);
+    const quieto = useReducedMotion();
 
     useEffect(() => {
         axios.get('https://admin-landing.allpafood.com/wp-json/wp/v2/preguntas-frecuentes')
@@ -40,71 +42,67 @@ const PreguntasFrecuentesPage = () => {
     }, []);
 
     return (
-        <LayoutDasboard claseStyle={false}>
-            <Cascada className="afPanel">
+        <Pantalla etiqueta="Ayuda" titulo="Preguntas frecuentes"
+            bajada="Lo que más nos preguntan sobre los planes, las entregas y los platos."
+            clase="faq">
 
-                <Bloque><h1 className="afPanel__titular">Preguntas frecuentes</h1></Bloque>
-                <Bloque>
-                    <p className="afMenu__ayuda">
-                        Lo que más nos preguntan sobre los planes, las entregas y los platos.
-                    </p>
-                </Bloque>
-
-                <Bloque>
-                    <div className="afCard afFaq">
-                        {faqList === null &&
-                            [0, 1, 2, 3].map((i) => (
-                                <div className="afFaq__it" key={i}>
-                                    <Skeleton variant="text" width={`${70 - i * 8}%`} height={28} />
-                                </div>
-                            ))
-                        }
-
-                        {faqList && faqList.length === 0 &&
-                            <p className="afMenu__nota afMenu__nota--suelta">
-                                No pudimos cargar las preguntas. Escríbenos y te respondemos al toque.
-                            </p>
-                        }
-
-                        {(faqList || []).map((item, i) => {
-                            const abierto = abierta === i;
-                            const pregunta = aTexto(item?.title?.rendered);
-                            const respuesta = aTexto(item?.content?.rendered);
-                            return (
-                                <div className={`afFaq__it${abierto ? ' afFaq__it--on' : ''}`} key={item.id || i}>
-                                    <button type="button" className="afFaq__btn"
-                                        aria-expanded={abierto}
-                                        onClick={() => setAbierta(abierto ? -1 : i)}>
-                                        <span>{pregunta}</span>
-                                        <i className="afFaq__mas" aria-hidden="true">{abierto ? '−' : '+'}</i>
-                                    </button>
-                                    {abierto &&
-                                        <p className="afFaq__txt">{respuesta}</p>
-                                    }
-                                </div>
-                            );
-                        })}
-                    </div>
-                </Bloque>
-
-                {/* La salida: quien llega hasta abajo sin respuesta necesita una
-                    persona, no otra pantalla. */}
-                <Bloque>
-                    <div className="afCard afFaq__ayuda">
-                        <div>
-                            <b>¿No encuentras tu respuesta?</b>
-                            <small>Te contestamos por WhatsApp de lunes a viernes.</small>
+            <Tramo className="faq__lista">
+                {faqList === null &&
+                    [0, 1, 2, 3].map((i) => (
+                        <div className="faq__it" key={i}>
+                            <Skeleton variant="text" width={`${70 - i * 8}%`} height={30} sx={{ my: '14px' }} />
                         </div>
-                        <motion.a className="afBtn afBtn--mint afFaq__wa"
-                            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola, tengo una consulta sobre mi plan.')}`}
-                            target="_blank" rel="noreferrer" {...alToque}>
-                            Escribirnos
-                        </motion.a>
-                    </div>
-                </Bloque>
+                    ))
+                }
 
-            </Cascada>
-        </LayoutDasboard>
+                {faqList && faqList.length === 0 &&
+                    <p className="cuP__vacio">
+                        No pudimos cargar las preguntas. Escríbenos y te respondemos pronto.
+                    </p>
+                }
+
+                {(faqList || []).map((item, i) => {
+                    const abierto = abierta === i;
+                    const pregunta = aTexto(item?.title?.rendered);
+                    const respuesta = aTexto(item?.content?.rendered);
+                    const id = `faq-r-${item.id || i}`;
+                    return (
+                        <div className={`faq__it${abierto ? ' is-on' : ''}`} key={item.id || i}>
+                            <button type="button" className="faq__btn"
+                                aria-expanded={abierto} aria-controls={id}
+                                onClick={() => setAbierta(abierto ? -1 : i)}>
+                                <span>{pregunta}</span>
+                                <motion.i className="faq__mas" aria-hidden="true"
+                                    animate={{ rotate: abierto ? 45 : 0 }}
+                                    transition={quieto ? { duration: 0 } : resorte.toque}>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                                </motion.i>
+                            </button>
+                            {abierto &&
+                                <motion.p className="faq__txt" id={id}
+                                    initial={quieto ? false : { opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+                                    transition={quieto ? { duration: 0 } : resorte.entra}>
+                                    {respuesta}
+                                </motion.p>
+                            }
+                        </div>
+                    );
+                })}
+            </Tramo>
+
+            {/* La salida: quien llega hasta abajo sin respuesta necesita una
+                persona, no otra pantalla. */}
+            <Tramo className="cuP__tinta faq__ayuda">
+                <b>¿No encuentras tu respuesta?</b>
+                <p>Te contestamos por WhatsApp de lunes a viernes.</p>
+                <motion.a className="cuP__btn cuP__btn--menta"
+                    href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola, tengo una consulta sobre mi plan.')}`}
+                    target="_blank" rel="noreferrer" whileTap={{ scale: 0.97 }} transition={resorte.toque}>
+                    Escribirnos por WhatsApp
+                </motion.a>
+            </Tramo>
+
+        </Pantalla>
     );
 };
 

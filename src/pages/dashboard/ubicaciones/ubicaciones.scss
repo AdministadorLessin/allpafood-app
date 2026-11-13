@@ -692,3 +692,79 @@
         line-height: 1.35;
     }
 }
+
+/* Mis direcciones, con la identidad nueva (maqueta HojaDirecciones): tus
+   lugares como tarjetas —solo la de siempre va enmarcada— y debajo como
+   agregar otra, en el orden en que se usa: el mapa primero. */
+
+.dir{
+    &__lugares{ margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    &__lugar{
+        display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-radius: 22px;
+        background: var(--n-papel); border: 2.5px solid var(--n-papel);
+        &.is-on{ border-color: var(--n-tinta); align-items: center; }
+    }
+    &__ico{
+        width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; background: #F1F2EC; color: var(--n-tinta);
+        display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; }
+        .is-on &{ background: var(--n-menta); }
+    }
+    &__txt{
+        flex: 1; min-width: 0;
+        b{ display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; font-size: 15px; font-weight: 700; color: var(--n-tinta); overflow-wrap: anywhere; }
+        small{ display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: #55655C; overflow-wrap: anywhere; }
+    }
+    &__acciones{ display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; margin-top: 2px; }
+    &__usar, &__borrar{
+        min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; font-family: inherit;
+        font-size: 13px; font-weight: 600; color: var(--n-tinta); text-decoration: underline; text-underline-offset: 4px;
+        &:focus-visible{ outline: 3px solid var(--n-tinta); outline-offset: 2px; border-radius: 8px; }
+    }
+    &__borrar{ color: #B4372B; }
+    &__nota{ margin-top: 8px; }
+
+    /* --- Agregar otra --- */
+    &__paso{
+        margin-top: 20px; display: flex; gap: 12px; align-items: flex-start;
+        b{ display: block; font-size: 15px; font-weight: 700; color: var(--n-tinta); }
+        small{ display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: #55655C; }
+    }
+    &__n{
+        flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        background: rgba(22,33,27,.08); color: #55655C; font-size: 13px; font-weight: 800;
+        svg{ width: 14px; height: 14px; }
+        &.is-on{ background: var(--n-tinta); color: var(--n-menta); }
+        &.is-ok{ background: var(--n-menta); color: var(--n-tinta); }
+    }
+    &__mapa{
+        margin-top: 14px;
+        .ubiPageMapApi{
+            position: relative; width: 100%; height: 340px; border-radius: 26px; overflow: hidden; background: #E6E9E2;
+            @media (min-width: 600px){ height: 420px; }
+        }
+        .ubiPageMapApiStyle{ width: 100%; height: 100%; border: 0; border-radius: 0; }
+    }
+    &__confirma{ margin-top: 6px; }
+    &__pista{ display: block; margin: 6px 2px 0; font-size: 12px; line-height: 1.35; color: #55655C; }
+    &__form{
+        margin-top: 14px;
+        /* Mientras no hay punto marcado, los campos se ven apagados: se
+           entiende que falta algo antes, en vez de parecer rotos. */
+        &.is-espera{ opacity: .5; pointer-events: none; }
+    }
+}
+
+/* --- Dentro de "Mis direcciones": el buscador y el aviso del mapa con la
+   identidad nueva. Las reglas de arriba se quedan como estaban porque las
+   usan tambien el registro y el menu (ProgramMenu, FormStep3, direccion). --- */
+.dir{
+    .searchMapBox input{
+        height: 52px; border-radius: 18px; box-shadow: 0 8px 20px rgba(22,33,27,.18);
+        font-family: var(--n-texto); color: var(--n-tinta);
+    }
+    .searchNotCobertura{
+        right: 10px; bottom: 14px; border-radius: 14px; background: var(--n-tinta);
+        p{ padding: 8px 14px; font-size: 12.5px; line-height: 1.35; color: #fff; }
+    }
+}

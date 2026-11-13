@@ -2,9 +2,9 @@
 .afMapa{
     position: relative;
     width: 100%;
-    border-radius: 16px;
+    border-radius: 28px;
     overflow: hidden;
-    border: 1px solid var(--af-line, #E3E9DF);
+    background: #E3E8EA;
 
     &__lienzo{
         width: 100%;
@@ -17,19 +17,25 @@
     .leaflet-control-attribution{ font-size: 10px; }
 }
 
-/* El pin: punta abajo, que es el punto exacto. */
+/* El pin, a color: circulo menta con el pin en tinta. La punta de abajo es
+   el punto exacto (48 de ancho, 57 de alto: el ancla esta en la punta). */
 .afPinWrap{ background: none; border: 0; }
 
 .afPin{
-    display: block;
-    width: 22px;
-    height: 22px;
-    margin: 0 auto;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    background: var(--af-accent, #177A4C);
-    border: 3px solid #FFFFFF;
-    box-shadow: 0 2px 6px rgba(16,31,24,.35);
+    display: flex; flex-direction: column; align-items: center;
+    width: 48px; height: 57px;
+    &__c{
+        width: 48px; height: 48px; border-radius: 50%; box-sizing: border-box;
+        background: #3CFB9F; color: #16211B; border: 2.5px solid #16211B;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 20px rgba(22,33,27,.30);
+        svg{ width: 24px; height: 24px; display: block; }
+    }
+    &__p{
+        width: 0; height: 0; margin-top: -1px;
+        border-left: 7px solid transparent; border-right: 7px solid transparent;
+        border-top: 10px solid #16211B;
+    }
 }
 
 .afBuscaMapa{
@@ -41,15 +47,17 @@
 
     input{
         width: 100%;
-        border: 1px solid var(--af-line, #E3E9DF);
-        border-radius: 999px;
-        padding: 11px 16px;
+        height: 48px;
+        border: 0;
+        border-radius: 16px;
+        padding: 0 14px;
         font: inherit;
-        font-size: 14px;
+        font-size: 16px;
+        color: #16211B;
         background: #FFFFFF;
-        box-shadow: 0 2px 10px rgba(16,31,24,.18);
+        box-shadow: 0 8px 20px rgba(22,33,27,.12);
 
-        &:focus{ outline: 2px solid rgba(23,122,76,.3); }
+        &:focus{ outline: 2px solid #16211B; }
     }
 
     &__estado{
@@ -84,7 +92,7 @@
             border-radius: 9px;
             cursor: pointer;
 
-            &:hover{ background: var(--af-accent-soft, #E2F3E9); }
+            &:hover{ background: #F4F5EF; }
         }
     }
 }

@@ -1,0 +1,137 @@
+$gris: #55655C;
+
+.bie{
+    position: relative; padding: calc(var(--n-arriba) + 14px) 22px 30px; overflow: hidden;
+    a{ color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    button{ -webkit-tap-highlight-color: transparent; }
+    > *:not(.bie__menta){ position: relative; }
+    &__menta{ position: absolute; left: 0; right: 0; top: 0; height: 380px; pointer-events: none;
+        background: linear-gradient(180deg, #3CFB9F 0%, #8CFCC4 46%, rgba(246,246,241,0) 100%); }
+
+    &__sobre{ display: flex; align-items: center; gap: 8px; min-height: 46px; font-size: 13px; font-weight: 600; color: var(--n-tinta-78); }
+    h1{ margin: 6px 0 0; font-size: 42px; line-height: .98; }
+    &__bajada{ margin: 10px 0 0; font-size: 14px; line-height: 1.45; color: var(--n-tinta-78); }
+    &__et{ display: block; font-size: 11.500px; font-weight: 600; letter-spacing: .1em; color: $gris;
+        &--claro{ color: rgba(255,255,255,.72); } }
+
+    /* Tu semana */
+    &__reto{ display: block; margin-top: 22px; padding: 20px; border-radius: 32px; background: var(--n-tinta); color: #fff !important;
+        box-shadow: 0 18px 40px rgba(22,33,27,.28); }
+    &__retoTit{ display: block; margin-top: 10px; font-family: var(--n-titular); font-weight: 800; font-size: 30px; line-height: 1.05; letter-spacing: -.02em; }
+    &__retoDias{ margin-top: 16px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
+        i{ height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 12px; font-weight: 600;
+            background: rgba(255,255,255,.1); color: rgba(255,255,255,.72);
+            &.is-on{ background: var(--n-menta); color: var(--n-tinta); } } }
+    &__retoPie{ margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        font-size: 13.500px; line-height: 1.45; color: rgba(255,255,255,.82);
+        b{ color: #fff; } svg{ width: 20px; height: 20px; flex: 0 0 auto; color: var(--n-menta); } }
+
+    /* Rodrigo */
+    &__rodrigo{ margin-top: 14px; display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 30px;
+        background: #fff; box-shadow: 0 14px 34px rgba(22,33,27,.08); }
+    &__rodrigoCara{ width: 60px; height: 60px; flex: 0 0 auto; border-radius: 50%; background: var(--n-tinta); display: flex; align-items: center; justify-content: center; }
+    &__rodrigoTxt{ flex: 1; min-width: 0;
+        b{ display: block; margin-top: 2px; font-family: var(--n-titular); font-weight: 800; font-size: 22px; line-height: 1.1; letter-spacing: -.02em; }
+        small{ display: block; margin-top: 4px; font-size: 12.500px; line-height: 1.4; color: $gris; } }
+    &__rodrigoIr{ width: 44px; height: 44px; flex: 0 0 auto; border-radius: 50%; background: var(--n-tinta); color: #fff; display: flex; align-items: center; justify-content: center;
+        svg{ width: 18px; height: 18px; } }
+
+    /* Secciones */
+    &__sec{ margin-top: 30px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+        h2{ font-family: var(--n-texto); font-weight: 800; font-size: 24px; letter-spacing: -.02em; line-height: 1.1; }
+        span{ font-size: 13px; font-weight: 600; } }
+
+    /* Habitos */
+    &__habitos{ margin-top: 4px; }
+    &__habito{ display: flex; align-items: center; gap: 14px; width: 100%; padding: 13px 0; border: 0; border-bottom: 1px solid var(--n-linea);
+        background: none; color: var(--n-tinta); text-align: left; cursor: pointer; box-sizing: border-box; }
+    div.bie__habito{ cursor: default; }
+    &__habitoIc{ width: 44px; height: 44px; flex: 0 0 auto; border-radius: 50%; background: var(--n-menta-suave); display: flex; align-items: center; justify-content: center;
+        svg{ width: 20px; height: 20px; } }
+    &__habitoTxt{ flex: 1; min-width: 0; b{ display: block; font-size: 15px; font-weight: 700; } small{ display: block; font-size: 12.500px; color: $gris; } }
+    &__marca{ width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; border: 2px solid #A9B0A6; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+        transition: background .18s ease, border-color .18s ease;
+        span{ display: flex; } svg{ width: 14px; height: 14px; }
+        &.is-on{ background: var(--n-menta); border-color: var(--n-menta); } }
+
+    /* Lecturas */
+    &__chips{ margin: 12px -22px 0; padding: 0 22px 2px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+        &::-webkit-scrollbar{ display: none; }
+        button{ flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; cursor: pointer; font-size: 13.500px; font-weight: 600; white-space: nowrap;
+            background: transparent; color: var(--n-tinta); border: 2px solid rgba(22,33,27,.18);
+            &.is-on{ background: var(--n-tinta); color: #fff; border-color: var(--n-tinta); } } }
+    &__espera{ display: block; margin-top: 16px; width: 272px; height: 372px; border-radius: 32px; background: rgba(22,33,27,.07); animation: bieLate 1.4s ease-in-out infinite; }
+    /* La fila de lecturas: se desliza de lado y deja asomar la siguiente. */
+    &__carril{ margin: 16px -22px 0; padding: 4px 22px 26px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+        scroll-padding-left: 22px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        &::-webkit-scrollbar{ display: none; } }
+    &__lectura{ position: relative; flex: 0 0 272px; height: 372px; padding: 0; border: 0; border-radius: 32px; overflow: hidden; cursor: pointer;
+        background: var(--n-tinta); color: #fff; text-align: left; scroll-snap-align: start;
+        box-shadow: 0 18px 34px rgba(22,33,27,.2);
+        img, .bie__sinFoto{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .bie__sinFoto{ display: flex; align-items: center; justify-content: center; background: linear-gradient(160deg, #2E5A45, #16211B); color: var(--n-menta); } }
+    &__lecturaVelo{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(22,33,27,.28) 0%, rgba(22,33,27,0) 28%, rgba(22,33,27,.2) 48%, rgba(22,33,27,.92) 100%); }
+    &__lecturaArriba{ position: absolute; left: 16px; right: 16px; top: 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    &__sello{ display: inline-block; max-width: 170px; transform: rotate(-4deg); transform-origin: left center;
+        font-size: 12px; font-weight: 800; letter-spacing: .03em; line-height: 1.1; text-transform: uppercase;
+        background: var(--n-menta); color: var(--n-tinta); padding: 6px 9px 5px; border-radius: 7px; }
+    &__tiempo{ flex: 0 0 auto; height: 30px; padding: 0 11px; border-radius: 15px; display: flex; align-items: center;
+        font-size: 12.500px; font-weight: 700; color: #fff; background: rgba(22,33,27,.45); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+    &__lecturaBajo{ position: absolute; left: 18px; right: 18px; bottom: 18px;
+        b{ display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+            font-family: var(--n-titular); font-weight: 800; font-size: 25px; line-height: 1.05; letter-spacing: -.03em; } }
+    &__lecturaPie{ margin-top: 14px; display: flex; align-items: center; justify-content: space-between;
+        small{ font-size: 13px; font-weight: 600; color: rgba(255,255,255,.82); }
+        i{ width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--n-tinta); display: flex; align-items: center; justify-content: center;
+            svg{ width: 17px; height: 17px; } } }
+    &__sinFoto{ display: flex; }
+
+    &__allpa{ margin-top: 26px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-radius: 24px; background: var(--n-menta-suave);
+        b{ display: block; margin-top: 2px; font-size: 16px; font-weight: 700; } svg{ width: 18px; height: 18px; flex: 0 0 auto; } }
+}
+@keyframes bieLate{ 0%,100%{ opacity: 1; } 50%{ opacity: .5; } }
+
+/* --- La lectura, a pantalla completa --- */
+.lec{
+    position: fixed; inset: 0; z-index: 200; background: var(--n-fondo); color: var(--n-tinta);
+    font-family: var(--n-texto); -webkit-font-smoothing: antialiased; will-change: transform;
+    &__hilo{ position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: calc(var(--n-abajo) + 40px); }
+    &__foto{ position: relative; height: 420px; background: var(--n-tinta); color: #fff;
+        img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; } }
+    &__velo{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(22,33,27,.25) 0%, rgba(22,33,27,0) 30%, rgba(22,33,27,.9) 100%); }
+    &__titulo{ position: absolute; left: 22px; right: 22px; bottom: 26px;
+        small{ display: block; font-size: 11.500px; font-weight: 600; letter-spacing: .08em; color: var(--n-menta); }
+        h1{ margin: 8px 0 0; font-family: var(--n-titular); font-weight: 800; font-size: 34px; line-height: 1.02; letter-spacing: -.035em; color: #fff; }
+        em{ display: block; margin-top: 10px; font-style: normal; font-size: 13px; color: rgba(255,255,255,.75); } }
+    &__cerrar{ position: absolute; right: 18px; top: calc(var(--n-arriba) + 14px); width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+        background: rgba(22,33,27,.55); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: #fff;
+        display: flex; align-items: center; justify-content: center; svg{ width: 18px; height: 18px; } }
+    &__texto{
+        padding: 26px 22px 0; font-size: 17px; line-height: 1.6; overflow-wrap: anywhere;
+        p{ margin: 0 0 16px; font-size: inherit; line-height: inherit; color: inherit; }
+        h2, h3, h4{ margin: 28px 0 10px; font-family: var(--n-texto); font-weight: 800; font-size: 22px; line-height: 1.15; letter-spacing: -.02em; }
+        h4{ font-size: 18px; }
+        ul, ol{ margin: 0 0 18px; padding: 0; list-style: none; counter-reset: paso; }
+        li{ position: relative; padding: 10px 0 10px 40px; border-bottom: 1px solid var(--n-linea); }
+        ul li::before{ content: ''; position: absolute; left: 10px; top: 21px; width: 8px; height: 8px; border-radius: 50%; background: var(--n-menta); box-shadow: 0 0 0 4px var(--n-menta-suave); }
+        ol li{ counter-increment: paso; }
+        ol li::before{ content: counter(paso); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: var(--n-tinta); color: #fff;
+            font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        img{ display: block; max-width: 100%; height: auto; border-radius: 22px; margin: 6px 0 18px; }
+        figure{ margin: 0; } figcaption{ font-size: 13px; color: #55655C; margin: -8px 0 18px; }
+        blockquote{ margin: 0 0 18px; padding: 16px 18px; border-radius: 22px; background: var(--n-menta-suave); p:last-child{ margin: 0; } }
+        a{ color: var(--n-tinta); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+        strong, b{ font-weight: 700; }
+    }
+}
+
+/* El habito que se cuenta (los vasos de agua): el circulo se llena como un
+   vaso y un anillo avanza alrededor del numero. */
+.bie .bie__habitoIc{ position: relative; overflow: hidden; > span{ position: relative; display: flex; } }
+.bie__lleno{ position: absolute; left: 0; right: 0; bottom: 0; display: block; background: var(--n-menta); }
+.bie .bie__marca{ position: relative; }
+.bie .bie__marca--anillo{ border-color: transparent;
+    svg{ position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); }
+    .bie__anilloFondo{ fill: none; stroke: #D9DDD5; stroke-width: 2.500; }
+    .bie__anilloOn{ fill: none; stroke: var(--n-tinta); stroke-width: 2.500; stroke-linecap: round; } }
+.bie__cuenta{ position: relative; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }

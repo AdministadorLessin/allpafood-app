@@ -5,6 +5,7 @@ import 'moment/locale/es';
 import Skeleton from '@mui/material/Skeleton';
 
 import './InicioNativo.scss';
+import Isotipo from '../../ultil/Isotipo';
 import PedidoDeHoy, { REPARTO } from '../PedidoDeHoy/PedidoDeHoy';
 import StatusBanner from '../StatusBanner/StatusBanner';
 import ActivarAvisos from '../ActivarAvisos/ActivarAvisos';
@@ -294,6 +295,10 @@ export default function InicioNativo({ perfil, plan, ordenes, aviso, metricas, o
             ? <h1>Hola, <em>{nombre}</em></h1>
             : <Skeleton variant="text" width={150} height={36} />}
         </div>
+        {/* Rodrigo, el asistente: siempre a un toque desde el Inicio. */}
+        <Link to="/rodrigo" className="inN__campana inN__rodrigo" aria-label="Hablar con Rodrigo" onClick={() => vibrar.toque()}>
+          <Isotipo size={20} hojas="#3CFB9F" sonrisa="#fff" />
+        </Link>
         <button type="button" className="inN__campana" aria-label="Avisos" onClick={() => abrir()}>
           <Ico d={CAMPANA} />
           {sinLeer > 0 && <i />}

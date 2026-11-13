@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Skeleton from '@mui/material/Skeleton';
+import { motion, useReducedMotion } from 'motion/react';
 
 import LayoutDasboard from '../../../components/LayoutDashborad/LayoutDashboard';
 import { useAuthContext } from '../../../context/authContext';
 import { API_URL } from '../../../config';
 import { vibrar } from '../../../nativo';
+import { cascada, sube, resorte } from '../../../movimiento';
 import './Invita.scss';
 
 /**
@@ -30,6 +31,7 @@ const I = {
   atras: 'M15 6l-6 6 6 6',
   chat: 'M21 12a8 8 0 0 1-12 7l-5 1 1-4.5A8 8 0 1 1 21 12z',
   check: 'M5 12l5 5 9-10',
+  copiar: ['M10 8h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z', 'M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'],
 };
 const entregas = (n) => (Number(n) === 1 ? '1 entrega' : `${n} entregas`);
 const amigos = (n) => (Number(n) === 1 ? '1 amigo' : `${n} amigos`);
@@ -42,10 +44,16 @@ export default function InvitaPage() {
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  const quieto = useReducedMotion();
 
   useEffect(() => {
     axios.get(`${API_URL}referidos`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => setDatos(r.data?.data ?? null))
+      .then((r) => {
+        /* Sin codigo no hay nada que pintar: mejor el aviso de error que una
+           pantalla llena de "undefined". */
+        const d = r.data?.data;
+        if (d && d.codigo) setDatos(d); else setError(true);
+      })
       .catch(() => setError(true));
   }, [token]);
 
@@ -69,89 +77,104 @@ export default function InvitaPage() {
     if (navigator.clipboard?.writeText) navigator.clipboard.writeText(datos.codigo).then(listo).catch(() => {});
   };
 
-  const pct = datos ? Math.min(Math.round((datos.amigos / 10) * 100), 100) : 0;
+  /* El primer escalon que todavia no alcanza: ahi va "Te falta N". */
+  const siguiente = (datos?.escalera || []).find((e) => !e.logrado);
+  const toque = quieto ? {} : { whileTap: { scale: 0.97 }, transition: resorte.toque };
 
   return (
-    <LayoutDasboard claseStyle={false}>
-      <div className="invN">
-        <button type="button" className="invN__volver" aria-label="Volver" onClick={() => navigate(-1)}>
-          <Ico d={I.atras} w={2.4} />
-        </button>
+    <LayoutDasboard claseStyle="nCaja">
+      <motion.div className="nPant invN" variants={cascada(quieto ? 0 : 0.06)} initial="oculto" animate="visible">
+        <span className="nMenta invN__menta" aria-hidden="true" />
 
-        <h1 className="invN__h">Invita y <em>come gratis</em></h1>
-        <p className="invN__bajada">
+        <motion.button type="button" className="invN__volver" aria-label="Volver" variants={sube}
+          whileTap={quieto ? undefined : { scale: 0.9 }} onClick={() => navigate(-1)}>
+          <Ico d={I.atras} w={2.4} />
+        </motion.button>
+        <motion.h1 className="invN__h" variants={sube}>Invita y<br />come gratis</motion.h1>
+        <motion.p className="invN__bajada" variants={sube}>
           {datos
             ? `Tu amigo gana ${entregas(datos.regaloAmigo)} en su primer plan. Tú ganas ${entregas(datos.premioPorAmigo)} cada vez que uno compra.`
             : 'Comparte tu código. Cuando un amigo compra su primer plan, los dos ganan entregas.'}
-        </p>
+        </motion.p>
 
         {error &&
-          <p className="invN__error">No pudimos traer tu código. Vuelve a intentarlo en un momento.</p>}
+          <motion.p className="invN__error" variants={sube} role="alert">
+            <b>No pudimos traer tu código.</b> Vuelve a intentarlo en un momento.
+          </motion.p>}
 
-        {!datos && !error && <Skeleton variant="rounded" height={250} sx={{ borderRadius: '28px', mt: 2.5 }} />}
+        {!datos && !error &&
+          <motion.div className="invN__espera" variants={sube} aria-label="Trayendo tu código" role="status">
+            <i /><i /><i />
+          </motion.div>}
 
         {datos && <>
-          <section className="invN__codigo">
+          <motion.section className="invN__codigo" variants={sube}>
             <span className="invN__et">TU CÓDIGO</span>
             <div className="invN__caja">
-              <b>{datos.codigo}</b>
-              <button type="button" onClick={copiar}>{copiado ? 'Copiado' : 'Copiar'}</button>
+              {/* El codigo va siempre en una linea: mientras mas largo, mas chico
+                  (puede tener hasta 11 letras, "CRISTINA947"). */}
+              <b style={{ fontSize: datos.codigo.length > 9 ? 19 : datos.codigo.length > 7 ? 23 : 30,
+                          letterSpacing: datos.codigo.length > 7 ? '.04em' : undefined, whiteSpace: 'nowrap' }}>{datos.codigo}</b>
+              <motion.button type="button" onClick={copiar} {...toque}>
+                <Ico d={copiado ? I.check : I.copiar} w={copiado ? 2.6 : 2} />{copiado ? 'Copiado' : 'Copiar'}
+              </motion.button>
             </div>
-            <button type="button" className="invN__compartir" onClick={compartir}>
-              <Ico d={I.chat} w={2.2} />Compartir con un amigo
-            </button>
+            <motion.button type="button" className="invN__compartir" onClick={compartir} {...toque}>
+              <Ico d={I.chat} />Compartir con un amigo
+            </motion.button>
             <div className="invN__cifras">
               <div><b>{datos.amigos}</b><small>{Number(datos.amigos) === 1 ? 'amigo ya compró' : 'amigos ya compraron'}</small></div>
               <div><b>{datos.ganadas}</b><small>{Number(datos.ganadas) === 1 ? 'entrega ganada' : 'entregas ganadas'}</small></div>
             </div>
-          </section>
+          </motion.section>
 
           {datos.porCobrar > 0 &&
-            <p className="invN__aviso">
-              Tienes <b>{entregas(datos.porCobrar)}</b> esperándote. Se suman solas cuando compres tu próximo plan.
-            </p>}
+            <motion.p className="invN__aviso" variants={sube}>
+              <em>REGALO</em>
+              <span>Tienes <b>{entregas(datos.porCobrar)}</b> esperándote. Se suman solas cuando compres tu próximo plan.</span>
+            </motion.p>}
 
-          <section className="invN__card">
-            <div className="invN__cardCab">
-              <h2>Tu escalera</h2>
-              <span><b>{datos.amigos}</b> de 10 amigos</span>
-            </div>
-            {datos.faltan
-              ? <p className="invN__ayuda">Te {Number(datos.faltan) === 1 ? 'falta' : 'faltan'} <b>{amigos(datos.faltan)}</b> para ganar {premio(datos.premioSiguiente)}.</p>
-              : <p className="invN__ayuda">Llegaste arriba. Cada amigo más te sigue dando {entregas(datos.premioPorAmigo)}.</p>}
-            <div className="invN__barra" aria-hidden="true"><i style={{ width: `${pct}%` }} /></div>
-            <ol className="invN__pasos">
-              {(datos.escalera || []).map((e) => (
-                <li key={e.amigos} className={e.logrado ? 'is-ok' : ''}>
-                  <span className="invN__num">{e.logrado ? <Ico d={I.check} w={3} /> : e.amigos}</span>
-                  <span className="invN__pasoTxt"><b>{amigos(e.amigos)}</b><small>{premio(e.entregas)}</small></span>
-                  {e.logrado && <span className="invN__chip">Ganado</span>}
-                </li>
-              ))}
-            </ol>
-          </section>
+          <motion.div className="invN__sec" variants={sube}>
+            <h2>Tu escalera</h2>
+            <span>{datos.amigos} de 10 amigos</span>
+          </motion.div>
+          {!datos.faltan &&
+            <motion.p className="invN__ayuda" variants={sube}>
+              Llegaste arriba. Cada amigo más te sigue dando {entregas(datos.premioPorAmigo)}.
+            </motion.p>}
+          <motion.ol className="invN__lista" variants={sube}>
+            {(datos.escalera || []).map((e) => (
+              <li key={e.amigos} className={e.logrado ? 'is-ok' : ''}>
+                <span className="invN__num">{e.logrado ? <Ico d={I.check} w={3} /> : e.amigos}</span>
+                <span className="invN__txt"><b>{amigos(e.amigos)}</b><small>{premio(e.entregas)}</small></span>
+                {e.logrado && <span className="invN__chip">Ganado</span>}
+                {!e.logrado && e === siguiente && datos.faltan > 0 &&
+                  <span className="invN__chip invN__chip--tinta">Te {Number(datos.faltan) === 1 ? 'falta' : 'faltan'} {datos.faltan}</span>}
+              </li>
+            ))}
+          </motion.ol>
 
           {(datos.lista || []).length > 0 && <>
-            <p className="invN__grupo">TUS INVITADOS</p>
-            <section className="invN__lista">
+            <motion.div className="invN__sec" variants={sube}><h2>Tus invitados</h2></motion.div>
+            <motion.div className="invN__lista" variants={sube}>
               {datos.lista.map((a, i) => (
                 <div key={i} className="invN__amigo">
                   {a.avatar !== null && a.avatar !== undefined && a.avatar !== ''
                     ? <img src={`/assets/img/avatars/avatar_${a.avatar}.jpg`} alt="" />
                     : <span className="invN__inicial">{String(a.nombre || '?').charAt(0).toUpperCase()}</span>}
-                  <span className="invN__pasoTxt"><b>{a.nombre}</b><small>Compró su plan</small></span>
-                  <span className="invN__chip">+{entregas(a.entregas)}</span>
+                  <span className="invN__txt"><b>{a.nombre}</b><small>Compró su plan</small></span>
+                  <b className="invN__mas">+{entregas(a.entregas)}</b>
                 </div>
               ))}
-            </section>
+            </motion.div>
           </>}
 
-          <p className="invN__reglas">
+          <motion.p className="invN__reglas" variants={sube}>
             Ganas cuando tu amigo paga su primer plan. Vale para amigos que nunca fueron clientes.
             Si no tienes un plan vigente, tus entregas te esperan en tu próxima compra.
-          </p>
+          </motion.p>
         </>}
-      </div>
+      </motion.div>
     </LayoutDasboard>
   );
 }

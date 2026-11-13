@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import Dialog from '@mui/material/Dialog';
+import Hoja from '../Hoja/Hoja';
 
 import { useAuthContext } from '../../../context/authContext';
 import { API_URL } from '../../../config';
@@ -25,7 +25,7 @@ const fechaCorta = (iso) => {
   return new Date(a, m - 1, d).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' });
 };
 
-const EliminarCuenta = () => {
+const EliminarCuenta = ({ enlace }) => {
   const { token } = useAuthContext();
   const [abierto, setAbierto] = useState(false);
   const [estado, setEstado] = useState('pregunta');   // pregunta | enviando | hecho | error
@@ -52,17 +52,26 @@ const EliminarCuenta = () => {
       .catch(() => setEstado('error'));
   };
 
+  const hecho = estado === 'hecho';
+
   return (
     <>
-      <button type="button" className="afEliminarCuenta" onClick={abrir}>
+      <button type="button" className={enlace ? 'afEliminarCuenta afEliminarCuenta--enlace' : 'afEliminarCuenta'} onClick={abrir}>
         Eliminar mi cuenta
       </button>
 
-      <Dialog open={abierto} onClose={() => setAbierto(false)}>
-        <div className="afEliminarCuentaDlg">
-          {estado === 'hecho' ? (
+      <Hoja abierta={abierto} alCerrar={() => setAbierto(false)}
+        etiqueta="Tu cuenta"
+        titulo={hecho ? 'Recibimos tu pedido' : '¿Eliminar tu cuenta?'}
+        textoCerrar={hecho ? false : 'Quedarme'}
+        pie={hecho
+          ? <button type="button" className="hoja__btn" onClick={() => setAbierto(false)}>Entendido</button>
+          : <button type="button" className="hoja__btn hoja__btn--peligro" onClick={pedir} disabled={estado === 'enviando'}>
+              {estado === 'enviando' ? 'Enviando…' : 'Eliminar mi cuenta'}
+            </button>}>
+        <div className="afEliminarCuentaTxt">
+          {hecho ? (
             <>
-              <h3>Recibimos tu pedido</h3>
               <p>
                 {pedidoEl ? `Lo pediste el ${fechaCorta(pedidoEl)}. ` : ''}
                 Atención va a eliminar tu cuenta y tus datos personales, y te
@@ -72,13 +81,9 @@ const EliminarCuenta = () => {
                 Si tienes un plan vigente, antes vemos contigo qué pasa con tus
                 almuerzos pendientes.
               </p>
-              <div className="afEliminarCuentaDlg__acciones">
-                <button type="button" className="afBtn" onClick={() => setAbierto(false)}>Entendido</button>
-              </div>
             </>
           ) : (
             <>
-              <h3>¿Eliminar tu cuenta?</h3>
               <p>
                 Borramos tu cuenta y tus datos personales: nombre, celular, direcciones
                 y perfil. Guardamos solo lo que la ley nos pide conservar, como los
@@ -89,23 +94,16 @@ const EliminarCuenta = () => {
                 pendientes antes de eliminarla.
               </p>
               {estado === 'error' &&
-                <p className="afEliminarCuentaDlg__error">
+                <p className="afEliminarCuentaTxt__error" role="alert">
                   No pudimos enviar tu pedido. Inténtalo de nuevo o{' '}
                   <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(MENSAJE)}`}
                      target="_blank" rel="noreferrer">escríbenos por WhatsApp</a>.
                 </p>
               }
-              <div className="afEliminarCuentaDlg__acciones">
-                <button type="button" className="afBtn afBtn--fantasma"
-                  onClick={() => setAbierto(false)}>Quedarme</button>
-                <button type="button" className="afBtn" onClick={pedir} disabled={estado === 'enviando'}>
-                  {estado === 'enviando' ? 'Enviando…' : 'Eliminar mi cuenta'}
-                </button>
-              </div>
             </>
           )}
         </div>
-      </Dialog>
+      </Hoja>
     </>
   );
 };
