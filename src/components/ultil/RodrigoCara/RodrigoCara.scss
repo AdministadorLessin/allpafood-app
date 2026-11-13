@@ -1,0 +1,9 @@
+.rCara{
+    display: inline-flex; flex: 0 0 auto; border-radius: 33.4%;
+    box-shadow: 0 6px 16px rgba(22,33,27,.16), 0 1px 3px rgba(22,33,27,.1);
+    svg{ display: block; }
+    /* Trabajando en un caso: late despacio. */
+    &--pensando{ animation: rCaraLate 1.2s ease-in-out infinite; }
+}
+@keyframes rCaraLate{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(.9); } }
+@media (prefers-reduced-motion: reduce){ .rCara--pensando{ animation: none; } }
