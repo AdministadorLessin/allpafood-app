@@ -19,6 +19,7 @@ import { leerLeidos } from './avisos';
 import { useCentro } from './CentroContext';
 import { useAuthContext } from '../../context/authContext';
 import { vibrar } from '../../nativo';
+import RodrigoCara from '../ultil/RodrigoCara/RodrigoCara';
 import { cascada, sube, resorte } from '../../movimiento';
 
 export const TERMINOS = 'https://allpafood.com/terminos';
@@ -89,7 +90,7 @@ export default function Centro() {
 
   const navigate = useNavigate();
   const quieto = useReducedMotion();
-  const { planInfo } = useAuthContext();
+  const { planInfo, token } = useAuthContext();
   const { avisos, abierto, cerrar, pestana, setPestana } = useCentro();
   const [tema, setTema] = useState(null);
 
@@ -227,22 +228,44 @@ export default function Centro() {
             ))}
           </div>
 
-          {/* La salida a una persona va al final, nunca de entrada: si
-              sale primero, todos la tocan y el reclamo solo se muda de
-              numero. */}
-          <motion.a
-            className="afCentro__persona" variants={fila}
-            whileTap={quieto ? undefined : { scale: 0.98 }}
-            href={enlaceWhatsapp('')} target="_blank" rel="noreferrer"
-            onClick={cerrar}
-          >
-            <span className="afCentro__ico"><Ico nombre="chat" /></span>
-            <span className="afCentro__filaTxt">
-              <b>Hablar con una persona</b>
-              <small>Atención al cliente por WhatsApp</small>
-            </span>
-            <span className="afCentro__chev"><Ico nombre="ir" w={2.4} /></span>
-          </motion.a>
+          {/* Primero Rodrigo: resuelve en el momento lo que una persona
+              tardaria en contestar (dónde está el pedido, cambiar el plato,
+              una devolución) y, si hace falta, pasa el caso a una persona
+              con el resumen. WhatsApp queda como salida chica, al final. */}
+          {token ? (
+            <motion.button
+              type="button" className="afCentro__persona" variants={fila}
+              whileTap={quieto ? undefined : { scale: 0.98 }}
+              onClick={() => ir('/rodrigo')}
+            >
+              <span className="afCentro__rodrigo"><RodrigoCara size={46} /></span>
+              <span className="afCentro__filaTxt">
+                <b>Pregúntale a Rodrigo</b>
+                <small>Resuelve tu pedido al toque. Si hace falta, te pasa con una persona.</small>
+              </span>
+              <span className="afCentro__chev"><Ico nombre="ir" w={2.4} /></span>
+            </motion.button>
+          ) : (
+            <motion.a
+              className="afCentro__persona" variants={fila}
+              whileTap={quieto ? undefined : { scale: 0.98 }}
+              href={enlaceWhatsapp('')} target="_blank" rel="noreferrer"
+              onClick={cerrar}
+            >
+              <span className="afCentro__ico"><Ico nombre="chat" /></span>
+              <span className="afCentro__filaTxt">
+                <b>Hablar con una persona</b>
+                <small>Atención al cliente por WhatsApp</small>
+              </span>
+              <span className="afCentro__chev"><Ico nombre="ir" w={2.4} /></span>
+            </motion.a>
+          )}
+          {token &&
+            <motion.p className="afCentro__otra" variants={fila}>
+              <a href={enlaceWhatsapp('')} target="_blank" rel="noreferrer" onClick={cerrar}>
+                Prefiero escribir por WhatsApp
+              </a>
+            </motion.p>}
         </motion.div>
       }
 
@@ -260,13 +283,25 @@ export default function Centro() {
 
           <motion.div className="afCentro__cola" variants={fila}>
             <p>¿No encuentras lo tuyo?</p>
-            <a
-              className="nHoja__btn"
-              href={enlaceWhatsapp(actual.titulo.toLowerCase())}
-              target="_blank" rel="noreferrer" onClick={cerrar}
-            >
-              <Ico nombre="chat" />Escribir a atención al cliente
-            </a>
+            {token ? (
+              <>
+                <button type="button" className="nHoja__btn" onClick={() => ir('/rodrigo')}>
+                  <RodrigoCara size={26} />Pregúntale a Rodrigo
+                </button>
+                <a className="afCentro__otraLink" href={enlaceWhatsapp(actual.titulo.toLowerCase())}
+                  target="_blank" rel="noreferrer" onClick={cerrar}>
+                  O escribe a atención al cliente
+                </a>
+              </>
+            ) : (
+              <a
+                className="nHoja__btn"
+                href={enlaceWhatsapp(actual.titulo.toLowerCase())}
+                target="_blank" rel="noreferrer" onClick={cerrar}
+              >
+                <Ico nombre="chat" />Escribir a atención al cliente
+              </a>
+            )}
           </motion.div>
         </motion.div>
       }

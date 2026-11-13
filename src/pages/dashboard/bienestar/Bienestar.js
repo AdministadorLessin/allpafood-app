@@ -25,8 +25,10 @@ import './Bienestar.scss';
  * - Las lecturas y recetas del equipo. Hoy salen del blog; cuando se
  *   administren desde el panel solo cambia de donde se leen (LECTURAS).
  */
-const LECTURAS = 'https://admin-landing.allpafood.com/wp-json/wp/v2/posts?per_page=20&_embed=wp:featuredmedia';
-const CATEGORIAS = 'https://admin-landing.allpafood.com/wp-json/wp/v2/categories?per_page=50';
+/* Van por nuestro servidor y no directo al blog: desde el iPhone el blog
+   rechaza el origen capacitor:// y la seccion no aparecia. */
+const LECTURAS = `${API_URL}public/lecturas/posts`;
+const CATEGORIAS = `${API_URL}public/lecturas/categorias`;
 
 const Ico = ({ d, w = 2 }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w}
@@ -101,8 +103,10 @@ export default function BienestarPage() {
   useEffect(() => {
     axios.get(`${API_URL}dashboard/orders`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => setOrdenes(r.data?.data || [])).catch(() => setOrdenes([]));
-    axios.get(LECTURAS).then((r) => setLecturas(Array.isArray(r.data) ? r.data : [])).catch(() => setLecturas([]));
-    axios.get(CATEGORIAS).then((r) => setCategorias(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    /* El servidor envuelve la respuesta en {code, message, data}. */
+    const lista = (r) => (Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : []);
+    axios.get(LECTURAS).then((r) => setLecturas(lista(r))).catch(() => setLecturas([]));
+    axios.get(CATEGORIAS).then((r) => setCategorias(lista(r))).catch(() => {});
   }, [token]);
 
   const guardar = (cambio) => setHabitos((h) => {

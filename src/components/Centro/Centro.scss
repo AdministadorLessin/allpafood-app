@@ -130,6 +130,12 @@ $hundido: #E9EBE3;
         .afCentro__ico{ background: var(--n-menta); color: var(--n-tinta); }
         small{ color: rgba(255,255,255,.78); }
     }
+    button.afCentro__persona{ width: 100%; border: 0; cursor: pointer; text-align: left; font: inherit; }
+    &__rodrigo{ flex: 0 0 auto; display: flex; }
+    &__otra{
+        margin: 6px 0 0; text-align: center;
+        a{ display: inline-block; padding: 12px; font-size: 13.5px; font-weight: 600; color: $gris; text-decoration: underline; }
+    }
 
     /* --- Dentro de un tema --- */
     &__cabTema{
@@ -173,7 +179,8 @@ $hundido: #E9EBE3;
     &__cola{
         margin-top: 22px;
         p{ margin: 0 0 10px; font-size: 13.5px; font-weight: 600; text-align: center; color: $gris; }
-        .nHoja__btn{ color: #fff; font-size: 15px; }
+        .nHoja__btn{ color: #fff; font-size: 15px; border: 0; cursor: pointer; width: 100%; gap: 10px; }
+        .afCentro__otraLink{ display: block; text-align: center; padding: 14px 8px 4px; font-size: 13.5px; font-weight: 600; color: $gris; text-decoration: underline; }
     }
 
     /* --- El pie de la hoja --- */
